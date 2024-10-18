@@ -1,1 +1,48 @@
+name: React CI Pipeline
+
+# Run this workflow on pushes and pull requests to the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Define the jobs for the workflow
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps for the job
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js (specify the version)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+
+      # Step 3: Cache node_modules to speed up subsequent builds
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Step 4: Install dependencies (use npm or yarn depending on your project)
+      - name: Install dependencies
+        run: npm install
+
+      # Step 5: Run tests
+      - name: Run tests
+        run: npm test
+
+      # Step 6: Build the application
+      - name: Build the application
+        run: npm run build
+
 
