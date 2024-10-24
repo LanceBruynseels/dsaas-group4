@@ -1,32 +1,34 @@
-name: Node.js CI
+name: Node.js CI with Cypress Tests
 
 on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   build:
-    runs-on: windows-latest  # Change to Windows environment
+    runs-on: windows-latest
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]  # Run against multiple Node.js versions
+        node-version: [14.x, 16.x, 18.x]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Run tests
-      run: npm test
+      - name: Run Cypress tests
+        run: npx cypress run --browser chrome --spec "./cypress/e2e/spec.cy.ts"
