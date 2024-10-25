@@ -41,3 +41,4 @@ export default function Login({ searchParams }: { searchParams: Message }) {
     </form>
   );
 }
+
