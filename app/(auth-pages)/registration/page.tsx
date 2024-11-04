@@ -2,13 +2,11 @@ import React from 'react';
 
 const Registration: React.FC = () => {
     return (
-        <div className="min-h-screen bg-pink-100 flex justify-center items-center">
-            {/* Main Wrapper */}
-            <div className="flex w-full max-w-7xl p-8 justify-between items-start">
+        <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: '#FFDFDB' }}>
+            <div className="flex w-full max-w-7xl justify-around items-center px-10">
                 {/* Logo Section */}
-                <div className="flex flex-col items-center space-y-4">
-                    <img src="/logo.jpg" alt="VLinder Logo" className="h-40" /> {/* Larger logo */}
-                    <h1 className="text-5xl font-bold">VLINDER</h1>
+                <div className="flex flex-col items-center space-y-6">
+                    <img src="/logo.jpg" alt="VLinder Logo" className="h-60" /> {/* Enlarged logo */}
                 </div>
 
                 {/* Form Section */}
