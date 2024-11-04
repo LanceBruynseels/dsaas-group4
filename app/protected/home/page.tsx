@@ -15,24 +15,27 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          This is a protected page that you can only see as an authenticated
-          user
+    <div className="flex flex-row w-full">
+        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg mt-6">01</div>
+        <div className="flex flex-col ">
+            <div className="basis-1/2 p-4 bg-white flex flex-row items-lef">
+                {/* Profile Image */}
+                <div className="w-full h-auto overflow-hidden rounded-lg mb-4">
+
+                </div>
+                {/* Profile Text Content */}
+                <div
+                    className="relative w-3/4 p-8 rounded-lg bg-gradient-to-b from-red-700 to-pink-950 text-white shadow-lg">
+                    <div className="text-pretty">
+                        <h2 className="text-2xl font-bold">Jara, 25 jaar</h2>
+                        <p className="mt-2">Meer informatie over Jara. Hobbies, interesses, relatie status, wat ze hoopt te
+                            vinden op de applicatie, hoe ze zichzelf voelt op dit moment</p>
+                        <div className="mt-4 text-3xl">😍</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(user, null, 2)}
-        </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
-      </div>
+        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg pt-6">03</div>
     </div>
   );
 }
