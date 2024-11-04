@@ -9,6 +9,7 @@ const initialState = {
 };
 
 const Registration: React.FC = () => {
+    // @ts-ignore
     const [state, formAction] = useFormState(registerAction, initialState);
 
     return (
