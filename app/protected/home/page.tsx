@@ -16,12 +16,11 @@ export default async function ProtectedPage() {
 
   return (
     <div className="flex flex-row w-full">
-        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg mt-6">01</div>
+        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">01</div>
         <div className="flex flex-col ">
-            <div className="basis-1/2 p-4 bg-white flex flex-row items-lef">
+            <div className="basis-1/2 p-4 flex flex-row items-left rounded-lg mt-4 mb-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 {/* Profile Image */}
                 <div className="w-full h-auto overflow-hidden rounded-lg mb-4">
-
                 </div>
                 {/* Profile Text Content */}
                 <div
@@ -35,7 +34,7 @@ export default async function ProtectedPage() {
                 </div>
             </div>
         </div>
-        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg pt-6">03</div>
+        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">03</div>
     </div>
   );
 }
