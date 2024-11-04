@@ -2,6 +2,7 @@ import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -16,11 +17,59 @@ export default async function ProtectedPage() {
 
   return (
     <div className="flex flex-row w-full">
-        <div className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">01</div>
+
+        {/* Meldingen side page */}
+        <div className=" flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div className="flex flex-row justify-between">
+                <div className="text-2xl font-bold left">Meldingen</div>
+                <Image
+                    src="/bell.png"
+                    alt="Bell Icon"
+                    height={15}
+                    width={15}
+                    className="right"
+                />
+            </div>
+
+            {/* This should be changed to dynamic notifications (meldingen) */}
+            <div className="flex flex-col my-2">
+                {/* one single notification (melding) */}
+                <div className="flex flex-row my-2">
+                    <Image
+                        src="/mock-picture.webp"
+                        alt="Profile Picture"
+                        width={32}
+                        height={32}
+                        className="rounded-full border border-gray-500"
+                    />
+                    <div className="text-xs mx-2"> you got a message from ...</div>
+                </div>
+
+                {/* one single notification (melding) */}
+                <div className="flex flex-row my-2">
+                    <Image
+                        src="/mock-picture.webp"
+                        alt="Profile Picture"
+                        width={32}
+                        height={32}
+                        className="rounded-full border border-gray-500"
+                    />
+                    <div className="text-xs mx-2"> you got a message from ...</div>
+                </div>
+            </div>
+        </div>
+
         <div className="flex flex-col ">
             <div className="basis-1/2 p-4 flex flex-row items-left rounded-lg mt-4 mb-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 {/* Profile Image */}
                 <div className="w-full h-auto overflow-hidden rounded-lg mb-4">
+                    <Image
+                        src="/mock-picture.webp"
+                        alt="Profile Picture"
+                        width={32}
+                        height={32}
+                        className="rounded-full border border-gray-500"
+                    />
                 </div>
                 {/* Profile Text Content */}
                 <div
