@@ -40,11 +40,11 @@ const Registration: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: '#FFDFDB' }}>
+        <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
             <div className="flex w-full max-w-7xl justify-around items-center px-10">
                 {/* Logo Section */}
                 <div className="flex flex-col items-center space-y-6">
-                    <img src="/logo.jpg" alt="VLinder Logo" className="h-60" />
+                    <img src="/vlinder.png" alt="VLinder Logo" className="h-60" />
                 </div>
 
                 {/* Form Section */}
