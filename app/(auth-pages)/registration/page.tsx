@@ -45,6 +45,7 @@ const Registration: React.FC = () => {
                 {/* Logo Section */}
                 <div className="flex flex-col items-center space-y-6">
                     <img src="/vlinder.png" alt="VLinder Logo" className="h-60" />
+                    <h1 className= "font-bold text-6xl">Vlinder</h1>
                 </div>
 
                 {/* Form Section */}
