@@ -13,7 +13,7 @@ export async function register(formData: FormData) {
         supervisor: formData.get("supervisor") as string,
     };
 
-    // to ensure the route is correct
+    // checking the url to ensure the route is correct
     const response = await fetch('/api/auth/registration', {
         method: 'POST',
         headers: {

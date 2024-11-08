@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-
+import bcrypt from 'bcryptjs';
 export async function POST(request: NextRequest) {
     try {
         const { username, password, facility, supervisor } = await request.json();
@@ -14,13 +14,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Insert into Supabase
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // store to Supabase
         const { data, error } = await supabase
             .from('users')
             .insert([
                 {
                     username,
-                    password,  // Note: In production, ensure password is hashed
+                    // password,  // hash it pls
+                    password: hashedPassword,
                     facility,
                     supervisor
                 }
@@ -31,7 +35,7 @@ export async function POST(request: NextRequest) {
         if (error) {
             console.error("Database error:", error);
             return NextResponse.json(
-                { error: "Registratie mislukt. Probeer het opnieuw." },
+                { error: "Registratie mislukt. Probeer het opnieuw." }, // Registration failed. Please try again
                 { status: 500 }
             );
         }
