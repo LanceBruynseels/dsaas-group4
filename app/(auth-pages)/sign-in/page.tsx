@@ -33,7 +33,6 @@ const SignInPage: React.FC = () => {
             }
 
             // Handle successful login, e.g., redirect or display a success message.
-            // For demonstration purposes, a success message can be set.
             alert("Login successful!");
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unexpected error occurred");
@@ -43,16 +42,16 @@ const SignInPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <div className="flex flex-grow items-center justify-center p-10">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <div className="flex flex-col lg:flex-row items-center justify-center lg:space-x-10 space-y-8 lg:space-y-0 w-full max-w-5xl">
                 {/* Left Side: Logo and Brand */}
-                <div className="flex flex-col items-center w-1/2 space-y-6">
+                <div className="flex flex-col items-center w-full lg:w-1/2 space-y-6 text-center lg:text-left">
                     <Image src="/vlinder.png" alt="Vlinder Logo" width={200} height={200} />
                     <h1 className="text-5xl font-bold text-gray-800">VLINDER</h1>
                 </div>
 
                 {/* Right Side: Login Form */}
-                <div className="w-1/3 p-8 text-white rounded-lg shadow-lg" style={{ backgroundColor: "#771D1D" }}>
+                <div className="w-full lg:w-1/3 p-8 text-white rounded-lg shadow-lg" style={{ backgroundColor: "#771D1D" }}>
                     <h2 className="text-2xl font-semibold mb-4">Log in</h2>
                     <p className="text-sm mb-6">
                         Hebt u nog geen account?{" "}
