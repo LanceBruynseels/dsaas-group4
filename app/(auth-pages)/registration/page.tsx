@@ -4,6 +4,9 @@ import { register } from '@/app/actions/auth/registration/registration';
 import { useRouter } from 'next/navigation'; // for redirect
 
 const Registration: React.FC = () => {
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const [status, setStatus] = useState<{
         type: 'error' | 'success' | null;
@@ -42,26 +45,27 @@ const Registration: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: '#FFDFDB' }}>
+        <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
             <div className="flex w-full max-w-7xl justify-around items-center px-10">
                 {/* Logo Section */}
                 <div className="flex flex-col items-center space-y-6">
-                    <img src="/logo.jpg" alt="VLinder Logo" className="h-60" />
+                    <img src="/vlinder.png" alt="VLinder Logo" className="h-60" />
+                    <h1 className= "font-bold text-6xl">Vlinder</h1>
                 </div>
 
                 {/* Form Section */}
-                <div className="bg-red-600 text-white p-10 rounded-lg shadow-2xl w-96">
+                <div className="bg-red-600 text-white p-10 rounded-lg shadow-2xl w-96" style={{ backgroundColor: "#771D1D" }}>
                     <h2 className="text-3xl font-bold mb-6">Registreer</h2>
 
-                    {status.message && (
-                        <div
-                            className={`p-3 rounded-md mb-4 ${
-                                status.type === 'success'
-                                    ? 'bg-green-600'
-                                    : 'bg-red-800'
-                            }`}
-                        >
-                            {status.message}
+                    {/* Status Messages */}
+                    {error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                            {error}
+                        </div>
+                    )}
+                    {success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                            {success}
                         </div>
                     )}
 
@@ -74,9 +78,7 @@ const Registration: React.FC = () => {
                                 type="text"
                                 id="username"
                                 name="username"
-                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black"
-                                required
-                            />
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black" required/>
                         </div>
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium">
@@ -102,8 +104,8 @@ const Registration: React.FC = () => {
                             >
                                 <option value="">Selecteer faciliteit</option>
                                 <option value="faciliteit Leuven">faciliteit Leuven</option>
-                                <option value="faciliteit Antwerpen">faciliteit Antwerpen</option>
-                                <option value="faciliteit Gent">faciliteit Gent</option>
+                                <option value="faciliteit Heverlee">faciliteit Heverlee</option>
+                                <option value="faciliteit Kessel-lo">faciliteit Kessel-lo</option>
                             </select>
                         </div>
                         <div>
@@ -119,14 +121,16 @@ const Registration: React.FC = () => {
                                 <option value="">Selecteer begeleider</option>
                                 <option value="Kris">Kris</option>
                                 <option value="Jan">Jan</option>
-                                <option value="Peter">Peter</option>
+                                <option value="Chris">Chris</option>
                             </select>
                         </div>
                         <button
                             type="submit"
-                            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold transition-colors duration-200"
+                            disabled={isLoading}
+                            style={{ backgroundColor: '#FCA5A5' }}
+                            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold disabled:opacity-50"
                         >
-                            Registreer
+                            {isLoading ? "Bezig met registreren..." : "Registreer"}
                         </button>
                     </form>
                 </div>
