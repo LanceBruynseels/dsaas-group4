@@ -4,6 +4,7 @@ interface LoginData {
     password: string;
 }
 
+// Function to handle login logic
 export async function login(formData: FormData) {
     const data: LoginData = {
         username: formData.get("username") as string,
@@ -23,5 +24,5 @@ export async function login(formData: FormData) {
         throw new Error(error.error || 'Login failed');
     }
 
-    return response.json();
+    return response.json(); // Return the response body (e.g., success message or user data)
 }

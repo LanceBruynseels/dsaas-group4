@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
+import { login } from 'app/actions/auth/sign-in/action';  // Import login from action.ts
 
 const SignInPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
@@ -15,25 +16,10 @@ const SignInPage: React.FC = () => {
         const formData = new FormData(event.target as HTMLFormElement);
 
         try {
-            const response = await fetch('/api/auth/sign-in', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: formData.get("username"),
-                    password: formData.get("password"),
-                }),
-            });
+            const result = await login(formData);
 
-            const result = await response.json();
+            window.location.href = '/protected/home';
 
-            if (!response.ok) {
-                throw new Error(result.error || "Login failed");
-            }
-
-            // Handle successful login, e.g., redirect or display a success message.
-            alert("Login successful!");
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unexpected error occurred");
         } finally {
