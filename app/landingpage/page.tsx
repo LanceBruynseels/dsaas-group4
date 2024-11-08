@@ -18,7 +18,7 @@ export default function Index() {
                 </a>
                 <a href="http://localhost:3000/sign-up" className="flex-1">
                     <button
-                        className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
+                        className="w-fullGI bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
                         REGISTRATIE
                     </button>
                 </a>
