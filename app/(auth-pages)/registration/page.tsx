@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from 'react';
 import { register } from '@/app/actions/auth/registration/registration';
+import { useRouter } from 'next/navigation'; // for redirect
 
 const Registration: React.FC = () => {
+    const router = useRouter();
     const [status, setStatus] = useState<{
         type: 'error' | 'success' | null;
         message: string | null;
@@ -13,10 +15,18 @@ const Registration: React.FC = () => {
             const result = await register(formData);
 
             if (result.success) {
+                // set status message from the API response
                 setStatus({
                     type: 'success',
-                    message: 'Registratie succesvol! Je account is aangemaakt.'
+                    message: result.redirect?.message || 'Registratie succesvol!'
                 });
+
+                // handle redirect if provided by the API
+                if (result.redirect?.destination) {
+                    setTimeout(() => {
+                        router.push(result.redirect!.destination);
+                    }, 1500);
+                }
             } else {
                 setStatus({
                     type: 'error',

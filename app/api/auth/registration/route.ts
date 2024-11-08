@@ -1,12 +1,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
+
 export async function POST(request: NextRequest) {
     try {
         const { username, password, facility, supervisor } = await request.json();
         const supabase = createClient();
 
-        // Validate all required fields
         if (!username || !password || !facility || !supervisor) {
             return NextResponse.json(
                 { error: "Alle velden zijn verplicht" },
@@ -17,13 +17,12 @@ export async function POST(request: NextRequest) {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // store to Supabase
+        // store data to Supabase
         const { data, error } = await supabase
             .from('users')
             .insert([
                 {
                     username,
-                    // password,  // hash it pls
                     password: hashedPassword,
                     facility,
                     supervisor
@@ -35,14 +34,19 @@ export async function POST(request: NextRequest) {
         if (error) {
             console.error("Database error:", error);
             return NextResponse.json(
-                { error: "Registratie mislukt. Probeer het opnieuw." }, // Registration failed. Please try again
+                { error: "Registratie mislukt. Probeer het opnieuw." },
                 { status: 500 }
             );
         }
 
+        // return success with redirect information
         return NextResponse.json({
             success: true,
-            data: data
+            data: data,
+            redirect: {
+                destination: '/sign-in',
+                // message: 'Registratie succesvol! Je wordt doorgestuurd naar de inlogpagina.'
+            }
         });
 
     } catch (error) {

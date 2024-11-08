@@ -4,6 +4,10 @@ interface RegistrationResponse {
     success: boolean;
     error?: string;
     data?: any;
+    redirect?: {
+        destination: string;
+        message: string;
+    };
 }
 
 export async function register(formData: FormData): Promise<RegistrationResponse> {
@@ -14,15 +18,14 @@ export async function register(formData: FormData): Promise<RegistrationResponse
         const facility = formData.get("facility") as string;
         const supervisor = formData.get("supervisor") as string;
 
-        // do we need this, seems like FE already handled this
         if (!username || !password || !facility || !supervisor) {
             return {
                 success: false,
-                error: 'Alle velden zijn verplicht11.'
+                error: 'Alle velden zijn verplicht.'
             };
         }
 
-        // call api
+        // invoke api
         const response = await fetch('http://localhost:3000/api/auth/registration', {
             method: 'POST',
             headers: {
@@ -38,7 +41,6 @@ export async function register(formData: FormData): Promise<RegistrationResponse
 
         const responseData = await response.json();
 
-        // return api response
         if (!response.ok) {
             return {
                 success: false,
@@ -46,10 +48,10 @@ export async function register(formData: FormData): Promise<RegistrationResponse
             };
         }
 
-        // return success response
         return {
             success: true,
-            data: responseData.data
+            data: responseData.data,
+            redirect: responseData.redirect
         };
 
     } catch (error) {
