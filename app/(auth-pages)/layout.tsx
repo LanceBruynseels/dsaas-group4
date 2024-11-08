@@ -1,11 +1,11 @@
-export default function RootLayout({
-                                     children,
-                                   }: {
-  children: React.ReactNode;
+// app/auth-pages/layout.tsx
+export default function Layout({
+                                   children,
+                               }: {
+    children: React.ReactNode;
 }) {
-  return (
-      <html lang="en">
-      <body>{children}</body>
-      </html>
-  );
+    return (
+        <div className="w-full flex flex-col gap-12 justify-center">{children}</div>
+    );
 }
+

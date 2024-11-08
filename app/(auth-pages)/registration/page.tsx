@@ -74,9 +74,8 @@ const Registration: React.FC = () => {
                                 type="text"
                                 id="username"
                                 name="username"
-                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black"
-                                required
-                            />
+
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black" required/>
                         </div>
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium">
@@ -102,12 +101,13 @@ const Registration: React.FC = () => {
                             >
                                 <option value="">Selecteer faciliteit</option>
                                 <option value="faciliteit Leuven">faciliteit Leuven</option>
-                                <option value="faciliteit Antwerpen">faciliteit Antwerpen</option>
-                                <option value="faciliteit Gent">faciliteit Gent</option>
+
+                                <option value="faciliteit Heverlee">faciliteit Heverlee</option>
+                                <option value="faciliteit Kessel-lo">faciliteit Kessel-lo</option>
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="supervisor" className="block text-sm font-medium">
+                        <label htmlFor="supervisor" className="block text-sm font-medium">
                                 Begeleider
                             </label>
                             <select
@@ -119,14 +119,19 @@ const Registration: React.FC = () => {
                                 <option value="">Selecteer begeleider</option>
                                 <option value="Kris">Kris</option>
                                 <option value="Jan">Jan</option>
-                                <option value="Peter">Peter</option>
+
+                                <option value="Chris">Chris</option>
                             </select>
                         </div>
                         <button
                             type="submit"
-                            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold transition-colors duration-200"
+
+                            disabled={isLoading}
+                            style={{ backgroundColor: '#FCA5A5' }}
+                            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold disabled:opacity-50"
                         >
-                            Registreer
+                            {isLoading ? "Bezig met registreren..." : "Registreer"}
+
                         </button>
                     </form>
                 </div>
