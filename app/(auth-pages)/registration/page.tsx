@@ -1,43 +1,35 @@
 "use client";
 import React, { useState } from 'react';
+import { register } from '@/app/actions/auth/registration/registration';
 
 const Registration: React.FC = () => {
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [status, setStatus] = useState<{
+        type: 'error' | 'success' | null;
+        message: string | null;
+    }>({ type: null, message: null });
 
-    async function handleSubmit(formData: FormData) {
+    const handleSubmit = async (formData: FormData) => {
         try {
-            setIsLoading(true);
-            setError(null);
+            const result = await register(formData);
 
-            // call the API directly
-            const response = await fetch('/api/auth/registration', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: formData.get("username"),
-                    password: formData.get("password"),
-                    facility: formData.get("facility"),
-                    supervisor: formData.get("supervisor")
-                }),
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error);
+            if (result.success) {
+                setStatus({
+                    type: 'success',
+                    message: 'Registratie succesvol! Je account is aangemaakt.'
+                });
+            } else {
+                setStatus({
+                    type: 'error',
+                    message: result.error || 'Registratie mislukt'
+                });
             }
-
-            setSuccess("Registratie succesvol!");
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Registration failed");
-        } finally {
-            setIsLoading(false);
+        } catch (error) {
+            setStatus({
+                type: 'error',
+                message: 'Er is een onverwachte fout opgetreden.'
+            });
         }
-    }
+    };
 
     return (
         <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: '#FFDFDB' }}>
@@ -51,15 +43,15 @@ const Registration: React.FC = () => {
                 <div className="bg-red-600 text-white p-10 rounded-lg shadow-2xl w-96">
                     <h2 className="text-3xl font-bold mb-6">Registreer</h2>
 
-                    {/* Status Messages */}
-                    {error && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                            {error}
-                        </div>
-                    )}
-                    {success && (
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                            {success}
+                    {status.message && (
+                        <div
+                            className={`p-3 rounded-md mb-4 ${
+                                status.type === 'success'
+                                    ? 'bg-green-600'
+                                    : 'bg-red-800'
+                            }`}
+                        >
+                            {status.message}
                         </div>
                     )}
 
@@ -100,7 +92,8 @@ const Registration: React.FC = () => {
                             >
                                 <option value="">Selecteer faciliteit</option>
                                 <option value="faciliteit Leuven">faciliteit Leuven</option>
-                                {/* Add more facilities as needed */}
+                                <option value="faciliteit Antwerpen">faciliteit Antwerpen</option>
+                                <option value="faciliteit Gent">faciliteit Gent</option>
                             </select>
                         </div>
                         <div>
@@ -115,15 +108,15 @@ const Registration: React.FC = () => {
                             >
                                 <option value="">Selecteer begeleider</option>
                                 <option value="Kris">Kris</option>
-                                {/* Add more supervisors as needed */}
+                                <option value="Jan">Jan</option>
+                                <option value="Peter">Peter</option>
                             </select>
                         </div>
                         <button
                             type="submit"
-                            disabled={isLoading}
-                            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold disabled:opacity-50"
+                            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold transition-colors duration-200"
                         >
-                            {isLoading ? "Bezig met registreren..." : "Registreer"}
+                            Registreer
                         </button>
                     </form>
                 </div>
