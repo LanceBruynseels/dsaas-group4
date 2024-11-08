@@ -1,11 +1,14 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
     try {
         const { username, password, facility, supervisor } = await request.json();
         const supabase = createClient();
+
+
 
         if (!username || !password || !facility || !supervisor) {
             return NextResponse.json(
@@ -14,10 +17,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
+
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // store data to Supabase
         const { data, error } = await supabase
             .from('users')
             .insert([
@@ -39,6 +42,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
+
         // return success with redirect information
         return NextResponse.json({
             success: true,
@@ -47,6 +51,7 @@ export async function POST(request: NextRequest) {
                 destination: '/sign-in',
                 // message: 'Registratie succesvol! Je wordt doorgestuurd naar de inlogpagina.'
             }
+
         });
 
     } catch (error) {

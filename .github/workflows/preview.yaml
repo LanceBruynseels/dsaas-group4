@@ -5,9 +5,10 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 on:
-  push:
-    branches-ignore:
-      - main
+  workflow_run:
+    workflows: ["Node.js CI with Cypress Tests"]
+    types:
+      - completed
 
 jobs:
   Deploy-Preview:
