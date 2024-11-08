@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { login } from 'app/actions/auth/sign-in/action';  // Import login from action.ts
+import { login } from 'app/actions/auth/sign-in/action';
+import { useRouter } from 'next/navigation';
 
 const SignInPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
@@ -18,10 +20,17 @@ const SignInPage: React.FC = () => {
         try {
             const result = await login(formData);
 
-            window.location.href = '/protected/home';
-
+            if (result.success) {
+                console.log("Login successful, navigating to /protected/home");
+                // Redirect using the URL provided by the server (from result.redirect)
+                router.push(result.redirect);  // Use `result.redirect` to ensure correct redirection
+            } else {
+                setError(result.error || "An unexpected error occurred");
+                console.log("Login failed:", result.error);
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unexpected error occurred");
+            console.error("Error during login:", err);
         } finally {
             setIsLoading(false);
         }
@@ -41,7 +50,7 @@ const SignInPage: React.FC = () => {
                     <h2 className="text-2xl font-semibold mb-4">Log in</h2>
                     <p className="text-sm mb-6">
                         Hebt u nog geen account?{" "}
-                        <Link href="/register" className="underline text-white hover:text-gray-200">
+                        <Link href="/sign-up" className="underline text-white hover:text-gray-200">
                             Registreer
                         </Link>
                     </p>

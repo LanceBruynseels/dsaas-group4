@@ -4,7 +4,6 @@ interface LoginData {
     password: string;
 }
 
-// Function to handle login logic
 export async function login(formData: FormData) {
     const data: LoginData = {
         username: formData.get("username") as string,
@@ -17,12 +16,31 @@ export async function login(formData: FormData) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        redirect: 'follow',
     });
 
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Login failed');
+    const responseData = await response.json();
+
+    if (response.redirected) {
+        // Handle redirection in the response
+        return {
+            success: true,
+            redirect: response.url
+        };
     }
 
-    return response.json(); // Return the response body (e.g., success message or user data)
+    if (!response.ok) {
+        // Correct the error handling here
+        return {
+            success: false,
+            error: responseData.error || 'Log in mislukt. Probeer het opnieuw.'
+        };
+    }
+
+    // Return the server response data (assuming it contains a redirect URL)
+    return {
+        success: true,
+        data: responseData.message,
+        redirect: responseData.redirect.destination // use the destination from server response
+    };
 }
