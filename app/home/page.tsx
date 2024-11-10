@@ -5,15 +5,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 
 export default async function ProtectedPage() {
-    const supabase = createClient();
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        return redirect("/sign-in");
-    }
 
     return (
         <div className="flex flex-row w-full">
@@ -70,31 +62,6 @@ export default async function ProtectedPage() {
                         <button className="text-3xl text-red-500">❤️</button>
                         <button className="text-3xl text-green-500">💬</button>
 
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col ">
-                <div className="basis-1/2 p-4 flex flex-row items-left rounded-lg mt-4 mb-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-                    {/* Profile Image */}
-                    <div className="w-full h-auto overflow-hidden rounded-lg mb-4">
-                        <Image
-                            src="/mock-picture.webp"
-                            alt="Profile Picture"
-                            width={32}
-                            height={32}
-                            className="rounded-full border border-gray-500"
-                        />
-                    </div>
-                    {/* Profile Text Content */}
-                    <div
-                        className="relative w-3/4 p-8 rounded-lg bg-gradient-to-b from-red-700 to-pink-950 text-white shadow-lg">
-                        <div className="text-pretty">
-                            <h2 className="text-2xl font-bold">Jara, 25 jaar</h2>
-                            <p className="mt-2">Meer informatie over Jara. Hobbies, interesses, relatie status, wat ze hoopt te
-                                vinden op de applicatie, hoe ze zichzelf voelt op dit moment</p>
-                            <div className="mt-4 text-3xl">😍</div>
-                        </div>
                     </div>
                 </div>
             </div>
