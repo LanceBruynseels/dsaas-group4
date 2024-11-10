@@ -8,3 +8,4 @@ export default function Layout({
         <div className="w-full flex flex-col gap-12 justify-center">{children}</div>
     );
 }
+

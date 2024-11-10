@@ -25,10 +25,11 @@ export async function POST(request: NextRequest) {
 
         if (error || !user) {
             return NextResponse.json(
-                { error: "Gebruikersnaam niet gevonden of wachtwoord is onjuist" },
+                { error: "Gebruikersnaam niet gevonden 22 of wachtwoord is onjuist" },
                 { status: 401 }
             );
         }
+        console.log("password from database:", user.password);
 
         // Verify the password
         const passwordMatches = await bcrypt.compare(password, user.password);
@@ -39,17 +40,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Successful login
+        // If successful, you might create a session token or JWT (not shown here)
         return NextResponse.json({
             success: true,
             message: "Inloggen succesvol!",
             userId: user.id,
-            redirect: {
-                destination: '/home', // Make sure this is correct for the client redirection
-            }
         });
 
-    } catch (error) {
+    }
+
+    catch (error) {
         console.error("Server error:", error);
         return NextResponse.json(
             { error: "Er is een fout opgetreden tijdens het inloggen" },

@@ -1,43 +1,48 @@
 "use client";
 import React, { useState } from 'react';
+import { register } from '@/app/actions/auth/registration/registration';
+import { useRouter } from 'next/navigation'; // for redirect
 
 const Registration: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    const [status, setStatus] = useState<{
+        type: 'error' | 'success' | null;
+        message: string | null;
+    }>({ type: null, message: null });
 
-    async function handleSubmit(formData: FormData) {
+    const handleSubmit = async (formData: FormData) => {
         try {
-            setIsLoading(true);
-            setError(null);
+            const result = await register(formData);
 
-            // call the API directly
-            const response = await fetch('/api/auth/registration', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: formData.get("username"),
-                    password: formData.get("password"),
-                    facility: formData.get("facility"),
-                    supervisor: formData.get("supervisor")
-                }),
-            });
+            if (result.success) {
+                // set status message from the API response
+                setStatus({
+                    type: 'success',
+                    message: result.redirect?.message || 'Registratie succesvol!'
+                });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error);
+                // handle redirect if provided by the API
+                if (result.redirect?.destination) {
+                    setTimeout(() => {
+                        router.push(result.redirect!.destination);
+                    }, 1500);
+                }
+            } else {
+                setStatus({
+                    type: 'error',
+                    message: result.error || 'Registratie mislukt'
+                });
             }
-
-            setSuccess("Registratie succesvol!");
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Registration failed");
-        } finally {
-            setIsLoading(false);
+        } catch (error) {
+            setStatus({
+                type: 'error',
+                message: 'Er is een onverwachte fout opgetreden.'
+            });
         }
-    }
+    };
 
     return (
         <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
@@ -104,7 +109,7 @@ const Registration: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                        <label htmlFor="supervisor" className="block text-sm font-medium">
+                            <label htmlFor="supervisor" className="block text-sm font-medium">
                                 Begeleider
                             </label>
                             <select

@@ -26,6 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+
       <html lang="nl" className={GeistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
       <ThemeProvider
@@ -83,3 +84,4 @@ export default function RootLayout({
       </html>
   );
 }
+

@@ -1,12 +1,15 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
+import bcrypt from 'bcryptjs';
+
 export async function POST(request: NextRequest) {
     try {
         const { username, password, facility, supervisor } = await request.json();
         const supabase = createClient();
 
-        // Validate all required fields
+
+
         if (!username || !password || !facility || !supervisor) {
             return NextResponse.json(
                 { error: "Alle velden zijn verplicht" },
@@ -14,13 +17,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Insert into Supabase
+
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         const { data, error } = await supabase
             .from('users')
             .insert([
                 {
                     username,
-                    password,  // Note: In production, ensure password is hashed
+                    password: hashedPassword,
                     facility,
                     supervisor
                 }
@@ -36,9 +42,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
+
+        // return success with redirect information
         return NextResponse.json({
             success: true,
-            data: data
+            data: data,
+            redirect: {
+                destination: '/sign-in',
+                // message: 'Registratie succesvol! Je wordt doorgestuurd naar de inlogpagina.'
+            }
+
         });
 
     } catch (error) {
