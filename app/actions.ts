@@ -78,7 +78,6 @@ export const forgotPasswordAction = async (formData: FormData) => {
   if (callbackUrl) {
     return redirect(callbackUrl);
   }
-
   return encodedRedirect(
     "success",
     "/forgot-password",

@@ -1,16 +1,30 @@
-import Hero from "@/components/hero";
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+import React from 'react';
 
-export default async function Index() {
-  return (
-    <>
-      <Hero />
-      <main className="flex-1 flex flex-col gap-6 px-4">
-        <h2 className="font-medium text-xl mb-4">Next steps</h2>
-        {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-      </main>
-    </>
-  );
+export default function Index() {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen text-center relative">
+            <div className="mb-5">
+                {/* Replace with the actual path to your butterfly logo */}
+                <img src="vlinder.png" alt="Vlinder Logo" className="  min-w-24 max-w-72 h-auto mx-auto"/>
+                <h1 className="text-4xl font-bold text-gray-800 mt-3">V(L)INDER</h1>
+            </div>
+
+            <div className="flex space-x-4 w-full max-w-md mx-auto mt-5">
+                <a href="http://localhost:3000/sign-in" className="flex-1">
+                    <button
+                        className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
+                        LOGIN
+                    </button>
+                </a>
+                <a href="http://localhost:3000/sign-up" className="flex-1">
+                    <button
+                        className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
+                        REGISTRATIE
+                    </button>
+                </a>
+            </div>
+
+
+        </div>
+    );
 }

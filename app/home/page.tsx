@@ -69,33 +69,36 @@ export default async function ProtectedPage() {
                         <button className="text-3xl text-blue-500">👍</button>
                         <button className="text-3xl text-red-500">❤️</button>
                         <button className="text-3xl text-green-500">💬</button>
+
                     </div>
                 </div>
             </div>
 
-            {/* Settings Section */}
-            <div className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-                <h3 className="text-lg font-bold">Zoek instellingen</h3>
-                {/* Settings fields */}
-                <div className="flex flex-col mt-4">
-                    <label className="text-sm">Persoonlijkheid:</label>
-                    <div className="flex flex-wrap gap-2">
-                        {["Leider", "Zorgzaam", "Avonturier", "Denker"].map((trait, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-white rounded-md shadow">{trait}</span>
-                        ))}
+            <div className="flex flex-col ">
+                <div className="basis-1/2 p-4 flex flex-row items-left rounded-lg mt-4 mb-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+                    {/* Profile Image */}
+                    <div className="w-full h-auto overflow-hidden rounded-lg mb-4">
+                        <Image
+                            src="/mock-picture.webp"
+                            alt="Profile Picture"
+                            width={32}
+                            height={32}
+                            className="rounded-full border border-gray-500"
+                        />
                     </div>
-                    <label className="text-sm mt-4">Religie:</label>
-                    <div className="flex flex-wrap gap-2">
-                        {["Niet gelovig", "Christen", "Moslim"].map((religion, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-white rounded-md shadow">{religion}</span>
-                        ))}
+                    {/* Profile Text Content */}
+                    <div
+                        className="relative w-3/4 p-8 rounded-lg bg-gradient-to-b from-red-700 to-pink-950 text-white shadow-lg">
+                        <div className="text-pretty">
+                            <h2 className="text-2xl font-bold">Jara, 25 jaar</h2>
+                            <p className="mt-2">Meer informatie over Jara. Hobbies, interesses, relatie status, wat ze hoopt te
+                                vinden op de applicatie, hoe ze zichzelf voelt op dit moment</p>
+                            <div className="mt-4 text-3xl">😍</div>
+                        </div>
                     </div>
-                    <label className="text-sm mt-4">Afstand:</label>
-                    <input type="range" className="mt-1"/>
-                    <label className="text-sm mt-4">Leeftijd:</label>
-                    <input type="range" className="mt-1"/>
                 </div>
             </div>
+            <div className="basis-1/4 p-4 bg-pink-100 rounded-lg rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">03</div>
         </div>
     );
 }

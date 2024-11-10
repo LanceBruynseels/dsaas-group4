@@ -94,3 +94,9 @@ Please file feedback and issues over on the [Supabase GitHub org](https://github
 - [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
 - [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
 - [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+
+## Project Structure and Setup
+- Created a new directory named "api" to serve as the route handler.
+- The code in "app/actions/auth/registration.ts" contains only data-fetching functions.
+- For FE implementation, simply import the route handler from api.
+- The "api" directory handles communication between FE pages and BE actions.
