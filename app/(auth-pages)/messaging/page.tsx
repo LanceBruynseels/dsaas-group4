@@ -12,7 +12,7 @@ const contacts = [
 
 const ChatApp: React.FC = () => {
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
             <Sidebar />
             <ChatSection />
         </div>
@@ -21,7 +21,7 @@ const ChatApp: React.FC = () => {
 
 const Sidebar: React.FC = () => {
     return (
-        <div className="w-1/3 bg-pink-100 p-4 overflow-y-auto">
+        <div className="w-1/3 bg-pink-100 p-4 overflow-y-auto" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
             <div className="mb-4">
                 <input
                     type="text"
@@ -46,7 +46,7 @@ const Sidebar: React.FC = () => {
 
 const ChatSection: React.FC = () => {
     return (
-        <div className="w-2/3 flex flex-col bg-pink-100 p-4">
+        <div className="w-2/3 flex flex-col bg-pink-100 p-4" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
             <ChatHeader />
             <div className="flex flex-col space-y-4 mb-4">
                 <div className="bg-white p-3 rounded-lg shadow-md max-w-xs self-start">
