@@ -65,20 +65,48 @@ const ChatSection: React.FC = () => {
         <>
             <ChatHeader />
             <div className="flex-1 overflow-y-auto min-h-0">
-                <div className="flex flex-col space-y-4 mb-6">
-                    {/*Their message*/}
-                    <div className="bg-white p-4 rounded-lg max-w-sm self-start">
-                        That's awesome. I think our users will really appreciate the improvements.
-                        <span className="block text-xs text-gray-400 mt-2">11:46</span>
-                    </div>
 
-                    <div className="bg-red-700 text-white p-4 rounded-lg max-w-sm self-end">
-                        That's awesome. I think our users will really appreciate the improvements.
-                        <span className="block text-xs text-gray-300 mt-2">11:46</span>
+                {/*their msg*/}
+                <div className="flex items-start gap-3">
+                    <img
+                        src="https://via.placeholder.com/40"
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full"
+                    />
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-baseline gap-2">
+                            <span className="font-semibold">Bonnie Green</span>
+                            <span className="text-xs text-gray-400">11:46</span>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg max-w-sm">
+                            That's awesome. I think our users will really appreciate the improvements.
+                        </div>
+                        <span className="text-xs text-gray-400">Delivered</span>
                     </div>
                 </div>
+                {/*their msg=================*/}
+
+                {/*your msg*/}
+                <div className="flex items-start justify-end gap-3">
+                    <div className="flex flex-col items-end gap-1">
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-xs text-gray-400">11:46</span>
+                            <span className="font-semibold">Bonnie Green</span>
+                        </div>
+                        <div className="bg-red-700 text-white p-4 rounded-lg max-w-sm">
+                            That's awesome. I think our users will really appreciate the improvements.
+                        </div>
+                        <span className="text-xs text-gray-400">Delivered</span>
+                    </div>
+                    <img
+                        src="https://via.placeholder.com/40"
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full"
+                    />
+                </div>
+                {/*your msg=================*/}
             </div>
-            <MessageInput />
+            <MessageInput/>
         </>
     );
 };
