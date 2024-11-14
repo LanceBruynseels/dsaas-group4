@@ -6,35 +6,110 @@ import Image from "next/image";
 
 export default async function ProtectedPage() {
 
-
     return (
         <div className="flex flex-row w-full">
-            {/* Notifications Side Panel */}
+            {/* Search Settings Section */}
             <div
-                className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-                <div className="flex flex-row justify-between items-center">
-                    <div className="text-2xl font-bold">Meldingen</div>
-                    <div>
-                        <Image src="/bell.png" alt="Bell Icon" height={25} width={25}/>
+                className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+
+                <h2 className="text-xl font-bold mb-4">Zoek Instellingen</h2>
+
+                {/* Personality Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Persoonlijkheid</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Avontuurlijk", "Romantisch", "Introvert", "Extrovert", "Intellectueel", "Amibieus", "Empatisch"].map((trait) => (
+                            <span key={trait} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{trait}</span>
+                        ))}
                     </div>
                 </div>
-                <div className="flex flex-col my-2">
-                    {/* Sample Notifications */}
-                    {["You got a message from ...", "You got a message from ..."].map((text, idx) => (
-                        <div key={idx} className="flex flex-row my-2 items-center">
-                            <Image src="/mock-picture.webp" alt="Profile Picture" width={50} height={50}
-                                   className="rounded-full border border-gray-500"/>
-                            <div className="text-xs mx-2">{text}</div>
-                        </div>
-                    ))}
+
+                {/* Relationship goals Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Relatiedoel</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Liefde", "Vriendschap", "sex"].map((relatiedoelen) => (
+                            <span key={relatiedoelen} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{relatiedoelen}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Gender Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Gender</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Man", "Vrouw", "x", "Andere"].map((gender) => (
+                            <span key={gender} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{gender}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Interests Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Interesses</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Muzikaal", "Graag buiten", "Creative hobby's", "Gamen", "Reizen", "Koken"].map((interests) => (
+                            <span key={interests} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{interests}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Disability Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Beperking</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Mentaal", "Fysiek"].map((disability) => (
+                            <span key={disability} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{disability}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Home status Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Thuis status</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Alleenwonend", "Werkende", "Zorgwonend", "andere"].map((disability) => (
+                            <span key={disability} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{disability}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Religion Options */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Religie</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {["Niet gelovig", "Christelijk", "Islamiet", "Hindoeïstisch", "Boeddhist", "Joods"].map((religion) => (
+                            <span key={religion} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{religion}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Distance Slider */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Afstand</h3>
+                    <input type="range" min="5" max="30" defaultValue="5" className="w-full mt-2" />
+                    <div className="flex justify-between text-sm mt-1">
+                        <span>5 km</span>
+                        <span>30 km</span>
+                    </div>
+                </div>
+
+                {/* Age Slider */}
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold">Leeftijd</h3>
+                    <input type="range" min="24" max="30" defaultValue="24" className="w-full mt-2" />
+                    <div className="flex justify-between text-sm mt-1">
+                        <span>18</span>
+                        <span>30</span>
+                    </div>
                 </div>
             </div>
+
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
                 {/* Profile Section */}
                 <div className="flex flex-col min-h-full p-4">
                     {/* Updated layout for Profile Image and Profile Details */}
-                    <div
-                        className="flex flex-row items-stretch">
+                    <div className="flex flex-row items-stretch">
 
                         {/* Profile Image Section, takes 50% width */}
                         <div className="flex basis-1/2 items-center justify-center p-4 border-r">
@@ -61,11 +136,30 @@ export default async function ProtectedPage() {
                         <button className="text-3xl text-blue-500">👍</button>
                         <button className="text-3xl text-red-500">❤️</button>
                         <button className="text-3xl text-green-500">💬</button>
-
                     </div>
                 </div>
             </div>
-            <div className="basis-1/4 p-4 bg-pink-100 rounded-lg rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">03</div>
+
+            {/* Notifications Side Panel */}
+            <div
+                className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+                <div className="flex flex-row justify-between items-center">
+                    <div className="text-2xl font-bold">Meldingen</div>
+                    <div>
+                        <Image src="/bell.png" alt="Bell Icon" height={25} width={25}/>
+                    </div>
+                </div>
+                <div className="flex flex-col my-2">
+                    {/* Sample Notifications */}
+                    {["You got a message from ...", "You got a message from ..."].map((text, idx) => (
+                        <div key={idx} className="flex flex-row my-2 items-center">
+                            <Image src="/mock-picture.webp" alt="Profile Picture" width={50} height={50}
+                                   className="rounded-full border border-gray-500"/>
+                            <div className="text-xs mx-2">{text}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
