@@ -12,75 +12,142 @@ const contacts = [
 
 const ChatApp: React.FC = () => {
     return (
-        <div className="flex h-screen" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
-            <Sidebar />
-            <ChatSection />
+        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+            {/* left sidebar */}
+            <div className="w-1/3 p-6">
+                <Sidebar />
+            </div>
+
+            {/* divider */}
+            <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
+
+            {/* chat block */}
+            <div className="flex-1 flex flex-col p-6">
+                <ChatSection />
+            </div>
         </div>
     );
 };
 
 const Sidebar: React.FC = () => {
     return (
-        <div className="w-1/3 bg-pink-100 p-4 overflow-y-auto" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
-            <div className="mb-4">
+        <>
+            <div className="mb-6">
                 <input
                     type="text"
                     placeholder="zoek een gesprek"
-                    className="w-full p-2 rounded-lg border border-gray-300"
+                    className="w-full p-3 rounded-lg border border-gray-300"
                 />
             </div>
-            <ul className="space-y-4"> {/* Increase spacing here */}
+            <div className="space-y-3">
                 {contacts.map((contact, index) => (
-                    <li key={index} className="flex items-center p-2 bg-white rounded-lg shadow-md hover:bg-gray-100 cursor-pointer">
-                        <img src="https://via.placeholder.com/40" alt="Profile" className="w-10 h-10 rounded-full mr-3" />
-                        <div>
-                            <div className="font-bold">{contact.name}</div>
-                            <div className="text-gray-500 text-sm">{contact.message}</div>
+                    <div key={index} className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                        <div className="flex items-center gap-4">
+                            <img
+                                src="https://via.placeholder.com/40"
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <div className="font-bold truncate">{contact.name}</div>
+                                <div className="text-gray-500 text-sm truncate">{contact.message}</div>
+                            </div>
                         </div>
-                    </li>
+                    </div>
                 ))}
-            </ul>
-        </div>
+            </div>
+        </>
     );
 };
 
 const ChatSection: React.FC = () => {
     return (
-        <div className="w-2/3 flex flex-col bg-pink-100 p-4" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
+        <>
             <ChatHeader />
-            <div className="flex flex-col space-y-4 mb-4">
-                <div className="bg-white p-3 rounded-lg shadow-md max-w-xs self-start">
-                    That's awesome. I think our users will really appreciate the improvements.
-                    <span className="block text-xs text-gray-400 mt-2">11:46</span>
-                </div>
-                <div className="bg-red-700 text-white p-3 rounded-lg shadow-md max-w-xs self-end">
-                    That's awesome. I think our users will really appreciate the improvements.
-                    <span className="block text-xs text-gray-300 mt-2">11:46</span>
+            <div className="flex-1 overflow-y-auto min-h-0">
+                <div className="flex flex-col space-y-4 mb-6">
+                    {/*Their message*/}
+                    <div className="bg-white p-4 rounded-lg max-w-sm self-start">
+                        That's awesome. I think our users will really appreciate the improvements.
+                        <span className="block text-xs text-gray-400 mt-2">11:46</span>
+                    </div>
+
+                    <div className="bg-red-700 text-white p-4 rounded-lg max-w-sm self-end">
+                        That's awesome. I think our users will really appreciate the improvements.
+                        <span className="block text-xs text-gray-300 mt-2">11:46</span>
+                    </div>
                 </div>
             </div>
             <MessageInput />
-        </div>
+        </>
     );
 };
 
 const ChatHeader: React.FC = () => {
     return (
-        <div className="flex items-center mb-4">
-            <img src="https://via.placeholder.com/40" alt="Profile" className="w-10 h-10 rounded-full mr-3" />
-            <h3 className="text-lg font-bold">Bonnie Green</h3>
+        <div className="flex items-center justify-between p-4 mb-6 bg-white rounded-lg">
+            <div className="flex items-center p-4 mb-6 bg-white rounded-lg">
+                <img
+                    src="https://via.placeholder.com/40"
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full mr-4"
+                />
+                <h3 className="text-lg font-bold">Bonnie Green</h3>
+            </div>
+
+            {/*video call button*/}
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <svg
+                    className="w-6 h-6 text-gray-600"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        fillRule="evenodd"
+                        d="M14 7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7Zm2 9.387 4.684 1.562A1 1 0 0 0 22 17V7a1 1 0 0 0-1.316-.949L16 7.613v8.774Z"
+                        clipRule="evenodd"
+                    />
+                </svg>
+            </button>
+
+            {/*voice call button*/}
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M7.978 4a2.553 2.553 0 0 0-1.926.877C4.233 6.7 3.699 8.751 4.153 10.814c.44 1.995 1.778 3.893 3.456 5.572 1.68 1.679 3.577 3.018 5.57 3.459 2.062.456 4.115-.073 5.94-1.885a2.556 2.556 0 0 0 .001-3.861l-1.21-1.21a2.689 2.689 0 0 0-3.802 0l-.617.618a.806.806 0 0 1-1.14 0l-1.854-1.855a.807.807 0 0 1 0-1.14l.618-.62a2.692 2.692 0 0 0 0-3.803l-1.21-1.211A2.555 2.555 0 0 0 7.978 4Z"/>
+                </svg>
+            </button>
+
+            {/*exclamation button*/}
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                          d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </button>
+
         </div>
     );
 };
 
 const MessageInput: React.FC = () => {
     return (
-        <div className="mt-auto flex items-center p-2 bg-white rounded-lg shadow-md">
+        <div className="mt-auto flex items-center p-4 bg-white rounded-lg">
             <input
                 type="text"
                 placeholder="Schrijf een bericht"
-                className="flex-grow p-2 rounded-lg border border-gray-300 outline-none"
+                className="flex-1 p-2 rounded-lg border border-gray-300 outline-none"
             />
-            <button className="ml-2 text-2xl text-gray-500">&#128172;</button>
+            <button className="ml-4 text-2xl text-gray-500 hover:text-gray-700 transition-colors">
+                &#128172;
+            </button>
         </div>
     );
 };
