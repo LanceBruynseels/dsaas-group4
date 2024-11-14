@@ -39,7 +39,7 @@ const Sidebar: React.FC = () => {
                     className="w-full p-3 rounded-lg border border-gray-300"
                 />
             </div>
-            <div className="space-y-3">
+            <div className="space-y-5">
                 {contacts.map((contact, index) => (
                     <div key={index} className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                         <div className="flex items-center gap-4">
