@@ -31,7 +31,7 @@ export default function NavBar() {
                     </Link>
                     <Link href="/" className="text-gray-700 hover:text-red-700">Start</Link>
                     <Link href="/berichten" className="text-gray-700 hover:text-red-700">Berichten</Link>
-                    <Link href="/ontdek" className="text-gray-700 hover:text-red-700">Ontdek</Link>
+                    <Link href="/discover" className="text-gray-700 hover:text-red-700">Ontdek</Link>
                     <Link href="/instellingen" className="text-gray-700 hover:text-red-700">Instellingen</Link>
                 </div>
             </nav>
