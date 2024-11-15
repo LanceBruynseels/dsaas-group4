@@ -7,7 +7,7 @@ import Image from 'next/image';
 export default function NavBar() {
     const path = usePathname();
 
-    if (path === '/' || path === '/sign-in' || path === '/sign-up') {
+    if (path === '/' || path === '/sign-in' || path === '/registration') {
         return (
             <nav className="w-full h-16 flex justify-between items-center px-5">
                 {/* Application Navigation Bar */}
@@ -15,7 +15,7 @@ export default function NavBar() {
                     <Link href="/">
                         <Image src="/vlinder.png" alt="Vlinder Logo" width={35} height={35} />
                     </Link>
-                    <Link href="/" className="text-gray-700 hover:text-red-700">Home</Link>
+                    <Link href="/" className="hover:text-red-700"><h4>Home</h4></Link>
                     <Link href="/about" className="text-gray-700 hover:text-red-700">About Us</Link>
                     <Link href="/contact" className="text-gray-700 hover:text-red-700">Contact</Link>
                 </div>

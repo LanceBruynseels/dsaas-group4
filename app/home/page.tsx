@@ -1,26 +1,39 @@
 import FetchDataSteps from "@components/tutorial/fetch-data-steps";
-import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { createClient } from '@/utils/supabase/server';
 
-export default async function ProtectedPage() {
+export default async function HomePage() {
+    const supabase = await createClient();
+
+    let { data: filter_data, error } = await supabase.rpc('get_all_filter_data')
+
+    if (error) {
+        console.error("Error fetching data:", error.message);
+        return <p>Error loading data</p>;
+    }
 
     return (
         <div className="flex flex-row w-full">
             {/* Search Settings Section */}
-            <div
-                className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-
-                <h2 className="text-xl font-bold mb-4">Zoek Instellingen</h2>
+            <div className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+                <h2 className="text-xl font-bold mb-4 text-red-950">Zoek Instellingen</h2>
 
                 {/* Personality Options */}
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Persoonlijkheid</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Avontuurlijk", "Romantisch", "Introvert", "Extrovert", "Intellectueel", "Amibieus", "Empatisch"].map((trait) => (
-                            <span key={trait} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{trait}</span>
-                        ))}
+                        {filter_data.personalities && filter_data.personalities.length > 0 ? (
+                            filter_data.personalities.map((personalities) => (
+                                <button key={personalities.personality_id}
+                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {personalities.personality}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
@@ -28,9 +41,16 @@ export default async function ProtectedPage() {
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Relatiedoel</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Liefde", "Vriendschap", "sex"].map((relatiedoelen) => (
-                            <span key={relatiedoelen} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{relatiedoelen}</span>
-                        ))}
+                        {filter_data.relationship_goals && filter_data.relationship_goals.length > 0 ? (
+                            filter_data.relationship_goals.map((goals) => (
+                                <button key={goals.relationship_goals_id}
+                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {goals.relationship_goals}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
@@ -38,9 +58,15 @@ export default async function ProtectedPage() {
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Gender</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Man", "Vrouw", "x", "Andere"].map((gender) => (
-                            <span key={gender} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{gender}</span>
-                        ))}
+                        {filter_data.genders && filter_data.genders.length > 0 ? (
+                            filter_data.genders.map((gender) => (
+                                <button key={gender.gender_id} className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {gender.gender}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
@@ -48,9 +74,15 @@ export default async function ProtectedPage() {
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Interesses</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Muzikaal", "Graag buiten", "Creative hobby's", "Gamen", "Reizen", "Koken"].map((interests) => (
-                            <span key={interests} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{interests}</span>
-                        ))}
+                        {filter_data.interests && filter_data.interests.length > 0 ? (
+                            filter_data.interests.map((item_interests) => (
+                                <button key={item_interests.id} className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {item_interests.interest}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
@@ -58,9 +90,16 @@ export default async function ProtectedPage() {
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Beperking</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Mentaal", "Fysiek"].map((disability) => (
-                            <span key={disability} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{disability}</span>
-                        ))}
+                        {filter_data.disabilities && filter_data.disabilities.length > 0 ? (
+                            filter_data.disabilities.map((disabilities) => (
+                                <button key={disabilities.disability_id}
+                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {disabilities.disability}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
@@ -68,9 +107,16 @@ export default async function ProtectedPage() {
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Thuis status</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Alleenwonend", "Werkende", "Zorgwonend", "andere"].map((disability) => (
-                            <span key={disability} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{disability}</span>
-                        ))}
+                        {filter_data.home_statuses && filter_data.home_statuses.length > 0 ? (
+                            filter_data.home_statuses.map((home_statuses) => (
+                                <button key={home_statuses.home_status_id}
+                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {home_statuses.home_status}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
@@ -78,16 +124,23 @@ export default async function ProtectedPage() {
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Religie</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {["Niet gelovig", "Christelijk", "Islamiet", "Hindoeïstisch", "Boeddhist", "Joods"].map((religion) => (
-                            <span key={religion} className="bg-gray-200 text-black px-2 py-1 rounded-lg">{religion}</span>
-                        ))}
+                        {filter_data.religions && filter_data.religions.length > 0 ? (
+                            filter_data.religions.map((religions) => (
+                                <button key={religions.religion_id}
+                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
+                                    {religions.religion}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No interests</p>
+                        )}
                     </div>
                 </div>
 
                 {/* Distance Slider */}
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Afstand</h3>
-                    <input type="range" min="5" max="30" defaultValue="5" className="w-full mt-2" />
+                    <input type="range" min="5" max="30" defaultValue="5" className="w-full mt-2"/>
                     <div className="flex justify-between text-sm mt-1">
                         <span>5 km</span>
                         <span>30 km</span>
@@ -97,7 +150,7 @@ export default async function ProtectedPage() {
                 {/* Age Slider */}
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Leeftijd</h3>
-                    <input type="range" min="24" max="30" defaultValue="24" className="w-full mt-2" />
+                    <input type="range" min="24" max="30" defaultValue="24" className="w-full mt-2"/>
                     <div className="flex justify-between text-sm mt-1">
                         <span>18</span>
                         <span>30</span>
@@ -111,7 +164,7 @@ export default async function ProtectedPage() {
                     {/* Updated layout for Profile Image and Profile Details */}
                     <div className="flex flex-row items-stretch">
 
-                        {/* Profile Image Section, takes 50% width */}
+                        {/* Profile Image Section */}
                         <div className="flex basis-1/2 items-center justify-center p-4 border-r">
                             <button className="left-2 text-black">❮</button>
                             <Image src="/profileImage.png" alt="Profile Picture" width={300} height={300}
@@ -119,10 +172,10 @@ export default async function ProtectedPage() {
                             <button className="right-2 text-black">❯</button>
                         </div>
 
-                        {/* Profile Details Section, takes 50% width */}
+                        {/* Profile Details Section */}
                         <div
                             className="flex basis-1/2 flex-col items-center justify-center p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
-                            <h2 className="text-2xl font-bold">Jara, 25 jaar</h2>
+                            <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
                             <p className="mt-2 text-center">Meer informatie over Jara. Hobbies, interesses, relatie
                                 status, wat ze hoopt te vinden op de applicatie, hoe ze zichzelf voelt op dit
                                 moment.</p>
@@ -144,7 +197,7 @@ export default async function ProtectedPage() {
             <div
                 className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex flex-row justify-between items-center">
-                    <div className="text-2xl font-bold">Meldingen</div>
+                    <h2 className="font-bold">Meldingen</h2>
                     <div>
                         <Image src="/bell.png" alt="Bell Icon" height={25} width={25}/>
                     </div>
