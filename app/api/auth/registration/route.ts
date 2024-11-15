@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: NextRequest) {
     try {
         const { username, password, facility, supervisor } = await request.json();
-        const supabase = createClient();
+        const supabase = await createClient();
 
 
 

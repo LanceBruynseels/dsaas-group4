@@ -21,7 +21,7 @@ const SignInPage: React.FC = () => {
             const result = await login(formData);
 
             if (result.success) {
-                console.log("Login successful, navigating to /protected/home");
+                console.log("Login successful, navigating to /home");
                 // Redirect using the URL provided by the server (from result.redirect)
                 router.push(result.redirect);  // Use `result.redirect` to ensure correct redirection
             } else {
@@ -50,7 +50,7 @@ const SignInPage: React.FC = () => {
                     <h2 className="text-2xl font-semibold mb-4">Log in</h2>
                     <p className="text-sm mb-6">
                         Hebt u nog geen account?{" "}
-                        <Link href="/sign-up" className="underline text-white hover:text-gray-200">
+                        <Link href="/registration" className="underline text-white hover:text-gray-200">
                             Registreer
                         </Link>
                     </p>
