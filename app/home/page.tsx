@@ -1,6 +1,8 @@
 import FetchDataSteps from "@components/tutorial/fetch-data-steps";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
+import ToggleLabel from "@components/toggleLabel";
+
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 
@@ -26,10 +28,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.personalities && filter_data.personalities.length > 0 ? (
                             filter_data.personalities.map((personalities) => (
-                                <button key={personalities.personality_id}
-                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {personalities.personality}
-                                </button>
+                                <ToggleLabel key={personalities.personality_id}
+                                             tag={personalities.personality}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
@@ -43,10 +44,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.relationship_goals && filter_data.relationship_goals.length > 0 ? (
                             filter_data.relationship_goals.map((goals) => (
-                                <button key={goals.relationship_goals_id}
-                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {goals.relationship_goals}
-                                </button>
+                                <ToggleLabel key={goals.relationship_goals_id}
+                                             tag={goals.relationship_goals}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
@@ -60,9 +60,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.genders && filter_data.genders.length > 0 ? (
                             filter_data.genders.map((gender) => (
-                                <button key={gender.gender_id} className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {gender.gender}
-                                </button>
+                                <ToggleLabel key={gender.gender_id}
+                                             tag={gender.gender}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
@@ -76,9 +76,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.interests && filter_data.interests.length > 0 ? (
                             filter_data.interests.map((item_interests) => (
-                                <button key={item_interests.id} className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {item_interests.interest}
-                                </button>
+                                <ToggleLabel key={item_interests.id}
+                                             tag={item_interests.interest}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
@@ -92,10 +92,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.disabilities && filter_data.disabilities.length > 0 ? (
                             filter_data.disabilities.map((disabilities) => (
-                                <button key={disabilities.disability_id}
-                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {disabilities.disability}
-                                </button>
+                                <ToggleLabel key={disabilities.disability_id}
+                                             tag={disabilities.disability}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
@@ -109,10 +108,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.home_statuses && filter_data.home_statuses.length > 0 ? (
                             filter_data.home_statuses.map((home_statuses) => (
-                                <button key={home_statuses.home_status_id}
-                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {home_statuses.home_status}
-                                </button>
+                                <ToggleLabel key={home_statuses.home_status_id}
+                                             tag={home_statuses.home_status}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
@@ -126,10 +124,9 @@ export default async function HomePage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {filter_data.religions && filter_data.religions.length > 0 ? (
                             filter_data.religions.map((religions) => (
-                                <button key={religions.religion_id}
-                                        className="bg-gray-200 text-black px-2 py-1 rounded-lg">
-                                    {religions.religion}
-                                </button>
+                                <ToggleLabel key={religions.religion_id}
+                                             tag={religions.religion}>
+                                </ToggleLabel>
                             ))
                         ) : (
                             <p>No interests</p>
