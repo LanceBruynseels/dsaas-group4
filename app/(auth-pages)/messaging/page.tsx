@@ -1,4 +1,8 @@
-import React from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
+
+const supabase = createClient();
 
 const contacts = [
     { name: 'Bonnie Green', message: "That's awesome. I think our users..." },
@@ -13,15 +17,10 @@ const contacts = [
 const ChatApp: React.FC = () => {
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-            {/* left sidebar */}
             <div className="w-1/3 p-6">
                 <Sidebar />
             </div>
-
-            {/* divider */}
             <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
-
-            {/* chat block */}
             <div className="flex-1 flex flex-col p-6">
                 <ChatSection />
             </div>
@@ -41,7 +40,10 @@ const Sidebar: React.FC = () => {
             </div>
             <div className="space-y-5">
                 {contacts.map((contact, index) => (
-                    <div key={index} className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                    <div
+                        key={index}
+                        className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
                         <div className="flex items-center gap-4">
                             <img
                                 src="https://via.placeholder.com/40"
@@ -50,7 +52,9 @@ const Sidebar: React.FC = () => {
                             />
                             <div className="flex-1 min-w-0">
                                 <div className="font-bold truncate">{contact.name}</div>
-                                <div className="text-gray-500 text-sm truncate">{contact.message}</div>
+                                <div className="text-gray-500 text-sm truncate">
+                                    {contact.message}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -61,55 +65,40 @@ const Sidebar: React.FC = () => {
 };
 
 const ChatSection: React.FC = () => {
+    const [messages, setMessages] = useState<any[]>([]);
+    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b'; // Your sender ID
+    const receiverId = '9ba9d983-1b17-49e2-9cc0-9dcd5bd0c9ba'; // Your receiver ID
+
+    useEffect(() => {
+        const fetchMessages = async () => {
+            const { data, error } = await supabase
+                .from('message')
+                .select('*')
+                .or(`and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`)
+
+            if (error) {
+                console.error('Failed to fetch messages:', error.message);
+            } else {
+                setMessages(data || []);
+            }
+        };
+
+        fetchMessages();
+    }, []);
+
     return (
         <>
             <ChatHeader />
             <div className="flex-1 overflow-y-auto min-h-0">
-
-                {/*their msg*/}
-                <div className="flex items-start gap-3">
-                    <img
-                        src="https://via.placeholder.com/40"
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full"
-                    />
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-baseline gap-2">
-                            <span className="font-semibold">Bonnie Green</span>
-                            <span className="text-xs text-gray-400">11:46</span>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg max-w-sm">
-                            That's awesome. I think our users will really appreciate the improvements.
-                        </div>
-                        <span className="text-xs text-gray-400">Delivered</span>
-                    </div>
-                </div>
-                {/*their msg=================*/}
-
-                {/*your msg*/}
-                <div className="flex items-start justify-end gap-3">
-                    <div className="flex flex-col items-end gap-1">
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-xs text-gray-400">11:46</span>
-                            <span className="font-semibold">Bonnie Green</span>
-                        </div>
-                        <div className="bg-red-700 text-white p-4 rounded-lg max-w-sm">
-                            That's awesome. I think our users will really appreciate the improvements.
-                        </div>
-                        <span className="text-xs text-gray-400">Delivered</span>
-                    </div>
-                    <img
-                        src="https://via.placeholder.com/40"
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full"
-                    />
-                </div>
-                {/*your msg=================*/}
+                {messages.map((message, index) => (
+                    <ChatMessage key={index} message={message} senderId={senderId} />
+                ))}
             </div>
-            <MessageInput/>
+            <MessageInput />
         </>
     );
 };
+
 
 const ChatHeader: React.FC = () => {
     return (
@@ -122,74 +111,172 @@ const ChatHeader: React.FC = () => {
                 />
                 <h3 className="text-lg font-bold">Bonnie Green</h3>
             </div>
+        </div>
+    );
+};
 
-            <div className="flex items-center gap-4">
-                {/*video call button*/}
-                <button className="hover:bg-gray-100 rounded-full p-2 transition-colors">
-                    <svg
-                        className="w-5 h-5 text-gray-600"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M14 7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7Zm2 9.387 4.684 1.562A1 1 0 0 0 22 17V7a1 1 0 0 0-1.316-.949L16 7.613v8.774Z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                </button>
+const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, senderId }) => {
+    const { mediaURL, time_stamp, sender } = message;
+    const [textContent, setTextContent] = useState<string | null>(null);
+    const isSentByCurrentUser = sender === senderId;
 
-                {/*voice call button*/}
-                <button className="hover:bg-gray-100 rounded-full p-2 transition-colors">
-                    <svg
-                        className="w-5 h-5 text-gray-600"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path d="M7.978 4a2.553 2.553 0 0 0-1.926.877C4.233 6.7 3.699 8.751 4.153 10.814c.44 1.995 1.778 3.893 3.456 5.572 1.68 1.679 3.577 3.018 5.57 3.459 2.062.456 4.115-.073 5.94-1.885a2.556 2.556 0 0 0 .001-3.861l-1.21-1.21a2.689 2.689 0 0 0-3.802 0l-.617.618a.806.806 0 0 1-1.14 0l-1.854-1.855a.807.807 0 0 1 0-1.14l.618-.62a2.692 2.692 0 0 0 0-3.803l-1.21-1.211A2.555 2.555 0 0 0 7.978 4Z"/>
-                    </svg>
-                </button>
+    useEffect(() => {
+        const fetchContent = async () => {
+            if (mediaURL) {
+                try {
+                    const response = await fetch(mediaURL);
+                    if (response.ok) {
+                        const contentType = response.headers.get('Content-Type');
 
-                {/*exclamation button*/}
-                <button className="hover:bg-gray-100 rounded-full p-2 transition-colors">
-                    <svg
-                        className="w-5 h-5 text-gray-600"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
+                        if (contentType?.startsWith('text/')) {
+                            const text = await response.text();
+                            setTextContent(text);
+                        } else if (contentType?.startsWith('image/')) {
+                            setTextContent(mediaURL); // Use the URL directly for images
+                        } else {
+                            setTextContent('Unsupported content type.');
+                        }
+                    } else {
+                        console.error('Failed to fetch media content:', response.statusText);
+                        setTextContent('Failed to fetch content.');
+                    }
+                } catch (error) {
+                    console.error('Error fetching media content:', error);
+                    setTextContent('Error loading content.');
+                }
+            }
+        };
+
+        fetchContent();
+    }, [mediaURL]);
+
+    const isImage = mediaURL && ['.jpeg', '.jpg', '.gif', '.png'].some(ext => mediaURL.endsWith(ext));
+
+    return (
+        <div className={`flex items-start ${isSentByCurrentUser ? 'justify-end' : 'justify-start'} gap-3 mb-3`}>
+            <div className="flex flex-col">
+                <div className="text-xs text-gray-400">{new Date(time_stamp).toLocaleTimeString()}</div>
+                {isImage ? (
+                    <img
+                        src={textContent || mediaURL}
+                        alt="Media content"
+                        className="w-40 h-40 object-cover rounded-lg"
+                    />
+                ) : (
+                    <div
+                        className={`p-3 rounded-lg max-w-xs ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}
                     >
-                        <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                        />
-                    </svg>
-                </button>
+                        <p>{textContent || 'Content could not be loaded'}</p>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
+
+
 const MessageInput: React.FC = () => {
+    const [textContent, setTextContent] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b'; // Your sender ID
+    const receiverId = '9ba9d983-1b17-49e2-9cc0-9dcd5bd0c9ba'; // Your receiver ID
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setTextContent(''); // Clear text input if a file is selected
+        }
+    };
+
+    const handleSend = async () => {
+        try {
+            let fileName: string;
+            let contentToUpload: File | Blob;
+
+            if (selectedFile) {
+                fileName = `images/${Date.now()}-${selectedFile.name}`;
+                contentToUpload = selectedFile;
+            } else if (textContent.trim()) {
+                fileName = `texts/${Date.now()}-message.txt`;
+                contentToUpload = new Blob([textContent], { type: 'text/plain' });
+            } else {
+                alert('Please enter a message or select a file.');
+                return;
+            }
+
+            const { data: uploadData, error: uploadError } = await supabase
+                .storage
+                .from('Messages')
+                .upload(fileName, contentToUpload);
+
+            if (uploadError) {
+                console.error('Upload failed:', uploadError.message);
+                alert(`Upload failed: ${uploadError.message}`);
+                return;
+            }
+
+            const { data: urlData } = supabase.storage.from('Messages').getPublicUrl(fileName);
+            const publicURL = urlData?.publicUrl;
+
+            if (!publicURL) {
+                alert('Failed to get public URL for the uploaded content.');
+                return;
+            }
+
+            const { error: insertError } = await supabase
+                .from('message')
+                .insert([
+                    {
+                        sender: senderId,
+                        receiver: receiverId,
+                        mediaURL: publicURL,
+                        time_stamp: new Date(),
+                        is_read: false
+                    }
+                ]);
+
+            if (insertError) {
+                console.error('Failed to insert message into database:', insertError.message);
+                alert(`Failed to save message: ${insertError.message}`);
+                return;
+            }
+
+            alert('Message saved to database successfully!');
+            setTextContent('');
+            setSelectedFile(null);
+        } catch (e) {
+            console.error('An unexpected error occurred:', e);
+            alert('An unexpected error occurred during upload.');
+        }
+    };
+
     return (
         <div className="mt-auto flex items-center p-4 bg-white rounded-lg">
-            <input
-                type="text"
-                placeholder="Schrijf een bericht"
+            <textarea
+                value={textContent}
+                onChange={(e) => setTextContent(e.target.value)}
+                placeholder="Type your message..."
                 className="flex-1 p-2 rounded-lg border border-gray-300 outline-none"
+                disabled={!!selectedFile}
             />
-            <button className="ml-4 text-2xl text-gray-500 hover:text-gray-700 transition-colors">
+            <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="ml-4"
+                disabled={!!textContent.trim()}
+            />
+            <button
+                onClick={handleSend}
+                className="ml-4 text-2xl text-gray-500 hover:text-gray-700 transition-colors"
+            >
                 &#128172;
             </button>
         </div>
     );
 };
+
 
 export default ChatApp;
