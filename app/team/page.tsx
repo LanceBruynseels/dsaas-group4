@@ -32,7 +32,7 @@ const TeamSection = () => {
                     nen hele hoop text habibi
                 </div>
             </div>
-            <div className="flex flex-row w-screen h-1/6 bg-purple-600 gap-[5%] justify-center">
+            <div className="flex  flex-row w-screen h-1/6 bg-purple-600 gap-[5%] justify-center">
 
                 {teamMembers.map((member, index) => (
                     <div
