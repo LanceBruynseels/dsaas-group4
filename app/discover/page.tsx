@@ -3,64 +3,90 @@ import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client"; // Adjust the import path
 
 const Discover: React.FC = () => {
-    const [imageUrls, setImageUrls] = useState<string[] | null>(null);
+    const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [filteredChats, setFilteredChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchImages = async () => {
+        const fetchChats = async () => {
             const supabase = createClient();
             try {
-                // Fetch the image URLs for chatimage1.jpg to chatimage6.jpg
-                const urls = await Promise.all(
-                    Array.from({ length: 6 }).map((_, index) => {
-                        const fileName = `chatimage${index + 1}.jpg`;
-                        const { data: imageData } = supabase.storage
-                            .from("chat-images") // Assuming 'chat-images' is your bucket
-                            .getPublicUrl(fileName);
+                // Fetch titles and image URLs from your 'chats' table
+                const { data, error } = await supabase
+                    .from("discover_chats")
+                    .select("id, title, image_url");
 
-                        return imageData?.publicUrl || ""; // return the public URL if it exists
-                    })
-                );
+                if (error) throw error;
 
-                setImageUrls(urls); // Store all image URLs in the state
-            } catch {
+                setChats(data); // Store the chat data (titles + image URLs)
+                setFilteredChats(data); // Initially, show all chats
+            } catch (err) {
                 setError("Er is een fout opgetreden.");
+                console.error(err);
             }
         };
 
-        fetchImages();
+        fetchChats();
     }, []);
 
-    return (
-        <div className="flex flex-1 container mx-auto py-2 px-1 bg-white">
-            <div className="bg-[#FCA5A5] text-white p-4 rounded-xl shadow-md col-span-3 w-1/4">
-                <h2 className="text-xl font-bold mb-4">Notifications</h2>
-                <p className="text-sm">Notifications</p>
-            </div>
+    const handleSearch = () => {
+        if (searchQuery) {
+            const filtered = chats?.filter((chat) =>
+                chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredChats(filtered); // Update filtered chats
+        } else {
+            setFilteredChats(chats); // If no search query, show all chats
+        }
+    };
 
-            <div className="bg-[#771D1D] text-white p-4 rounded-xl shadow-md col-span-9 w-3/4 ml-6 min-h-[400px]">
+    return (
+        <div className="flex flex-1 container mx-auto py-2 px-2 bg-white">
+
+            <div className="bg-[#771D1D] text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
                 <h2 className="text-xl font-bold mb-4">Discover</h2>
                 <p className="text-sm mb-4">Group chats</p>
 
+                {/* Search bar and button */}
+                <div className="flex items-center mb-4">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="p-2 rounded-l-lg w-1/3 border border-gray-300 text-black"
+                        placeholder="Search chats"
+                    />
+                    <button
+                        onClick={handleSearch}
+                        className="bg-rose-400 text-white p-2 rounded-r-lg ml-2 hover:bg-blue-400"
+                    >
+                        Search
+                    </button>
+                </div>
+
                 {/* Group chat image sections */}
-                <div className="grid grid-cols-3 gap-4 ">
-                    {imageUrls ? (
-                        imageUrls.map((imageUrl, index) => (
-                            <div key={index} className="bg-white p-4 rounded-lg text-center hover:bg-rose-400">
-                                {imageUrl ? (
+                <div className="grid grid-cols-3 gap-4">
+                    {filteredChats ? (
+                        filteredChats.map((chat) => (
+                            <div
+                                key={chat.id} // Using chat.id for the key
+                                className="bg-white p-4 rounded-lg text-center hover:bg-rose-400"
+                            >
+                                {chat.image_url ? (
                                     <img
-                                        src={imageUrl} // Use the specific image URL for each index
-                                        alt={`Chat ${index + 1}`}
+                                        src={chat.image_url} // Use the specific image URL for each chat
+                                        alt={chat.title}
                                         className="w-full h-[200px] object-cover rounded-md mb-2"
                                     />
                                 ) : (
                                     <div className="w-full h-[200px] bg-gray-300 rounded-md mb-2"></div>
                                 )}
-                                <p className="text-sm text-black">Chat {index + 1}</p>
+                                <p className="text-sm text-black">{chat.title}</p> {/* Display the title */}
                             </div>
                         ))
                     ) : (
-                        <div>Loading images...</div>
+                        <div>Loading chats...</div>
                     )}
                 </div>
             </div>
