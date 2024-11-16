@@ -1,15 +1,11 @@
-import FetchDataSteps from "@components/tutorial/fetch-data-steps";
-import { InfoIcon } from "lucide-react";
-import { redirect } from "next/navigation";
-import ToggleLabel from "@components/toggleLabel";
-
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
+import FilterSection from '@components/filterselection';
 
 export default async function HomePage() {
     const supabase = await createClient();
 
-    let { data: filter_data, error } = await supabase.rpc('get_all_filter_data')
+    let { data: filter_data, error } = await supabase.rpc('get_all_filter_data');
 
     if (error) {
         console.error("Error fetching data:", error.message);
@@ -23,121 +19,72 @@ export default async function HomePage() {
                 <h2 className="text-xl font-bold mb-4 text-red-950">Zoek Instellingen</h2>
 
                 {/* Personality Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Persoonlijkheid</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.personalities && filter_data.personalities.length > 0 ? (
-                            filter_data.personalities.map((personalities) => (
-                                <ToggleLabel key={personalities.personality_id}
-                                             tag={personalities.personality}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Persoonlijkheid"
+                    table="personality"
+                    data={filter_data.personalities}
+                    keyField="personality_id"
+                    labelField="personality"
+                />
 
                 {/* Relationship goals Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Relatiedoel</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.relationship_goals && filter_data.relationship_goals.length > 0 ? (
-                            filter_data.relationship_goals.map((goals) => (
-                                <ToggleLabel key={goals.relationship_goals_id}
-                                             tag={goals.relationship_goals}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Relatiedoel"
+                    table="relationship_goals"
+                    data={filter_data.relationship_goals}
+                    keyField="relationship_goals_id"
+                    labelField="relationship_goals"
+                />
 
                 {/* Gender Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Gender</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.genders && filter_data.genders.length > 0 ? (
-                            filter_data.genders.map((gender) => (
-                                <ToggleLabel key={gender.gender_id}
-                                             tag={gender.gender}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Gender"
+                    table="gender"
+                    data={filter_data.genders}
+                    keyField="gender_id"
+                    labelField="gender"
+                />
 
                 {/* Interests Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Interesses</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.interests && filter_data.interests.length > 0 ? (
-                            filter_data.interests.map((item_interests) => (
-                                <ToggleLabel key={item_interests.id}
-                                             tag={item_interests.interest}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Interesses"
+                    table="interests"
+                    data={filter_data.interests}
+                    keyField="id"
+                    labelField="interest"
+                />
 
                 {/* Disability Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Beperking</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.disabilities && filter_data.disabilities.length > 0 ? (
-                            filter_data.disabilities.map((disabilities) => (
-                                <ToggleLabel key={disabilities.disability_id}
-                                             tag={disabilities.disability}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Beperking"
+                    table="disability"
+                    data={filter_data.disabilities}
+                    keyField="disability_id"
+                    labelField="disability"
+                />
 
                 {/* Home status Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Thuis status</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.home_statuses && filter_data.home_statuses.length > 0 ? (
-                            filter_data.home_statuses.map((home_statuses) => (
-                                <ToggleLabel key={home_statuses.home_status_id}
-                                             tag={home_statuses.home_status}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Thuis status"
+                    table="home_status"
+                    data={filter_data.home_statuses}
+                    keyField="home_status_id"
+                    labelField="home_status"
+                />
 
                 {/* Religion Options */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Religie</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {filter_data.religions && filter_data.religions.length > 0 ? (
-                            filter_data.religions.map((religions) => (
-                                <ToggleLabel key={religions.religion_id}
-                                             tag={religions.religion}>
-                                </ToggleLabel>
-                            ))
-                        ) : (
-                            <p>No interests</p>
-                        )}
-                    </div>
-                </div>
+                <FilterSection
+                    title="Religie"
+                    table="religion"
+                    data={filter_data.religions}
+                    keyField="religion_id"
+                    labelField="religion"
+                />
 
                 {/* Distance Slider */}
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Afstand</h3>
-                    <input type="range" min="5" max="30" defaultValue="5" className="w-full mt-2"/>
+                    <input type="range" min="5" max="30" defaultValue="5" className="w-full mt-2" />
                     <div className="flex justify-between text-sm mt-1">
                         <span>5 km</span>
                         <span>30 km</span>
@@ -147,7 +94,7 @@ export default async function HomePage() {
                 {/* Age Slider */}
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold">Leeftijd</h3>
-                    <input type="range" min="24" max="30" defaultValue="24" className="w-full mt-2"/>
+                    <input type="range" min="24" max="30" defaultValue="24" className="w-full mt-2" />
                     <div className="flex justify-between text-sm mt-1">
                         <span>18</span>
                         <span>30</span>
@@ -155,27 +102,18 @@ export default async function HomePage() {
                 </div>
             </div>
 
+            {/* Profile Section */}
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
-                {/* Profile Section */}
                 <div className="flex flex-col min-h-full p-4">
-                    {/* Updated layout for Profile Image and Profile Details */}
                     <div className="flex flex-row items-stretch">
-
-                        {/* Profile Image Section */}
                         <div className="flex basis-1/2 items-center justify-center p-4 border-r">
                             <button className="left-2 text-black">❮</button>
-                            <Image src="/profileImage.png" alt="Profile Picture" width={300} height={300}
-                                   className="rounded-lg object-cover"/>
+                            <Image src="/profileImage.png" alt="Profile Picture" width={300} height={300} className="rounded-lg object-cover" />
                             <button className="right-2 text-black">❯</button>
                         </div>
-
-                        {/* Profile Details Section */}
-                        <div
-                            className="flex basis-1/2 flex-col items-center justify-center p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
+                        <div className="flex basis-1/2 flex-col items-center justify-center p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
                             <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
-                            <p className="mt-2 text-center">Meer informatie over Jara. Hobbies, interesses, relatie
-                                status, wat ze hoopt te vinden op de applicatie, hoe ze zichzelf voelt op dit
-                                moment.</p>
+                            <p className="mt-2 text-center">Meer informatie over Jara...</p>
                             <div className="mt-4 text-4xl">😍</div>
                         </div>
                     </div>
@@ -191,20 +129,18 @@ export default async function HomePage() {
             </div>
 
             {/* Notifications Side Panel */}
-            <div
-                className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex flex-row justify-between items-center">
                     <h2 className="font-bold">Meldingen</h2>
                     <div>
-                        <Image src="/bell.png" alt="Bell Icon" height={25} width={25}/>
+                        <Image src="/bell.png" alt="Bell Icon" height={25} width={25} />
                     </div>
                 </div>
                 <div className="flex flex-col my-2">
                     {/* Sample Notifications */}
                     {["You got a message from ...", "You got a message from ..."].map((text, idx) => (
                         <div key={idx} className="flex flex-row my-2 items-center">
-                            <Image src="/mock-picture.webp" alt="Profile Picture" width={50} height={50}
-                                   className="rounded-full border border-gray-500"/>
+                            <Image src="/mock-picture.webp" alt="Profile Picture" width={50} height={50} className="rounded-full border border-gray-500" />
                             <div className="text-xs mx-2">{text}</div>
                         </div>
                     ))}
