@@ -21,6 +21,25 @@ async function addLabelToUser(table: string, labelKey: number) {
     }
 }
 
+// Function to call the API route to delete a label out of the table
+async function removeLabelToUser(table: string, labelKey: number) {
+    const response = await fetch("/api/addLabel", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ table, key: labelKey }), // Send data to API route
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        return data;
+    } else {
+        console.error("Error deleting data:", data.error);
+        return null;
+    }
+}
+
 function ToggleLabel({
                          tag,
                          labelKey,
@@ -39,6 +58,8 @@ function ToggleLabel({
             // Only add the label to the user if it's selected (i.e., newSelected is true)
             if (newSelected) {
                 addLabelToUser(table, labelKey);
+            } else {
+                removeLabelToUser(table, labelKey);
             }
             return newSelected;
         });
