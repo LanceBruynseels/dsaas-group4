@@ -19,6 +19,8 @@ declare module "next-auth" {
     }
 }
 
+// export const authOptions: NextAuthOptions = {
+// changed to const to resolving pipeline failure
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
@@ -89,3 +91,6 @@ export const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
+// // Export the GET and POST handlers
+// export const GET = handler;
+// export const POST = handler;
