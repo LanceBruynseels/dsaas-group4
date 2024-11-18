@@ -5,6 +5,8 @@ export async function middleware(request: NextRequest) {
   return await updateSession(request);
 }
 
+export { default } from "next-auth/middleware" // for persistent login
+
 export const config = {
   matcher: [
     /*
@@ -16,5 +18,12 @@ export const config = {
      * Feel free to modify this pattern to include more paths.
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+
+    // "/protected/:path*",// Any routes under protected folder// Add paths you want to protect for protecting (persistent login)
+    // "/home/:path*"  // Protect home pages
   ],
+
+
 };
+
+

@@ -100,3 +100,7 @@ Please file feedback and issues over on the [Supabase GitHub org](https://github
 - The code in "app/actions/auth/registration.ts" contains only data-fetching functions.
 - For FE implementation, simply import the route handler from api.
 - The "api" directory handles communication between FE pages and BE actions.
+
+## staying logged in states for end-users
+- first run 'npm install @types/next-auth' or 'npm uninstall next-auth' to install next-auth lib for session management
+- 

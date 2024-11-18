@@ -7,16 +7,18 @@
     "cy:open": "cypress open"
   },
   "dependencies": {
-
+    "18": "^0.0.0",
+    "@auth/core": "^0.37.3",
+    "@auth/supabase-adapter": "^1.7.3",
     "@builder.io/react": "^5.0.9",
     "@builder.io/sdk": "^3.0.5",
-    "18": "^0.0.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
+    "@types/next-auth": "^3.13.0",
     "autoprefixer": "^10.4.17",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
@@ -24,6 +26,7 @@
     "geist": "^1.2.1",
     "lucide-react": "^0.436.0",
     "next": "latest",
+    "next-auth": "^4.24.10",
     "next-themes": "^0.3.0",
     "node": "^22.11.0",
     "prettier": "^3.3.3",
