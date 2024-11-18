@@ -1,38 +1,17 @@
-'use client'
-import React, { useState, useEffect } from "react";
+// ProfilePicture.tsx
+'use client';
+
+import React, { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 type ProfilePictureProps = {
-    userId: string; // The user ID to fetch and save the profile picture URL
+    imageUrl: string;  // URL passed from the server
+    userId: 'abb0c0af-904c-4c52-b19b-5be0fc3da588';    // User's ID to update their profile in the database
 };
 
-const ProfilePicture: React.FC<ProfilePictureProps> = ({ userId }) => {
-    const [imageUrl, setImageUrl] = useState<string | null>(null); // URL of the profile picture
-    const [isUploading, setIsUploading] = useState(false); // To track upload progress
+const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => {
+    const [isUploading, setIsUploading] = useState(false);  // To track upload progress
     const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message for failed uploads
-
-    // Fetch the current profile picture when the component mounts
-    useEffect(() => {
-        const fetchProfilePicture = async () => {
-            try {
-                const { data, error } = await createClient()
-                    .rpc("getProfilePicture", { userid: userId });
-                if (error) {
-                    console.error("Error fetching profile picture:", error);
-                    setImageUrl("/profileImage.png"); // Default image on error
-                } else {
-                    setImageUrl(data?.profile_picture_url || "/profileImage.png");
-                }
-                console.log(data)
-
-            } catch (error) {
-                console.error("Unexpected error:", error);
-                setImageUrl("/profileImage.png"); // Default image on unexpected error
-            }
-        };
-
-        fetchProfilePicture();
-    }, [userId]); // Re-fetch if userId changes
 
     // Handle file upload
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,23 +28,35 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ userId }) => {
                 .upload(`profile-pics/${userId}/${file.name}`, file);
 
             if (error) {
+                console.error('Error uploading file:', error.message);
                 throw error; // Handle upload error
             }
 
             // Construct the public URL for the uploaded image
             const publicUrl = `https://legfcpyiwzvfhacgnpkw.supabase.co/storage/v1/object/public/profilePictures/profile-pics/${userId}/${file.name}`;
 
-            // Call the custom Supabase function to update the profile picture in the database
-            const { error: funcError } = await createClient()
-                .rpc('setProfilePicture', { userid: userId, picture_url: publicUrl });
+            console.log("Uploaded file public URL:", publicUrl);
 
-            if (funcError) {
-                console.error("Function error:", funcError);
-                throw funcError; // Handle function error
+            // Save the profile picture URL in the database by calling the POST endpoint
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    pictureUrl: publicUrl,
+                }),
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                console.error("Error updating profile picture in the database:", result.error);
+                throw new Error(result.error || 'Failed to update profile picture in database.');
             }
 
-            // Update the profile picture URL in the state after successful upload
-            setImageUrl(publicUrl);
+            // Clear error message and indicate success
+            setErrorMessage(null);  // Clear any error messages on success
             console.log("Profile picture updated successfully.");
         } catch (error: any) {
             console.error("Error:", error.message);

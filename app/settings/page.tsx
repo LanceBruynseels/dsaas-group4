@@ -1,39 +1,36 @@
-// app/settings/page.tsx
-import { createClient } from "@/utils/supabase/server";
-import React from "react";
+// page.tsx (Server-side rendering)
+import { fetchProfileData } from "app/actions/settings/action";
 import { SubmitButton } from "@/components/submit-button";
 import Slider from "@/components/slider";
-import ProfilePicture from "@/components/profilePicture";
-import FilterSection from "@/components/filterselection";
-import InputFieldsSection from "@components/InputFieldSection";
+import ProfilePicture from "@/components/profilePicture";  // This will now be used with the URL data
+import InputFieldsSection from "@/components/InputFieldSection";
 import Link from "next/link";
+import ProfileFilters from "@/components/profileFilters";
+
+export const revalidate = 0;  // Optional: to specify caching strategy for revalidation
 
 const SettingsPage = async () => {
-    const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588'; // Hardcoded userId
-
-    let filterData = {
-        personalities: [],
-        relationship_goals: [],
-        genders: [],
-        interests: [],
-        disabilities: [],
-        home_statuses: [],
-        religions: [],
-    };
+    let profileData;
+    let filterData;
+    let profilePicture;
+    const userId =  'abb0c0af-904c-4c52-b19b-5be0fc3da588';    // User's ID to update their profile in the database
 
     try {
-        // Fetch all filter data
-        const { data: filterDataResponse, error: filterError } = await createClient().rpc("get_all_filter_data");
-        if (filterError) {
-            console.error("Error fetching filter data:", filterError);
-        } else {
-            filterData = filterDataResponse || filterData;
-        }
-    }
-    catch (error) {
-        console.error("Unexpected error:", error);
-    }
+        // Fetch profile and filter data server-side
+        const data = await fetchProfileData();
+        profileData = data.profile;
+        filterData = data.filters;
+        profilePicture = data.picture;
+        console.log(profilePicture);
 
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+        return (
+            <div className="text-red-500">
+                Er is een probleem opgetreden bij het laden van de instellingen.
+            </div>
+        );
+    }
 
     return (
         <div className="flex">
@@ -62,70 +59,27 @@ const SettingsPage = async () => {
             <div className="flex flex-col basis-3/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] flex-grow">
                 {/* Profile Picture Section */}
                 <div className="flex flex-col justify-center items-center mb-6">
-                    <ProfilePicture userId={userId} />
+                    <ProfilePicture imageUrl={profilePicture.profile_picture_url || "/profileImage.png"} userId={userId} />
                 </div>
 
                 {/* Input Fields Section */}
                 <InputFieldsSection
                     fields={[
-                        { label: "Mijn voornaam", type: "text", value: "" },
-                        { label: "Mijn achternaam", type: "text", value: "" },
+                        { label: "Mijn voornaam", type: "text", value: profileData.firstName || "" },
+                        { label: "Mijn achternaam", type: "text", value: profileData.lastName || "" },
                     ]}
                 />
 
                 {/* Filter Sections */}
-                <div className="grid grid-cols-3 gap-2 mb-6">
-                    <FilterSection
-                        title="Mijn persoonlijkheid"
-                        data={filterData.personalities}
-                        keyField="personality_id"
-                        labelField="personality"
-                    />
-                    <FilterSection
-                        title="Mijn relatiedoel"
-                        data={filterData.relationship_goals}
-                        keyField="relationship_goals_id"
-                        labelField="relationship_goals"
-                    />
-                    <FilterSection
-                        title="Mijn gender"
-                        data={filterData.genders}
-                        keyField="gender_id"
-                        labelField="gender"
-                    />
-                    <FilterSection
-                        title="Mijn interesses"
-                        data={filterData.interests}
-                        keyField="id"
-                        labelField="interest"
-                    />
-                    <FilterSection
-                        title="Mijn beperking"
-                        data={filterData.disabilities}
-                        keyField="disability_id"
-                        labelField="disability"
-                    />
-                    <FilterSection
-                        title="Mijn thuisstatus"
-                        data={filterData.home_statuses}
-                        keyField="home_status_id"
-                        labelField="home_status"
-                    />
-                    <FilterSection
-                        title="Mijn religie"
-                        data={filterData.religions}
-                        keyField="religion_id"
-                        labelField="religion"
-                    />
-                </div>
+                <ProfileFilters filterData={filterData} profileData={profileData} />
 
                 {/* Sliders */}
                 <div className="flex justify-between gap-4 mt-4 mb-6">
                     <div className="flex-1 px-20 w-1/2">
-                        <Slider label="Afstand" unit="km" min={5} max={30} defaultValue={15} sliderColor="#771D1D" />
+                        <Slider label="Afstand" unit="km" min={5} max={30} defaultValue={profileData.distance || 15} sliderColor="#771D1D" />
                     </div>
                     <div className="flex-1 px-20 w-1/2">
-                        <Slider label="Leeftijd" unit="jaar" min={18} max={60} defaultValue={24} sliderColor="#771D1D" />
+                        <Slider label="Leeftijd" unit="jaar" min={18} max={60} defaultValue={profileData.age || 24} sliderColor="#771D1D" />
                     </div>
                 </div>
 
