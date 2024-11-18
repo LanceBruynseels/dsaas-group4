@@ -6,25 +6,34 @@ import Slider from "@/components/slider";
 import ProfilePicture from "@/components/profilePicture";
 import FilterSection from "@/components/filterselection";
 import InputFieldsSection from "@components/InputFieldSection";
-import Link from 'next/link';
+import Link from "next/link";
 
-// This is the server-side code now directly inside the component
 const SettingsPage = async () => {
-    const userId = "abb0c0af-904c-4c52-b19b-5be0fc3da588"; // Hardcoded userId
+    const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588'; // Hardcoded userId
 
-    // Fetch filter data based on userId
-    let filterData;
+    let filterData = {
+        personalities: [],
+        relationship_goals: [],
+        genders: [],
+        interests: [],
+        disabilities: [],
+        home_statuses: [],
+        religions: [],
+    };
+
     try {
-        const { data, error } = await createClient().rpc("get_all_filter_data");
-        if (error) {
-            console.error("Error fetching filter data:", error);
-            return <p>Error loading settings.</p>;
+        // Fetch all filter data
+        const { data: filterDataResponse, error: filterError } = await createClient().rpc("get_all_filter_data");
+        if (filterError) {
+            console.error("Error fetching filter data:", filterError);
+        } else {
+            filterData = filterDataResponse || filterData;
         }
-        filterData = data;
-    } catch (error) {
-        console.error("Error fetching data from Supabase:", error);
-        return <p>Error loading settings. Please try again later.</p>;
     }
+    catch (error) {
+        console.error("Unexpected error:", error);
+    }
+
 
     return (
         <div className="flex">
@@ -41,7 +50,8 @@ const SettingsPage = async () => {
                 </div>
                 <ul className="space-y-4 flex-1">
                     <li className="text-base font-semibold text-[#771D1D] cursor-pointer hover:text-[#771D1D]">
-                        <Link href="/settings">Profiel</Link></li>
+                        <Link href="/settings">Profiel</Link>
+                    </li>
                     <li className="text-base text-gray-500 cursor-pointer hover:text-gray-700">
                         <Link href="/settings/language">Taal Instellingen</Link>
                     </li>
@@ -52,7 +62,7 @@ const SettingsPage = async () => {
             <div className="flex flex-col basis-3/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] flex-grow">
                 {/* Profile Picture Section */}
                 <div className="flex flex-col justify-center items-center mb-6">
-                    <ProfilePicture imageUrl={filterData?.profile_pictureURL} userId={userId} />
+                    <ProfilePicture userId={userId} />
                 </div>
 
                 {/* Input Fields Section */}

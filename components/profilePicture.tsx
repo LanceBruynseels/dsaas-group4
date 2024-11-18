@@ -1,38 +1,77 @@
 'use client'
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 type ProfilePictureProps = {
-    imageUrl: string | null; // The URL of the profile picture, can be null if not available
-    userId: string; // The user ID to save the profile picture URL
+    userId: string; // The user ID to fetch and save the profile picture URL
 };
 
-const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => {
-    const [isUploading, setIsUploading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+const ProfilePicture: React.FC<ProfilePictureProps> = ({ userId }) => {
+    const [imageUrl, setImageUrl] = useState<string | null>(null); // URL of the profile picture
+    const [isUploading, setIsUploading] = useState(false); // To track upload progress
+    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message for failed uploads
 
-    // Handle file change and upload logic
+    // Fetch the current profile picture when the component mounts
+    useEffect(() => {
+        const fetchProfilePicture = async () => {
+            try {
+                const { data, error } = await createClient()
+                    .rpc("getProfilePicture", { userid: userId });
+                if (error) {
+                    console.error("Error fetching profile picture:", error);
+                    setImageUrl("/profileImage.png"); // Default image on error
+                } else {
+                    setImageUrl(data?.profile_picture_url || "/profileImage.png");
+                }
+                console.log(data)
+
+            } catch (error) {
+                console.error("Unexpected error:", error);
+                setImageUrl("/profileImage.png"); // Default image on unexpected error
+            }
+        };
+
+        fetchProfilePicture();
+    }, [userId]); // Re-fetch if userId changes
+
+    // Handle file upload
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
         setIsUploading(true);
-        setErrorMessage(null); // Reset error message
+        setErrorMessage(null); // Reset any previous error messages
 
         try {
-            const { error: uploadError } = await createClient()
-                .from('profile')
-                .update({profile_pictureURL: imageUrl})
-                .eq('user_id', userId);
+            // Upload file to Supabase storage bucket 'profilePictures'
+            const { data, error } = await createClient()
+                .storage.from('profilePictures')
+                .upload(`profile-pics/${userId}/${file.name}`, file);
 
-            if (uploadError) throw uploadError;
+            if (error) {
+                throw error; // Handle upload error
+            }
 
-            // Successfully uploaded and saved the new URL
-            setIsUploading(false);
+            // Construct the public URL for the uploaded image
+            const publicUrl = `https://legfcpyiwzvfhacgnpkw.supabase.co/storage/v1/object/public/profilePictures/profile-pics/${userId}/${file.name}`;
+
+            // Call the custom Supabase function to update the profile picture in the database
+            const { error: funcError } = await createClient()
+                .rpc('setProfilePicture', { userid: userId, picture_url: publicUrl });
+
+            if (funcError) {
+                console.error("Function error:", funcError);
+                throw funcError; // Handle function error
+            }
+
+            // Update the profile picture URL in the state after successful upload
+            setImageUrl(publicUrl);
+            console.log("Profile picture updated successfully.");
         } catch (error: any) {
-            console.error("Error uploading image:", error.message);
+            console.error("Error:", error.message);
             setErrorMessage("Failed to upload image. Please try again.");
-            setIsUploading(false);
+        } finally {
+            setIsUploading(false); // Hide the uploading state
         }
     };
 
