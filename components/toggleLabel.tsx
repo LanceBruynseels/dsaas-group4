@@ -1,19 +1,19 @@
-"use client";
+import React from "react";
 
-import React, { useState } from "react";
+type ToggleLabelProps = {
+    tag: string;
+    isSelected: boolean;
+    onClick: () => void;
+};
 
-function ToggleLabel({ tag }: { tag: string }) {
-    const [selected, setSelected] = useState(false);
-
-    const handleToggle = () => setSelected((prev) => !prev);
-
+function ToggleLabel({ tag, isSelected, onClick }: ToggleLabelProps) {
     return (
         <button
-            onClick={handleToggle}
-            className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 hover:bg-gray-100"
+            onClick={onClick}
+            className="px-3 py-1 text-sm rounded-full shadow-sm border border-gray-300 hover:bg-gray-100"
             style={{
-                backgroundColor: selected ? "#771D1D" : "white",
-                color: selected ? "white" : "#771D1D",
+                backgroundColor: isSelected ? "#771D1D" : "white",
+                color: isSelected ? "white" : "#771D1D",
             }}
         >
             {tag}
