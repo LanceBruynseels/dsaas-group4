@@ -105,4 +105,5 @@ Please file feedback and issues over on the [Supabase GitHub org](https://github
 - first run 'npm install @types/next-auth' or 'npm uninstall next-auth' to install next-auth lib for session management
 - app/api/[...nexauth]/route.ts is the new route for sign in handler & session management (session will be stored in cookies once user is signed in)
 - components/UserDisplay.tsx is for session info display, there we set up a session hook for session info receiving (user-side session management)
-- 
+- in file .env.local, we need to set up next auth URL connection and secret key for session encryption ("NEXTAUTH_URL=http://localhost:3000
+  NEXTAUTH_SECRET=v/lulMgFezKtvHSuSGMfzRN/zLzQx5e/IoA4hHkA1hc=")
