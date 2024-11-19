@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Function to call the API route to insert label into the user's search table
 async function addLabelToUser(table: string, labelKey: number) {
@@ -44,18 +44,19 @@ function ToggleLabel({
                          tag,
                          labelKey,
                          table,
+                         isSelected: initialSelected,
                      }: {
     tag: string;
     labelKey: number;
     table: string;
+    isSelected: boolean;
 }) {
-    const [selected, setSelected] = useState(false);
+    const [selected, setSelected] = useState(initialSelected);
 
     // Toggle the label selection state
     const handleToggle = async () => {
         setSelected((prev) => {
             const newSelected = !prev;
-            // Only add the label to the user if it's selected (i.e., newSelected is true)
             if (newSelected) {
                 addLabelToUser(table, labelKey);
             } else {
@@ -64,6 +65,10 @@ function ToggleLabel({
             return newSelected;
         });
     };
+
+    useEffect(() => {
+        setSelected(initialSelected);
+    }, [initialSelected]);
 
     return (
         <button

@@ -1,9 +1,11 @@
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
+import profileImage from 'public/profileImage.png';
 
 export default async function HomePage() {
     const supabase = await createClient();
+    const user_id = "abb0c0af-904c-4c52-b19b-5be0fc3da588"
 
     let { data: filter_data, error } = await supabase.rpc('get_all_filter_data');
 
@@ -25,6 +27,7 @@ export default async function HomePage() {
                     data={filter_data.personalities}
                     keyField="personality_id"
                     labelField="personality"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Relationship goals Options */}
@@ -34,6 +37,7 @@ export default async function HomePage() {
                     data={filter_data.relationship_goals}
                     keyField="relationship_goals_id"
                     labelField="relationship_goals"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Gender Options */}
@@ -43,6 +47,7 @@ export default async function HomePage() {
                     data={filter_data.genders}
                     keyField="gender_id"
                     labelField="gender"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Interests Options */}
@@ -52,6 +57,7 @@ export default async function HomePage() {
                     data={filter_data.interests}
                     keyField="id"
                     labelField="interest"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Disability Options */}
@@ -61,6 +67,7 @@ export default async function HomePage() {
                     data={filter_data.disabilities}
                     keyField="disability_id"
                     labelField="disability"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Home status Options */}
@@ -70,6 +77,7 @@ export default async function HomePage() {
                     data={filter_data.home_statuses}
                     keyField="home_status_id"
                     labelField="home_status"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Religion Options */}
@@ -79,6 +87,7 @@ export default async function HomePage() {
                     data={filter_data.religions}
                     keyField="religion_id"
                     labelField="religion"
+                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
                 />
 
                 {/* Distance Slider */}
@@ -104,14 +113,25 @@ export default async function HomePage() {
 
             {/* Profile Section */}
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
-                <div className="flex flex-col min-h-full p-4">
-                    <div className="flex flex-row items-stretch">
+                <div className="flex flex-col min-h-full p-4 w-full">
+                    <div className="flex flex-row items-stretch w-full">
                         <div className="flex basis-1/2 items-center justify-center p-4 border-r">
                             <button className="left-2 text-black">❮</button>
-                            <Image src="/profileImage.png" alt="Profile Picture" width={300} height={300} className="rounded-lg object-cover" />
+                            <div className="relative w-full h-full flex-shrink-0">
+                                <Image
+                                    src={profileImage}
+                                    alt="Profile Picture"
+                                    width={1000}
+                                    height={1000}
+                                    className="rounded-lg object-contain w-full h-full"
+                                    loading={"lazy"}
+                                    decoding={"async"}
+                                />
+                            </div>
                             <button className="right-2 text-black">❯</button>
                         </div>
-                        <div className="flex basis-1/2 flex-col items-center justify-center p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
+                        <div
+                            className="flex basis-1/2 flex-col items-center justify-center p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
                             <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
                             <p className="mt-2 text-center">Meer informatie over Jara...</p>
                             <div className="mt-4 text-4xl">😍</div>

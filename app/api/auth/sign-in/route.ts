@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
     try {
         const { username, password } = await request.json();
         const supabase = await createClient();
+        const user_id = "abb0c0af-904c-4c52-b19b-5be0fc3da588"
+
 
         // Validate required fields
         if (!username || !password) {
