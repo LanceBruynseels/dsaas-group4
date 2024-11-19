@@ -1,54 +1,33 @@
 'use client'
+import ToggleLabel from "@components/toggleLabel";
 import React, { useState, useEffect } from 'react';
-import ToggleLabel from "@components/toggleLabel"; // Assuming this is a custom toggle button component
 
-type FilterSectionProps = {
+type ProfileFilterSectionProps = {
     title: string;
-    data: any[];   // All possible filter options (e.g., genders, interests, etc.)
-    keyField: string; // The field used for unique keys in the data (e.g., gender_id, id, etc.)
-    labelField: string; // The field used for the display label
-    profileData: any;  // User's selected labels (the data specific to the user)
+    data: any[];
+    keyField: string;
+    labelField: string;
+    selectedIds: number[]; // Pre-selected IDs from profileData
 };
 
-const ProfileFilterSection: React.FC<FilterSectionProps> = ({ title, data, keyField, labelField, profileData }) => {
-    const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({});
+const ProfileFilterSection: React.FC<ProfileFilterSectionProps> = ({ title, data, keyField, labelField, selectedIds }) => {
+    const [selectedItems, setSelectedItems] = useState<{ [key: number]: boolean }>({});
 
+    // Initialize selectedItems state based on selectedIds
     useEffect(() => {
-        // Initialize selectedItems based on profileData
-        const initialSelections: { [key: string]: boolean } = {};
+        const initialSelected = (selectedIds || []).reduce((acc, id) => {
+            acc[id] = true;
+            return acc;
+        }, {} as { [key: number]: boolean });
+        setSelectedItems(initialSelected);
+    }, [selectedIds]);
 
-        if (profileData) {
-            const userSelectedValues = profileData[title.toLowerCase().replace(" ", "")]; // e.g., "Mijn religie" => "religie"
-
-            if (userSelectedValues) {
-                if (Array.isArray(userSelectedValues)) {
-                    // Multi-select case
-                    userSelectedValues.forEach((value: string) => {
-                        initialSelections[value] = true;  // Mark those values as selected
-                    });
-                } else {
-                    // Single-select case
-                    initialSelections[userSelectedValues] = true;
-                }
-            }
-        }
-
-        setSelectedItems(initialSelections);  // Update state with the initial selections
-    }, [profileData, title]);
-
-    const handleToggle = (key: string) => {
-        if (["Mijn religie", "Mijn gender", "Mijn thuisstatus"].includes(title)) {
-            // Single-select logic: Clear previous selections and select the new one
-            setSelectedItems({
-                [key]: true, // Set the clicked item as selected
-            });
-        } else {
-            // Multi-select logic: Toggle the current selection state
-            setSelectedItems((prevSelected) => ({
-                ...prevSelected,
-                [key]: !prevSelected[key], // Toggle selection state
-            }));
-        }
+    // Handle toggle logic
+    const handleToggle = (id: number) => {
+        setSelectedItems((prevSelected) => ({
+            ...prevSelected,
+            [id]: !prevSelected[id], // Toggle the selected state of the clicked item
+        }));
     };
 
     return (
@@ -57,7 +36,7 @@ const ProfileFilterSection: React.FC<FilterSectionProps> = ({ title, data, keyFi
             <div className="flex flex-wrap gap-2 mt-2">
                 {data && data.length > 0 ? (
                     data.map((item) => {
-                        const isSelected = !!selectedItems[item[keyField]];  // Check if this item is selected
+                        const isSelected = !!selectedItems[item[keyField]]; // Check if this item is selected
                         return (
                             <ToggleLabel
                                 key={item[keyField]}
