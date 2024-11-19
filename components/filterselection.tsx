@@ -11,7 +11,7 @@ type FilterSectionProps = {
     user_id: string;
 };
 
-let FilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, keyField, labelField, user_id }) => {
+const FilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, keyField, labelField, user_id }) => {
     const supabase = await createClient();
 
     // Fetch selected items from the database
