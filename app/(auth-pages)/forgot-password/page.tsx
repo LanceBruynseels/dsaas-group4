@@ -7,10 +7,11 @@ import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
 type PageProps = {
-  searchParams: Message;
+  searchParams?: Promise<Message>; // Updated type to match Next.js expectation
 };
 
-export default function ForgotPassword({ searchParams }: PageProps) {
+export default async function ForgotPassword({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams; // Resolve the promise
   return (
       <>
         <form className="flex-1 flex flex-col w-full gap-2 text-foreground [&>input]:mb-6 min-w-64 max-w-64 mx-auto">
@@ -29,7 +30,7 @@ export default function ForgotPassword({ searchParams }: PageProps) {
             <SubmitButton formAction={forgotPasswordAction}>
               Reset Password
             </SubmitButton>
-            <FormMessage message={searchParams} />
+            <FormMessage message={resolvedSearchParams!} /> {/* Pass resolved params */}
           </div>
         </form>
         <SmtpMessage />
