@@ -47,7 +47,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
       >
-        <main className="min-h-screen flex flex-col">
+        <main className="min-h-screen flex flex-col bg-[#FFDFDB]">
           <nav className="w-full border-b border-red-950 h-16 flex justify-between items-center px-5">
             {/* Logo + Navigation */}
             <NavBar />

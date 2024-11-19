@@ -6,7 +6,9 @@ import bcrypt from "bcryptjs";
 export async function POST(request: NextRequest) {
     try {
         const { username, password } = await request.json();
-        const supabase = createClient();
+        const supabase = await createClient();
+        const user_id = "abb0c0af-904c-4c52-b19b-5be0fc3da588"
+
 
         // Validate required fields
         if (!username || !password) {
@@ -45,6 +47,10 @@ export async function POST(request: NextRequest) {
             success: true,
             message: "Inloggen succesvol!",
             userId: user.id,
+            redirect: {
+                destination: '/home',
+                // message: 'Registratie succesvol! Je wordt doorgestuurd naar de inlogpagina.'
+            }
         });
 
     }

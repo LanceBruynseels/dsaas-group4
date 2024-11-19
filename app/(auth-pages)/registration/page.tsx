@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from 'react';
-import { register } from '@/app/actions/auth/registration/registration';
-import { useRouter } from 'next/navigation'; // for redirect
+import React, { useState } from "react";
+import { register } from "@/app/actions/auth/registration/registration";
+import { useRouter } from "next/navigation"; // for redirect
 
 const Registration: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
@@ -9,22 +9,27 @@ const Registration: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const [status, setStatus] = useState<{
-        type: 'error' | 'success' | null;
+        type: "error" | "success" | null;
         message: string | null;
     }>({ type: null, message: null });
 
-    const handleSubmit = async (formData: FormData) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        const formData = new FormData(event.currentTarget); // Extract form data
+        setIsLoading(true);
+        setError(null);
+        setSuccess(null);
+
         try {
             const result = await register(formData);
 
             if (result.success) {
-                // set status message from the API response
                 setStatus({
-                    type: 'success',
-                    message: result.redirect?.message || 'Registratie succesvol!'
+                    type: "success",
+                    message: result.redirect?.message || "Registratie succesvol!",
                 });
 
-                // handle redirect if provided by the API
                 if (result.redirect?.destination) {
                     setTimeout(() => {
                         router.push(result.redirect!.destination);
@@ -32,44 +37,52 @@ const Registration: React.FC = () => {
                 }
             } else {
                 setStatus({
-                    type: 'error',
-                    message: result.error || 'Registratie mislukt'
+                    type: "error",
+                    message: result.error || "Registratie mislukt",
                 });
             }
         } catch (error) {
             setStatus({
-                type: 'error',
-                message: 'Er is een onverwachte fout opgetreden.'
+                type: "error",
+                message: "Er is een onverwachte fout opgetreden.",
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "hsl(10, 100%, 90%)" }}>
+        <div
+            className="min-h-screen flex justify-center items-center"
+            style={{ backgroundColor: "hsl(10, 100%, 90%)" }}
+        >
             <div className="flex w-full max-w-7xl justify-around items-center px-10">
                 {/* Logo Section */}
                 <div className="flex flex-col items-center space-y-6">
                     <img src="/vlinder.png" alt="VLinder Logo" className="h-60" />
-                    <h1 className= "font-bold text-6xl">Vlinder</h1>
+                    <h1 className="font-bold text-6xl">Vlinder</h1>
                 </div>
 
                 {/* Form Section */}
-                <div className="bg-red-600 text-white p-10 rounded-lg shadow-2xl w-96" style={{ backgroundColor: "#771D1D" }}>
+                <div
+                    className="bg-red-600 text-white p-10 rounded-lg shadow-2xl w-96"
+                    style={{ backgroundColor: "#771D1D" }}
+                >
                     <h2 className="text-3xl font-bold mb-6">Registreer</h2>
 
                     {/* Status Messages */}
-                    {error && (
+                    {status.type === "error" && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                            {error}
+                            {status.message}
                         </div>
                     )}
-                    {success && (
+                    {status.type === "success" && (
                         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                            {success}
+                            {status.message}
                         </div>
                     )}
 
-                    <form action={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium">
                                 Gebruikersnaam
@@ -78,7 +91,9 @@ const Registration: React.FC = () => {
                                 type="text"
                                 id="username"
                                 name="username"
-                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black" required/>
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black"
+                                required
+                            />
                         </div>
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium">
@@ -127,7 +142,7 @@ const Registration: React.FC = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            style={{ backgroundColor: '#FCA5A5' }}
+                            style={{ backgroundColor: "#FCA5A5" }}
                             className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold disabled:opacity-50"
                         >
                             {isLoading ? "Bezig met registreren..." : "Registreer"}
