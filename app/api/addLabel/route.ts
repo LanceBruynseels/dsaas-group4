@@ -4,7 +4,7 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        const { table, key } = body; // Get data from client-side request
+        const { table, key, user_id } = body; // Get data from client-side request
         const searchTable = `search_${table}`;
         const search_id = `${table}_id`;
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
             .from(searchTable)
             .insert([
                 {
-                    user_id: "abb0c0af-904c-4c52-b19b-5be0fc3da588", // user id from a user account that i made by inserting into the database
+                    user_id: user_id, // user id from a user account that i made by inserting into the database
                     [search_id]: key,
                 },
             ])
@@ -34,7 +34,7 @@ export async function DELETE(req: Request) {
     try {
         const body = await req.json();
 
-        const { table, key } = body; // Get data from client-side request
+        const { table, key, user_id } = body; // Get data from client-side request
         const searchTable = `search_${table}`;
         const search_id = `${table}_id`;
 
@@ -42,7 +42,7 @@ export async function DELETE(req: Request) {
         const { error } = await supabase
             .from(searchTable)
             .delete()
-            .eq("user_id", "abb0c0af-904c-4c52-b19b-5be0fc3da588") // Specific user ID
+            .eq("user_id", user_id) // Specific user ID
             .eq(search_id, key); // Match the ID to delete
 
         if (error) {

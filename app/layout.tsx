@@ -51,18 +51,6 @@ export default async function RootLayout({
           <nav className="w-full border-b border-red-950 h-16 flex justify-between items-center px-5">
             {/* Logo + Navigation */}
             <NavBar />
-            {/* Account Section */}
-            {/*<div className="flex items-center gap-2">*/}
-            {/*  <span className="text-xs text-gray-800">{session?.user?.username ?? 'Mijn account'}</span>*/}
-
-            {/*  <Image*/}
-            {/*      src="/mock-picture.webp"*/}
-            {/*      alt="Profile Picture"*/}
-            {/*      width={32}*/}
-            {/*      height={32}*/}
-            {/*      className="rounded-full border border-gray-500"*/}
-            {/*  />*/}
-            {/*</div>*/}
 
             <UserDisplay session={session} />
           </nav>

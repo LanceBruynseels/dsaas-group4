@@ -39,6 +39,7 @@ let FilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, k
                             tag={item[labelField]}
                             labelKey={item[keyField]}
                             table={table}
+                            user_id={user_id}
                             isSelected={selectedIds.has(item[keyField])} // Check if labelKey is in selectedIds
                         />
                     ))

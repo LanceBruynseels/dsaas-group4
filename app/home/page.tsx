@@ -2,12 +2,22 @@ import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
 import profileImage from 'public/profileImage.png';
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
+import {redirect} from "next/navigation";
 
 export default async function HomePage() {
     const supabase = await createClient();
-    const user_id = "abb0c0af-904c-4c52-b19b-5be0fc3da588"
+    const session = await getServerSession(authOptions);
 
-    let { data: filter_data, error } = await supabase.rpc('get_all_filter_data');
+    if (!session) {
+        return redirect("/sign-in");
+    }
+
+    const user_id = session.user.id;
+    console.log(user_id);
+
+    const { data: filter_data, error } = await supabase.rpc('get_all_filter_data');
 
     if (error) {
         console.error("Error fetching data:", error.message);
@@ -27,7 +37,7 @@ export default async function HomePage() {
                     data={filter_data.personalities}
                     keyField="personality_id"
                     labelField="personality"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Relationship goals Options */}
@@ -37,7 +47,7 @@ export default async function HomePage() {
                     data={filter_data.relationship_goals}
                     keyField="relationship_goals_id"
                     labelField="relationship_goals"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Gender Options */}
@@ -47,7 +57,7 @@ export default async function HomePage() {
                     data={filter_data.genders}
                     keyField="gender_id"
                     labelField="gender"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Interests Options */}
@@ -57,7 +67,7 @@ export default async function HomePage() {
                     data={filter_data.interests}
                     keyField="id"
                     labelField="interest"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Disability Options */}
@@ -67,7 +77,7 @@ export default async function HomePage() {
                     data={filter_data.disabilities}
                     keyField="disability_id"
                     labelField="disability"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Home status Options */}
@@ -77,7 +87,7 @@ export default async function HomePage() {
                     data={filter_data.home_statuses}
                     keyField="home_status_id"
                     labelField="home_status"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Religion Options */}
@@ -87,7 +97,7 @@ export default async function HomePage() {
                     data={filter_data.religions}
                     keyField="religion_id"
                     labelField="religion"
-                    user_id="abb0c0af-904c-4c52-b19b-5be0fc3da588"
+                    user_id={user_id}
                 />
 
                 {/* Distance Slider */}
@@ -168,4 +178,5 @@ export default async function HomePage() {
             </div>
         </div>
     );
+
 }

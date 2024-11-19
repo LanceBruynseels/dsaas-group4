@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 
 // Function to call the API route to insert label into the user's search table
-async function addLabelToUser(table: string, labelKey: number) {
+async function addLabelToUser(table: string, labelKey: number, user_id: string) {
     const response = await fetch("/api/addLabel", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ table, key: labelKey }), // Send data to API route
+        body: JSON.stringify({ table, key: labelKey, user_id: user_id }), // Send data to API route
     });
 
     const data = await response.json();
@@ -22,13 +22,13 @@ async function addLabelToUser(table: string, labelKey: number) {
 }
 
 // Function to call the API route to delete a label out of the table
-async function removeLabelToUser(table: string, labelKey: number) {
+async function removeLabelToUser(table: string, labelKey: number, user_id: string) {
     const response = await fetch("/api/addLabel", {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ table, key: labelKey }), // Send data to API route
+        body: JSON.stringify({ table, key: labelKey, user_id: user_id }), // Send data to API route
     });
 
     const data = await response.json();
@@ -45,11 +45,13 @@ function ToggleLabel({
                          labelKey,
                          table,
                          isSelected: initialSelected,
+                         user_id
                      }: {
-    tag: string;
-    labelKey: number;
-    table: string;
-    isSelected: boolean;
+    tag: string,
+    labelKey: number,
+    table: string,
+    isSelected: boolean,
+    user_id: string
 }) {
     const [selected, setSelected] = useState(initialSelected);
 
@@ -58,9 +60,9 @@ function ToggleLabel({
         setSelected((prev) => {
             const newSelected = !prev;
             if (newSelected) {
-                addLabelToUser(table, labelKey);
+                addLabelToUser(table, labelKey, user_id);
             } else {
-                removeLabelToUser(table, labelKey);
+                removeLabelToUser(table, labelKey, user_id);
             }
             return newSelected;
         });

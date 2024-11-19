@@ -71,7 +71,7 @@ const SignInPage: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-center justify-center lg:space-x-10 space-y-8 lg:space-y-0 w-full max-w-5xl">
           {/* Left Side: Logo and Brand */}
           <div className="flex flex-col items-center w-full lg:w-1/2 space-y-6 text-center lg:text-left">
-            <Image src="/vlinder.png" alt="Vlinder Logo" width={200} height={200} />
+            <Image src="/vlinder.png" alt="Vlinder Logo" width={200} height={200} priority/>
             <h1 className="text-5xl font-bold text-gray-800">VLINDER</h1>
           </div>
 
