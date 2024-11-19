@@ -4,8 +4,6 @@ import { register } from "@/app/actions/auth/registration/registration";
 import { useRouter } from "next/navigation"; // for redirect
 
 const Registration: React.FC = () => {
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const [status, setStatus] = useState<{
@@ -18,8 +16,6 @@ const Registration: React.FC = () => {
 
         const formData = new FormData(event.currentTarget); // Extract form data
         setIsLoading(true);
-        setError(null);
-        setSuccess(null);
 
         try {
             const result = await register(formData);

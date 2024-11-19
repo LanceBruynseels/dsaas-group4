@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { login } from 'app/actions/auth/sign-in/action';
 import { useRouter } from 'next/navigation';
 import { signIn } from "next-auth/react";
 
