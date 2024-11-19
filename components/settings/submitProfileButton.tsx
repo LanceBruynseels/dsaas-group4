@@ -1,63 +1,57 @@
 "use client";
 
-import { SubmitButton } from "@components/submit-button";
 import { useState } from "react";
+import { SubmitButton } from "@/components/submit-button";
 
-interface SubmitProfileButtonProps {
-    profileData: { firstName: string; lastName: string; distance: number; age: number };
-    filterData: any;
+type SubmitProfileButtonProps = {
+    profileData: {
+        firstName: string;
+        lastName: string;
+        dob: string | null;
+        distance: number;
+    };
+    filterData: Record<string, any>;
     userId: string;
-    onProfileUpdate?: () => void; // Optional callback for handling UI updates
-}
+};
 
-export function SubmitProfileButton({
-                                        profileData,
-                                        filterData,
-                                        userId,
-                                        onProfileUpdate,
-                                    }: SubmitProfileButtonProps) {
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); // Prevent default form submission behavior
+export function SubmitProfileButton({ profileData, filterData, userId }: SubmitProfileButtonProps) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-        const payload = {
-            userId,
-            profile: {
-                firstName: profileData.firstName,
-                lastName: profileData.lastName,
-                distance: profileData.distance,
-                age: profileData.age,
-            },
-            filters: filterData,
-        };
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
 
         try {
-            const response = await fetch("/api/profile/update", {
+            const response = await fetch("/api/settings", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({
+                    userId,
+                    profileData,
+                    filterData,
+                }),
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to update profile: ${response.statusText}`);
+                throw new Error("Failed to update profile");
             }
 
-            if (onProfileUpdate) onProfileUpdate(); // Call optional UI update callback
+            console.log("Profile updated successfully!");
         } catch (error) {
             console.error("Error updating profile:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <SubmitButton
-                pendingText="Vernieuw profiel..."
-                className="px-4 py-2 text-white font-bold rounded-md hover:bg-red-600"
-                style={{ backgroundColor: "#771D1D" }}
-            >
-                Vernieuw profiel
-            </SubmitButton>
-        </form>
+        <SubmitButton
+            pendingText="Opslaan..."
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+        >
+            Opslaan
+        </SubmitButton>
     );
 }

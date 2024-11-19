@@ -1,10 +1,10 @@
-'use client'
+'use client';
 import React, { useState } from "react";
 
 interface InputFieldsSectionProps {
     fields: {
         label: string;
-        type: string; // e.g., "date", "text", etc.
+        type: string; // e.g., "text", etc.
         value: string;
     }[];
 }
@@ -27,15 +27,15 @@ function InputFieldsSection({ fields }: InputFieldsSectionProps) {
     };
 
     return (
-        <div className="flex justify-between gap-4 mt-4 mb-6">
+        <div className="flex items-center justify-center gap-4 mt-4 mb-6">
             {fields.map((field, index) => (
-                <div key={index} className="flex-1 px-20 w-1/2">
-                    <label className="block text-sm font-medium text-gray-700">{field.label}</label>
+                <div key={index} className="flex-1 px-20">
+                    <label className="block text-lg font-semibold">{field.label}</label>
                     <input
                         type={field.type}
                         value={inputValues[field.label]}
                         onChange={handleInputChange(field.label)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                        className="mt-1 block w-fit border-gray-300 rounded-md shadow-sm"
                     />
                 </div>
             ))}

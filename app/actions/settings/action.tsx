@@ -4,7 +4,7 @@ export async function fetchProfileData() {
     // Check if running on the client-side or server-side
     if (typeof window !== "undefined") {
         // Client-side: use window.location.origin to get the full URL
-        apiUrl = `${window.location.origin}/api/settings`;
+        apiUrl = `${window.location.origin}/api/settings/get-profile-data`;
     } else {
         // Server-side: assume the server is at the root
         apiUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/api/settings`;

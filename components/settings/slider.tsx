@@ -16,7 +16,7 @@ function Slider({ label, unit, min, max, defaultValue, sliderColor }: ClientSlid
 
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700">{label} : {value} {unit}</label>
+            <h3 className="text-lg font-semibold">{label}: {value} {unit}</h3>
             <input
                 type="range"
                 min={min}
@@ -31,10 +31,11 @@ function Slider({ label, unit, min, max, defaultValue, sliderColor }: ClientSlid
             <style jsx>{`
                 .slider {
                     -webkit-appearance: none;
-                    width: 100%;
+                    width: 600px;
                     height: 8px;
                     border-radius: 5px;
                     outline: none;
+                    background: linear-gradient(to right, ${sliderColor} 0%, ${sliderColor} 50%, #ddd 50%, #ddd 100%);
                     transition: background 0.3s ease-in-out;
                 }
 
@@ -54,8 +55,8 @@ function Slider({ label, unit, min, max, defaultValue, sliderColor }: ClientSlid
                 }
 
                 .slider::-moz-range-thumb {
-                    width: 16px;
-                    height: 16px;
+                    width: 24px; /* Larger thumb */
+                    height: 24px;
                     border-radius: 50%;
                     background: ${sliderColor}; /* Custom color for thumb */
                     cursor: pointer;
@@ -67,8 +68,8 @@ function Slider({ label, unit, min, max, defaultValue, sliderColor }: ClientSlid
                 }
 
                 .slider::-ms-thumb {
-                    width: 16px;
-                    height: 16px;
+                    width: 24px; /* Larger thumb */
+                    height: 24px;
                     border-radius: 50%;
                     background: ${sliderColor}; /* Custom color for thumb */
                     cursor: pointer;
