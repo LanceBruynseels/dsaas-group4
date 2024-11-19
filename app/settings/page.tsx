@@ -21,9 +21,6 @@ const SettingsPage = async () => {
         profileData = data.profile;
         filterData = data.filters;
         profilePicture = data.picture;
-        console.log(profileData);
-        console.log(filterData);
-
 
     } catch (error) {
         console.error("Error fetching profile data:", error);

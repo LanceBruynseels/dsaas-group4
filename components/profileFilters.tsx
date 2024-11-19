@@ -34,16 +34,17 @@ const ProfileFilters: React.FC<ProfileFiltersProps> = ({ filterData, profileData
     ];
 
     return (
-        <div>
+        <div className="flex flex-wrap gap-8 px-8">
             {filterSections.map((filter) => (
-                <ProfileFilterSection
-                    key={filter.title}
-                    title={filter.title}
-                    data={filter.data}
-                    keyField={filter.keyField}
-                    labelField={filter.labelField}
-                    selectedIds={filter.selectedIds}
-                />
+                <div key={filter.title} className="flex-1 min-w-[300px] max-w-[400px]">
+                    <ProfileFilterSection
+                        title={filter.title}
+                        data={filter.data}
+                        keyField={filter.keyField}
+                        labelField={filter.labelField}
+                        selectedIds={filter.selectedIds}
+                    />
+                </div>
             ))}
         </div>
     );

@@ -1,17 +1,22 @@
-// ProfilePicture.tsx
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 type ProfilePictureProps = {
-    imageUrl: string;  // URL passed from the server
-    userId: 'abb0c0af-904c-4c52-b19b-5be0fc3da588';    // User's ID to update their profile in the database
+    imageUrl: string; // URL passed from the server
+    userId: string;   // User's ID to update their profile in the database
 };
 
 const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => {
-    const [isUploading, setIsUploading] = useState(false);  // To track upload progress
-    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message for failed uploads
+    const [currentImageUrl, setCurrentImageUrl] = useState(imageUrl); // State to manage the displayed profile picture
+    const [isUploading, setIsUploading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    // Update the image URL state when the prop changes
+    useEffect(() => {
+        setCurrentImageUrl(imageUrl);
+    }, [imageUrl]);
 
     // Handle file upload
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,17 +24,17 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
         if (!file) return;
 
         setIsUploading(true);
-        setErrorMessage(null); // Reset any previous error messages
+        setErrorMessage(null);
 
         try {
             // Upload file to Supabase storage bucket 'profilePictures'
             const { data, error } = await createClient()
                 .storage.from('profilePictures')
-                .upload(`profile-pics/${userId}/${file.name}`, file);
+                .upload(`profile-pics/${userId}/${file.name}`, file, { upsert: true });
 
             if (error) {
                 console.error('Error uploading file:', error.message);
-                throw error; // Handle upload error
+                throw error;
             }
 
             // Construct the public URL for the uploaded image
@@ -55,14 +60,15 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
                 throw new Error(result.error || 'Failed to update profile picture in database.');
             }
 
-            // Clear error message and indicate success
-            setErrorMessage(null);  // Clear any error messages on success
+            // Update the state with the new image URL
+            setCurrentImageUrl(publicUrl);
+
             console.log("Profile picture updated successfully.");
         } catch (error: any) {
             console.error("Error:", error.message);
             setErrorMessage("Failed to upload image. Please try again.");
         } finally {
-            setIsUploading(false); // Hide the uploading state
+            setIsUploading(false);
         }
     };
 
@@ -70,9 +76,9 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
         <div className="relative">
             {/* Display the profile picture */}
             <img
-                src={imageUrl || "/profileImage.png"} // Fallback to a default image if no URL
+                src={currentImageUrl || "/profileImage.png"} // Fallback to a default image if no URL
                 alt="Profile"
-                className="w-24 h-24 rounded-full object-cover" // You can adjust the size as needed
+                className="w-44 h-44 rounded-full object-cover"
             />
 
             {/* Upload icon */}
