@@ -159,7 +159,7 @@ export default async function HomePage() {
             </div>
 
             {/* Notifications Side Panel */}
-            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-[#FFAB9F]">
                 <div className="flex flex-row justify-between items-center">
                     <h2 className="font-bold">Meldingen</h2>
                     <div>
