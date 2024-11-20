@@ -1,5 +1,4 @@
-'use client';
-
+'use client'
 import React, { useState } from "react";
 
 interface ClientSliderProps {
@@ -8,24 +7,57 @@ interface ClientSliderProps {
     min: number;
     max: number;
     defaultValue: number;
-    sliderColor: string; // New prop for the slider color
+    sliderColor: string;
+    userId: string;
 }
 
-function Slider({ label, unit, min, max, defaultValue, sliderColor }: ClientSliderProps) {
+const Slider: React.FC<ClientSliderProps> = ({ label, unit, min, max, defaultValue, sliderColor, userId }) => {
     const [value, setValue] = useState(defaultValue);
+
+    // Function to send updated value to the backend
+    const updateDistance = async (newValue: number) => {
+        try {
+            const response = await fetch("/api/settings/slider", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    table: "profile_distance",
+                    key: newValue,
+                    user_id: userId,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error("Error updating distance:", error);
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = Number(e.target.value);
+        setValue(newValue);
+        updateDistance(newValue); // Update backend with the new value
+    };
 
     return (
         <div>
-            <h3 className="text-lg font-semibold">{label}: {value} {unit}</h3>
+            <h3 className="text-lg font-semibold">
+                {label}: {value} {unit}
+            </h3>
             <input
                 type="range"
                 min={min}
                 max={max}
                 value={value}
-                onChange={(e) => setValue(Number(e.target.value))}
+                onChange={handleChange}
                 className="w-full mt-2 slider"
                 style={{
-                    background: `linear-gradient(to right, ${sliderColor} ${((value - min) / (max - min)) * 100}%, #ddd 0%)`, // dynamic track color
+                    background: `linear-gradient(to right, ${sliderColor} ${(value - min) / (max - min) * 100}%, #ddd 0%)`,
                 }}
             />
             <style jsx>{`
@@ -45,43 +77,17 @@ function Slider({ label, unit, min, max, defaultValue, sliderColor }: ClientSlid
                     width: 16px;
                     height: 16px;
                     border-radius: 50%;
-                    background: ${sliderColor}; /* Custom color for thumb */
+                    background: ${sliderColor};
                     cursor: pointer;
                     transition: background-color 0.3s ease-in-out;
                 }
 
                 .slider::-webkit-slider-thumb:hover {
-                    background: #9E2A2A; /* Hover color for thumb */
-                }
-
-                .slider::-moz-range-thumb {
-                    width: 24px; /* Larger thumb */
-                    height: 24px;
-                    border-radius: 50%;
-                    background: ${sliderColor}; /* Custom color for thumb */
-                    cursor: pointer;
-                    transition: background-color 0.3s ease-in-out;
-                }
-
-                .slider::-moz-range-thumb:hover {
-                    background: #9E2A2A; /* Hover color for thumb */
-                }
-
-                .slider::-ms-thumb {
-                    width: 24px; /* Larger thumb */
-                    height: 24px;
-                    border-radius: 50%;
-                    background: ${sliderColor}; /* Custom color for thumb */
-                    cursor: pointer;
-                    transition: background-color 0.3s ease-in-out;
-                }
-
-                .slider::-ms-thumb:hover {
-                    background: #9E2A2A; /* Hover color for thumb */
+                    background: #9e2a2a;
                 }
             `}</style>
         </div>
     );
-}
+};
 
 export default Slider;

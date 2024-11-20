@@ -20,6 +20,7 @@ const SettingsPage = async () => {
 
     console.log(profile_data)
 
+
     if (filterError || profileError || pictureError) {
         console.error("Error fetching data:", filterError || profileError || pictureError);
         return <p>Error loading profile data</p>;
@@ -135,12 +136,15 @@ const SettingsPage = async () => {
                     {/* Sliders */}
                     <div className="flex flex-col w-full mt-4 mb-6">
                         <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
-                            <Slider label="Afstand tot anderen" unit="km" min={5} max={30} defaultValue={profile_data.distance || 15} sliderColor="#771D1D" />
+                            <Slider label="Afstand tot anderen"
+                                    unit="km"
+                                    min={5}
+                                    max={30}
+                                    defaultValue={profile_data.distance || 15}
+                                    userId={user_id}
+                                    sliderColor="#771D1D"
+                            />
                         </div>
-                    </div>
-
-                    <div className="mt-2 py-5 flex justify-center">
-                        <SubmitButton className="px-4 py-2 text-white font-bold rounded-md hover:bg-red-600" style={{ backgroundColor: "#771D1D" }} pendingText="Vernieuw profiel...">Update profiel</SubmitButton>
                     </div>
                 </div>
             </div>
