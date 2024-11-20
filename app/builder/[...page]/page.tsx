@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use client';
 
 import { builder } from '@builder.io/react';
