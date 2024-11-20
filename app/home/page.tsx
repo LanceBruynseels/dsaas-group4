@@ -4,6 +4,7 @@ import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
+<<<<<<< Updated upstream
 export default async function ProtectedPage() {
     // const supabase = createClient();
     //
@@ -14,6 +15,10 @@ export default async function ProtectedPage() {
     // if (!user) {
     //     return redirect("/sign-in");
     // }
+=======
+export default async function Homepage() {
+
+>>>>>>> Stashed changes
 
     return (
         <div className="flex flex-row w-full">
