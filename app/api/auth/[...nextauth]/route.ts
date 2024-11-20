@@ -21,7 +21,7 @@ declare module "next-auth" {
 
 // export const authOptions: NextAuthOptions = {
 // changed to const to resolving pipeline failure
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
             credentials: {
