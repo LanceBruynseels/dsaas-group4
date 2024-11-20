@@ -11,7 +11,7 @@ builder.init('ab2c2ceb389045f397e3deaac91c4b88');
 
 interface PageProps {
     params: {
-        page?: string[]; // Optional to handle cases where no dynamic route is provided
+        page: string[]; // Optional to handle cases where no dynamic route is provided
     };
 }
 
