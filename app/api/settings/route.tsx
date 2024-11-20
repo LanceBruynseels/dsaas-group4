@@ -1,6 +1,5 @@
-// route.tsx
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import {NextRequest, NextResponse} from "next/server";
+import {createClient} from "@/utils/supabase/server";
 
 export async function GET(request: NextRequest) {
     const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588';
@@ -26,28 +25,74 @@ export async function GET(request: NextRequest) {
     }
 }
 export async function POST(request: NextRequest) {
-    const { userId, pictureUrl } = await request.json();  // Expecting userId and pictureUrl in the body
-
     try {
+        const body = await request.json();
+        const { picture_url, userId } = body;
+
+        if (!picture_url || !userId) {
+            console.error("Invalid request payload:", body);
+            return NextResponse.json(
+                { error: "Missing required fields: userId or picture_url" },
+                { status: 400 }
+            );
+        }
+
+        console.log("Updating profile picture for:", { userId, picture_url });
+
         const supabase = await createClient();
-
-        // Call the new function to update the profile picture URL
         const { error } = await supabase.rpc("set_profile_picture", {
-            userid: userId,       // Ensure both parameters are passed correctly
-            picture_url: pictureUrl,
+            userid: userId,
+            picture_url: picture_url,
         });
-
-        console.log("userid: ", userId);
-        console.log("url: ", pictureUrl);
 
         if (error) {
             console.error("Error updating profile picture:", error);
-            return NextResponse.json({ error: "Failed to update profile picture" }, { status: 500 });
+            return NextResponse.json(
+                { error: "Failed to update profile picture" },
+                { status: 500 }
+            );
         }
 
+        console.log("Profile picture updated successfully:", picture_url);
         return NextResponse.json({ message: "Profile picture updated successfully" });
-    } catch (error) {
-        console.error("Unexpected error:", error);
+    } catch (error: any) {
+        console.error("Unexpected error:", error.message || error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}
+
+// Update Date of Birth
+export async function PUT(request: NextRequest) {
+    try {
+        const body = await request.json();
+        const { userid, dob } = body;
+        console.log(body)
+        console.log("Received DOB:", dob);       // Log received DOB
+        console.log("Received User ID:", userid); // Log received user ID
+
+        if (!userid || !dob) {
+            return NextResponse.json(
+                { error: "Missing required fields: userId or dob" },
+                { status: 400 }
+            );
+        }
+
+        const supabase = await createClient();
+
+        const { error } = await supabase.rpc("set_new_dob", {
+            userid: userid,
+            dob: dob,
+        });
+
+        if (error) {
+            console.error("Supabase RPC Error:", error); // Log Supabase error
+            return NextResponse.json({ error: "Failed to update DOB" }, { status: 500 });
+        }
+
+        console.log("DOB updated successfully for User ID:", userid);
+        return NextResponse.json({ message: "DOB updated successfully" });
+    } catch (error: any) {
+        console.error("Unexpected error in PUT handler:", error.message || error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

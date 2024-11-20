@@ -27,7 +27,7 @@ function InputFieldsSection({ fields }: InputFieldsSectionProps) {
     };
 
     return (
-        <div className="flex items-center justify-center gap-4 mt-4 mb-6">
+        <div className="flex flex-row mt-6 justify-center items-center">
             {fields.map((field, index) => (
                 <div key={index} className="flex-1 px-20">
                     <label className="block text-lg font-semibold">{field.label}</label>
@@ -41,6 +41,7 @@ function InputFieldsSection({ fields }: InputFieldsSectionProps) {
             ))}
         </div>
     );
+
 }
 
 export default InputFieldsSection;

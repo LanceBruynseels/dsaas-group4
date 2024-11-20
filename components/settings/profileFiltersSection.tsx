@@ -7,7 +7,7 @@ type ProfileFilterSectionProps = {
     data: any[];
     keyField: string;
     labelField: string;
-    selectedIds: number[]; // Pre-selected IDs from profileData
+    selectedIds: number[];
 };
 
 const ProfileFilterSection: React.FC<ProfileFilterSectionProps> = ({ title, data, keyField, labelField, selectedIds }) => {

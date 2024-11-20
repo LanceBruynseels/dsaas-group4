@@ -6,7 +6,7 @@ import ProfilePicture from "@/components/settings/profilePicture";
 import InputFieldsSection from "@/components/InputFieldSection";
 import Link from "next/link";
 import ProfileFilters from "@/components/settings/profileFilters";
-import ProfileDOB from "@/components/settings/profileDOB"; // Import the new ProfileDOB component
+import ProfileDOB from "@/components/settings/profileDOB";
 
 export const revalidate = 0; // Optional: to specify caching strategy for revalidation
 
@@ -14,7 +14,7 @@ const SettingsPage = async () => {
     let profileData;
     let filterData;
     let profilePicture;
-    const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588'; // User's ID to update their profile in the database
+    const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588';
 
     try {
         // Fetch profile and filter data server-side
@@ -66,7 +66,7 @@ const SettingsPage = async () => {
                                         userId={userId}/>
                     </div>
 
-                    <ProfileDOB dob={profileData.dob}/>
+                    <ProfileDOB userId={userId} dob={profileData.dob}/>
 
                     <InputFieldsSection
                         fields={[
