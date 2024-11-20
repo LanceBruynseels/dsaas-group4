@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { register } from "@/app/actions/auth/registration/registration";
-import { useRouter } from "next/navigation"; // for redirect
+import { useRouter } from "next/navigation";
+import Image from "next/image"; // for redirect
 
 const Registration: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +56,7 @@ const Registration: React.FC = () => {
             <div className="flex w-full max-w-7xl justify-around items-center px-10">
                 {/* Logo Section */}
                 <div className="flex flex-col items-center space-y-6">
-                    <img src="/vlinder.png" alt="VLinder Logo" className="h-60" />
+                    <Image src="/vlinder.png" alt="VLinder Logo" className="h-60" fill/>
                     <h1 className="font-bold text-6xl">Vlinder</h1>
                 </div>
 
