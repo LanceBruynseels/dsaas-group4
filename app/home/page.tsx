@@ -2,9 +2,12 @@ import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
 import profileImage from 'public/profileImage.png';
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/[...nextauth]/route";
-import {redirect} from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import type { Notification_user } from "@components/notification";
+import { PostgrestError } from "@supabase/supabase-js";
+import NotificationItem from '@components/notification';  // Import your NotificationItem component
 
 export default async function HomePage() {
     const supabase = await createClient();
@@ -17,10 +20,15 @@ export default async function HomePage() {
     const user_id = session.user.id;
     console.log(user_id);
 
-    const { data: filter_data, error } = await supabase.rpc('get_all_filter_data');
+    const { data: filter_data, error: filter_data_error } = await supabase.rpc('get_all_filter_data');
 
-    if (error) {
-        console.error("Error fetching data:", error.message);
+    const { data: notification_data, error: notification_error } = await supabase
+        .rpc<Notification_user[]>('get_user_notifications', {
+            notifications_user_id: user_id
+        });
+
+    if (filter_data_error || notification_error) {
+        console.error("Error fetching data:", filter_data_error || notification_error);
         return <p>Error loading data</p>;
     }
 
@@ -159,7 +167,7 @@ export default async function HomePage() {
             </div>
 
             {/* Notifications Side Panel */}
-            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-[#FFAB9F]">
+            <div className="flex flex-col basis-1/4 p-4 rounded-lg m-4 bg-[#FFAB9F]">
                 <div className="flex flex-row justify-between items-center">
                     <h2 className="font-bold">Meldingen</h2>
                     <div>
@@ -167,16 +175,16 @@ export default async function HomePage() {
                     </div>
                 </div>
                 <div className="flex flex-col my-2">
-                    {/* Sample Notifications */}
-                    {["You got a message from ...", "You got a message from ..."].map((text, idx) => (
-                        <div key={idx} className="flex flex-row my-2 items-center">
-                            <Image src="/mock-picture.webp" alt="Profile Picture" width={50} height={50} className="rounded-full border border-gray-500" />
-                            <div className="text-xs mx-2">{text}</div>
-                        </div>
-                    ))}
+                    {/* Render Notifications */}
+                    {notification_data && notification_data.length > 0 ? (
+                        notification_data.map((notification) => (
+                            <NotificationItem key={notification.notification_id} notification={notification} />
+                        ))
+                    ) : (
+                        <p>No new notifications.</p>
+                    )}
                 </div>
             </div>
         </div>
     );
-
 }
