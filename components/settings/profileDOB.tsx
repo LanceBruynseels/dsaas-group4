@@ -48,9 +48,8 @@ const ProfileDOB: React.FC<ProfileDOBProps> = ({ userId, dob }) => {
     };
 
     return (
-        <div className="flex flex-col mt-6 justify-center items-center px-20">
-            <label className="block text-lg font-semibold">Mijn verjaardag</label>
-            <div className="flex items-center gap-4 mt-1">
+        <div className="flex flex-col mt-8 justify-center items-center mb-8 px-20">
+            <div className="flex items-center mt-4 gap-4 mt-1">
                 {/* Date input */}
                 <input
                     type="date"
@@ -62,13 +61,14 @@ const ProfileDOB: React.FC<ProfileDOBProps> = ({ userId, dob }) => {
                 <button
                     onClick={handleUpdateClick}
                     disabled={loading}
+                    style={{backgroundColor: "#771D1D"}}
                     className={`px-4 py-2 rounded-md font-semibold ${
                         loading
                             ? 'bg-gray-400 cursor-not-allowed'
                             : 'bg-blue-500 text-white hover:bg-blue-600 transition'
                     }`}
                 >
-                    {loading ? 'Updating...' : 'Update'}
+                    {loading ? 'Updating...' : 'Pas aan'}
                 </button>
             </div>
             {/* Message display */}

@@ -1,53 +1,48 @@
-'use client'
-import ToggleLabel from "@components/toggleLabel";
-import React, { useState, useEffect } from 'react';
+import ToggleLabel from "@components/settings/toggleLabel";
+import {createClient} from "@/utils/supabase/server";
 
-type ProfileFilterSectionProps = {
+type FilterSectionProps = {
     title: string;
-    data: any[];
+    table: string;
+    data: any[];  // Filter data passed to this component
     keyField: string;
     labelField: string;
-    selectedIds: number[];
+    user_id: string;
 };
 
-const ProfileFilterSection: React.FC<ProfileFilterSectionProps> = ({ title, data, keyField, labelField, selectedIds }) => {
-    const [selectedItems, setSelectedItems] = useState<{ [key: number]: boolean }>({});
+const ProfileFilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, keyField, labelField, user_id }) => {
+    const supabase = await createClient();
 
-    // Initialize selectedItems state based on selectedIds
-    useEffect(() => {
-        const initialSelected = (selectedIds || []).reduce((acc, id) => {
-            acc[id] = true;
-            return acc;
-        }, {} as { [key: number]: boolean });
-        setSelectedItems(initialSelected);
-    }, [selectedIds]);
+    const { data: isSelectedData, error } = await supabase
+        .from(`profile_${table}`)
+        .select(`${table}_id`)
+        .eq('user_id', user_id);
 
-    // Handle toggle logic
-    const handleToggle = (id: number) => {
-        setSelectedItems((prevSelected) => ({
-            ...prevSelected,
-            [id]: !prevSelected[id], // Toggle the selected state of the clicked item
-        }));
-    };
+    if (error) {
+        console.log("Error fetching data:", error.message);
+        return <p>Error loading data</p>;
+    }
+
+    // Extract IDs into a Set for quick lookup
+    const selectedIds = new Set(isSelectedData?.map((item: any) => item[`${table}_id`]));
 
     return (
         <div className="mb-4">
             <h3 className="text-lg font-semibold">{title}</h3>
             <div className="flex flex-wrap gap-2 mt-2">
                 {data && data.length > 0 ? (
-                    data.map((item) => {
-                        const isSelected = !!selectedItems[item[keyField]]; // Check if this item is selected
-                        return (
-                            <ToggleLabel
-                                key={item[keyField]}
-                                tag={item[labelField]}
-                                isSelected={isSelected}
-                                onClick={() => handleToggle(item[keyField])}
-                            />
-                        );
-                    })
+                    data.map((item) => (
+                        <ToggleLabel
+                            key={item[keyField]} // React key
+                            tag={item[labelField]}
+                            labelKey={item[keyField]}
+                            table={table}
+                            user_id={user_id}
+                            isSelected={selectedIds.has(item[keyField])} // Check if item is selected
+                        />
+                    ))
                 ) : (
-                    <p>No data available</p>
+                    <p>No {title.toLowerCase()}</p>
                 )}
             </div>
         </div>

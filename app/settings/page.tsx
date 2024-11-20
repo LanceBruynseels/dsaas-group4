@@ -1,35 +1,28 @@
 // page.tsx (Server-side rendering)
-import { fetchProfileData } from "@/app/actions/settings/action";
 import { SubmitButton } from "@/components/submit-button";
 import Slider from "@/components/settings/slider";
 import ProfilePicture from "@/components/settings/profilePicture";
-import InputFieldsSection from "@/components/InputFieldSection";
-import Link from "next/link";
-import ProfileFilters from "@/components/settings/profileFilters";
+import ProfileFiltersSection from "@components/settings/profileFiltersSection";
 import ProfileDOB from "@/components/settings/profileDOB";
+import { createClient } from "@/utils/supabase/server";
+import React from "react";
+import Link from "next/link";
 
-export const revalidate = 0; // Optional: to specify caching strategy for revalidation
 
 const SettingsPage = async () => {
-    let profileData;
-    let filterData;
-    let profilePicture;
-    const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588';
+    const supabase = await createClient();
 
-    try {
-        // Fetch profile and filter data server-side
-        const data = await fetchProfileData();
-        profileData = data.profile;
-        filterData = data.filters;
-        profilePicture = data.picture;
+    const user_id = 'abb0c0af-904c-4c52-b19b-5be0fc3da588';
 
-    } catch (error) {
-        console.error("Error fetching profile data:", error);
-        return (
-            <div className="text-red-500">
-                Er is een probleem opgetreden bij het laden van de instellingen.
-            </div>
-        );
+    const { data: filter_data, error: filterError } = await supabase.rpc('get_all_filter_data');
+    const { data: profile_data, error: profileError } = await supabase.rpc('get_all_profile_data', { userid: user_id });
+    const { data: picture, error: pictureError } = await supabase.rpc('get_profile_picture', { userid: user_id });
+
+    console.log(profile_data)
+
+    if (filterError || profileError || pictureError) {
+        console.error("Error fetching data:", filterError || profileError || pictureError);
+        return <p>Error loading profile data</p>;
     }
 
     return (
@@ -55,50 +48,99 @@ const SettingsPage = async () => {
                 </ul>
             </div>
 
-            {/* Main Content */}
             <div className="flex flex-col basis-3/4 p-4 m-2 flex-grow bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-                {/* Top Section: Profile Picture, DOB, Name */}
-                <div className="rounded-lg mb-6 p-4" style={{backgroundColor: "#FFDFDB"}}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
-                        Mijn persoonlijke gegevens</h2>
+                <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
                     <div className="flex flex-col justify-center items-center mb-6">
-                        <ProfilePicture imageUrl={profilePicture.profile_picture_url || "/mock-picture.webp"}
-                                        userId={userId}/>
+                        <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                            {profile_data.first_name} {profile_data.last_name}
+                        </h2>
+                        <ProfilePicture imageUrl={picture.profile_picture_url || "/mock-picture.webp"} userId={user_id} />
                     </div>
-
-                    <ProfileDOB userId={userId} dob={profileData.dob}/>
-
-                    <InputFieldsSection
-                        fields={[
-                            {label: "Mijn voornaam", type: "text", value: profileData.first_name || ""},
-                            {label: "Mijn achternaam", type: "text", value: profileData.last_name || ""},
-                        ]}
-                    />
+                    <ProfileDOB userId={user_id} dob={profile_data.dob} />
                 </div>
 
-                {/* Bottom Section: Filters and Sliders */}
-                <div className="rounded-lg p-4" style={{backgroundColor: "#FFDFDB"}}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
-                        Dit moet je ook weten over mij...</h2>
-                    <ProfileFilters filterData={filterData} profileData={profileData}/>
+                <div className="rounded-lg p-4" style={{ backgroundColor: "#FFDFDB" }}>
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">Dit moet je ook weten over mij...</h2>
+
+                    {/* Personality Options */}
+                    <ProfileFiltersSection
+                        title="Persoonlijkheid"
+                        table="personality"
+                        data={filter_data.personalities}
+                        keyField="personality_id"
+                        labelField="personality"
+                        user_id={user_id}
+                    />
+
+                    {/* Relationship goals Options */}
+                    <ProfileFiltersSection
+                        title="Relatiedoel"
+                        table="relationship_goal"
+                        data={filter_data.relationship_goals}
+                        keyField="relationship_goals_id"
+                        labelField="relationship_goals"
+                        user_id={user_id}
+                    />
+
+                    {/* Gender Options */}
+                    <ProfileFiltersSection
+                        title="Gender"
+                        table="gender"
+                        data={filter_data.genders}
+                        keyField="gender_id"
+                        labelField="gender"
+                        user_id={user_id}
+                    />
+
+                    {/* Interests Options */}
+                    <ProfileFiltersSection
+                        title="Interesses"
+                        table="interest"
+                        data={filter_data.interests}
+                        keyField="id"
+                        labelField="interest"
+                        user_id={user_id}
+                    />
+
+                    {/* Disability Options */}
+                    <ProfileFiltersSection
+                        title="Beperking"
+                        table="disability"
+                        data={filter_data.disabilities}
+                        keyField="disability_id"
+                        labelField="disability"
+                        user_id={user_id}
+                    />
+
+                    {/* Home status Options */}
+                    <ProfileFiltersSection
+                        title="Thuis status"
+                        table="home_status"
+                        data={filter_data.home_statuses}
+                        keyField="home_status_id"
+                        labelField="home_status"
+                        user_id={user_id}
+                    />
+
+                    {/* Religion Options */}
+                    <ProfileFiltersSection
+                        title="Religie"
+                        table="religion"
+                        data={filter_data.religions}
+                        keyField="religion_id"
+                        labelField="religion"
+                        user_id={user_id}
+                    />
 
                     {/* Sliders */}
                     <div className="flex flex-col w-full mt-4 mb-6">
-                        <div className="flex flex-col w-full mt-6 justify-center items-center px-20 ">
-                            <Slider label="Afstand tot anderen" unit="km" min={5} max={30}
-                                    defaultValue={profileData.distance || 15} sliderColor="#771D1D"/>
+                        <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
+                            <Slider label="Afstand tot anderen" unit="km" min={5} max={30} defaultValue={profile_data.distance || 15} sliderColor="#771D1D" />
                         </div>
                     </div>
 
-                    {/* Save Button */}
                     <div className="mt-2 py-5 flex justify-center">
-                        <SubmitButton
-                            className="px-4 py-2 text-white font-bold rounded-md hover:bg-red-600"
-                            style={{backgroundColor: "#771D1D"}}
-                            pendingText="Vernieuw profiel..."
-                        >
-                            Update profiel
-                        </SubmitButton>
+                        <SubmitButton className="px-4 py-2 text-white font-bold rounded-md hover:bg-red-600" style={{ backgroundColor: "#771D1D" }} pendingText="Vernieuw profiel...">Update profiel</SubmitButton>
                     </div>
                 </div>
             </div>
