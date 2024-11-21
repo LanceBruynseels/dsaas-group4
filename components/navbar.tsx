@@ -7,7 +7,7 @@ import Image from 'next/image';
 export default function NavBar() {
     const path = usePathname();
 
-    if (path === '/' || path === '/sign-in' || path === '/registration') {
+    if (path === '/' || path === '/sign-in' || path === '/registration' || path === '/caretaker') {
         return (
             <nav className="w-full h-16 flex justify-between items-center px-5">
                 {/* Application Navigation Bar */}
@@ -18,6 +18,7 @@ export default function NavBar() {
                     <Link href="/" className="hover:text-red-700"><h4>Home</h4></Link>
                     <Link href="/about" className="text-gray-700 hover:text-red-700">About Us</Link>
                     <Link href="/contact" className="text-gray-700 hover:text-red-700">Contact</Link>
+                    <button className="rounded-xl hover:bg-[#771d1d] bg-[#FCA5A5] transition duration-300 p-2"><Link href="/caretaker" className="text-red-50 ">Caretaker</Link></button>
                 </div>
             </nav>
         );

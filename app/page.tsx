@@ -3,6 +3,7 @@ import Image from "next/image";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 import {redirect} from "next/navigation";
+import Link from "next/link";
 
 export default async function Index() {
 
@@ -22,18 +23,18 @@ export default async function Index() {
             </div>
 
             <div className="flex space-x-4 w-full max-w-md mx-auto mt-5">
-                <a href="http://localhost:3000/sign-in" className="flex-1">
+                <Link href="/sign-in" className="flex-1">
                     <button
                         className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
                         LOGIN
                     </button>
-                </a>
-                <a href="http://localhost:3000/registration" className="flex-1">
+                </Link>
+                <Link href="/registration" className="flex-1">
                     <button
                         className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
                         REGISTRATIE
                     </button>
-                </a>
+                </Link>
             </div>
 
 
