@@ -65,6 +65,7 @@ const SignInPage: React.FC = () => {
     }
   }
 
+
   return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="flex flex-col lg:flex-row items-center justify-center lg:space-x-10 space-y-8 lg:space-y-0 w-full max-w-5xl">

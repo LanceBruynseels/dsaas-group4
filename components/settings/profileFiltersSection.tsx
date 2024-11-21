@@ -1,22 +1,20 @@
-import React from 'react';
-import ToggleLabel from "@components/toggleLabel";
-import { createClient } from "@/utils/supabase/server"; // Assuming this is your Supabase client setup
+import ToggleLabel from "@components/settings/toggleLabel";
+import {createClient} from "@/utils/supabase/server";
 
 type FilterSectionProps = {
     title: string;
     table: string;
-    data: any[];
+    data: any[];  // Filter data passed to this component
     keyField: string;
     labelField: string;
     user_id: string;
 };
 
-const FilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, keyField, labelField, user_id }) => {
+const ProfileFilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, keyField, labelField, user_id }) => {
     const supabase = await createClient();
 
-    // Fetch selected items from the database
     const { data: isSelectedData, error } = await supabase
-        .from(`search_${table}`)
+        .from(`profile_${table}`)
         .select(`${table}_id`)
         .eq('user_id', user_id);
 
@@ -33,7 +31,6 @@ const FilterSection: React.FC<FilterSectionProps> = async ({ title, table, data,
             <h3 className="text-lg font-semibold">{title}</h3>
             <div className="flex flex-wrap gap-2 mt-2">
                 {data && data.length > 0 ? (
-
                     data.map((item) => (
                         <ToggleLabel
                             key={item[keyField]} // React key
@@ -41,15 +38,15 @@ const FilterSection: React.FC<FilterSectionProps> = async ({ title, table, data,
                             labelKey={item[keyField]}
                             table={table}
                             user_id={user_id}
-                            isSelected={selectedIds.has(item[keyField])} // Check if labelKey is in selectedIds
+                            isSelected={selectedIds.has(item[keyField])} // Check if item is selected
                         />
                     ))
                 ) : (
-                    <p>No interests</p>
+                    <p>No {title.toLowerCase()}</p>
                 )}
             </div>
         </div>
     );
 };
 
-export default FilterSection;
+export default ProfileFilterSection;
