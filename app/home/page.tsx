@@ -1,10 +1,13 @@
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
-import profileImage from 'public/profileImage.png';
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/[...nextauth]/route";
-import {redirect} from "next/navigation";
+import profileImage from 'public/profile-picture.jpeg';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import type { Notification_user } from "@components/notification";
+import { PostgrestError } from "@supabase/supabase-js";
+import NotificationItem from '@components/notification';  // Import your NotificationItem component
 
 export default async function HomePage() {
     const supabase = await createClient();
@@ -17,17 +20,22 @@ export default async function HomePage() {
     const user_id = session.user.id;
     console.log(user_id);
 
-    const { data: filter_data, error } = await supabase.rpc('get_all_filter_data');
+    const { data: filter_data, error: filter_data_error } = await supabase.rpc('get_all_filter_data');
 
-    if (error) {
-        console.error("Error fetching data:", error.message);
+    const { data: notification_data, error: notification_error } = await supabase
+        .rpc('get_user_notifications', {
+            notifications_user_id: user_id
+        });
+
+    if (filter_data_error || notification_error) {
+        console.error("Error fetching data:", filter_data_error || notification_error);
         return <p>Error loading data</p>;
     }
 
     return (
         <div className="flex flex-row w-full">
             {/* Search Settings Section */}
-            <div className="basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div className="basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <h2 className="text-xl font-bold mb-4 text-red-950">Zoek Instellingen</h2>
 
                 {/* Personality Options */}
@@ -123,43 +131,50 @@ export default async function HomePage() {
 
             {/* Profile Section */}
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
-                <div className="flex flex-col min-h-full p-4 w-full">
-                    <div className="flex flex-row items-stretch w-full">
-                        <div className="flex basis-1/2 items-center justify-center p-4 border-r">
+                <div className="flex flex-col p-4 w-full h-full">
+                    <div className="flex flex-row w-full max-h-[500px] h-full">
+                        {/* Left Image Section */}
+                        <div className="flex basis-1/2 justify-center border-r">
                             <button className="left-2 text-black">❮</button>
-                            <div className="relative w-full h-full flex-shrink-0">
-                                <Image
-                                    src={profileImage}
-                                    alt="Profile Picture"
-                                    width={1000}
-                                    height={1000}
-                                    className="rounded-lg object-contain w-full h-full"
-                                    loading={"lazy"}
-                                    decoding={"async"}
-                                />
+                            <div className="relative bg-[url('/profile-picture.jpeg')] bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg ">
+
                             </div>
                             <button className="right-2 text-black">❯</button>
                         </div>
-                        <div
-                            className="flex basis-1/2 flex-col items-center justify-center p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
+
+                        {/* Right Info Section */}
+                        <div className="flex basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
                             <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
-                            <p className="mt-2 text-center">Meer informatie over Jara...</p>
+                            <p className="mt-2">Meer informatie over Jara...
+                            </p>
                             <div className="mt-4 text-4xl">😍</div>
                         </div>
                     </div>
 
                     {/* Interaction Buttons */}
-                    <div className="flex justify-around w-full mt-4">
-                        <button className="text-3xl text-gray-500">👎</button>
-                        <button className="text-3xl text-blue-500">👍</button>
-                        <button className="text-3xl text-red-500">❤️</button>
-                        <button className="text-3xl text-green-500">💬</button>
+                    <div className="flex justify-around w-full bg-red-50 mt-4 p-4 rounded-lg">
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/thumbs-down.png"} alt={"thumbs-down"} fill/>
+                        </button>
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/thumbs-up.png"} alt={"thumbs-up"} fill/>
+                        </button>
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/heart.png"} alt={"heart"} fill/>️
+                        </button>
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/message-circle.png"} alt={"message-circle"} fill/>
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* Notifications Side Panel */}
-            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div className="flex flex-col basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex flex-row justify-between items-center">
                     <h2 className="font-bold">Meldingen</h2>
                     <div>
@@ -167,16 +182,16 @@ export default async function HomePage() {
                     </div>
                 </div>
                 <div className="flex flex-col my-2">
-                    {/* Sample Notifications */}
-                    {["You got a message from ...", "You got a message from ..."].map((text, idx) => (
-                        <div key={idx} className="flex flex-row my-2 items-center">
-                            <Image src="/mock-picture.webp" alt="Profile Picture" width={50} height={50} className="rounded-full border border-gray-500" />
-                            <div className="text-xs mx-2">{text}</div>
-                        </div>
-                    ))}
+                    {/* Render Notifications */}
+                    {notification_data && notification_data.length > 0 ? (
+                        notification_data.map((notification : Notification_user) => (
+                            <NotificationItem key={notification.notification_id} notification={notification} />
+                        ))
+                    ) : (
+                        <p>No new notifications.</p>
+                    )}
                 </div>
             </div>
         </div>
     );
-
 }

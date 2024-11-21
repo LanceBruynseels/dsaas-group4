@@ -4,7 +4,7 @@
 
 import { builder } from '@builder.io/react';
 import { RenderBuilderContent } from '@/components/builder';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Your Builder.io API key
 builder.init('ab2c2ceb389045f397e3deaac91c4b88');
@@ -15,7 +15,7 @@ interface PageProps {
     };
 }
 
-export default function Page({ params }: PageProps) {
+export default function Page({ params }: React.FC<PageProps>) {
     const [content, setContent] = useState<any>(null); // Type can be improved based on `RenderBuilderContent` props
 
     useEffect(() => {

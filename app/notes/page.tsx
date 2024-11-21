@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import Image from "next/image";
 
 export default async function Notes() {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Fetch notes data
     const { data: notes } = await supabase.from("notes").select();
