@@ -1,19 +1,84 @@
-import React from "react";
+"use client";
 
-type ToggleLabelProps = {
-    tag: string;
-    isSelected: boolean;
-    onClick: () => void;
-};
+import React, { useState, useEffect } from "react";
 
-function ToggleLabel({ tag, isSelected, onClick }: ToggleLabelProps) {
+// Function to call the API route to insert label into the user's search table
+async function addLabelToUser(table: string, labelKey: number, user_id: string) {
+    const response = await fetch("/api/addLabel", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ table, key: labelKey, user_id: user_id }), // Send data to API route
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        return data;
+    } else {
+        console.error("Error inserting data:", data.error);
+        return null;
+    }
+}
+
+// Function to call the API route to delete a label out of the table
+async function removeLabelToUser(table: string, labelKey: number, user_id: string) {
+    const response = await fetch("/api/addLabel", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ table, key: labelKey, user_id: user_id }), // Send data to API route
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        return data;
+    } else {
+        console.error("Error deleting data:", data.error);
+        return null;
+    }
+}
+
+function ToggleLabel({
+                         tag,
+                         labelKey,
+                         table,
+                         isSelected: initialSelected,
+                         user_id
+                     }: {
+    tag: string,
+    labelKey: number,
+    table: string,
+    isSelected: boolean,
+    user_id: string
+}) {
+    const [selected, setSelected] = useState(initialSelected);
+
+    // Toggle the label selection state
+    const handleToggle = async () => {
+        setSelected((prev) => {
+            const newSelected = !prev;
+            if (newSelected) {
+                addLabelToUser(table, labelKey, user_id);
+            } else {
+                removeLabelToUser(table, labelKey, user_id);
+            }
+            return newSelected;
+        });
+    };
+
+    useEffect(() => {
+        setSelected(initialSelected);
+    }, [initialSelected]);
+
     return (
         <button
-            onClick={onClick}
-            className="px-3 py-1 text-sm rounded-full shadow-sm border border-gray-300 hover:bg-gray-100"
+            onClick={handleToggle}
+            className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 hover:bg-gray-100"
             style={{
-                backgroundColor: isSelected ? "#771D1D" : "white",
-                color: isSelected ? "white" : "#771D1D",
+                backgroundColor: selected ? "#771D1D" : "white",
+                color: selected ? "white" : "#771D1D",
             }}
         >
             {tag}

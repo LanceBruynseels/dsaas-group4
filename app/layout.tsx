@@ -4,23 +4,27 @@ import { ThemeProvider } from "next-themes";
 import NavBar from '@/components/navbar';
 import Image from "next/image";
 import "./globals.css";
+// for session handler
+import UserDisplay from '@/components/UserDisplay';
+// import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// const defaultUrl = process.env.VERCEL_URL
-//     ? https://${process.env.VERCEL_URL}
-// : "http://localhost:3000";
-
-// export const metadata = {
-//   metadataBase: new URL(defaultUrl),
-//   title: "Next.js and Supabase Starter Kit",
-//   description: "The fastest way to build apps with Next.js and Supabase",
-// };
-
-export default function RootLayout({
-                                     children,
-                                   }: {
-  children: React.ReactNode;
+export default async function RootLayout({
+                                             children,
+                                         }: {
+    children: React.ReactNode;
 }) {
-  return (
+
+    const session = await getServerSession(authOptions); // for session handler
+    // console.log('Session in layout:', session);
+    console.log('Layout - Session:', {
+        exists: !!session,
+        user: session?.user,
+        expires: session?.expires
+    });
+
+    return (
 
       <html lang="nl" className={GeistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
@@ -30,21 +34,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
       >
-        <main className="min-h-screen flex flex-col">
+        <main className="min-h-screen flex flex-col bg-red-50">
           <nav className="w-full border-b border-red-950 h-16 flex justify-between items-center px-5">
             {/* Logo + Navigation */}
             <NavBar />
-            {/* Account Section */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-800">Mijn Account</span>
-              <Image
-                  src="/mock-picture.webp"
-                  alt="Profile Picture"
-                  width={32}
-                  height={32}
-                  className="rounded-full border border-gray-500"
-              />
-            </div>
+
+            {/* User info if logged in*/}
+            <UserDisplay session={session} />
           </nav>
 
           {/* Main Content */}
@@ -69,6 +65,6 @@ export default function RootLayout({
       </ThemeProvider>
       </body>
       </html>
-  );
+    );
 }
 

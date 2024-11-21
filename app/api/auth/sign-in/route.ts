@@ -48,7 +48,6 @@ export async function POST(request: NextRequest) {
             redirect: {
                 destination: '/home'
             }
-
         });
 
     }
