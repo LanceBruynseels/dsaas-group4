@@ -4,31 +4,64 @@ import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
 
-const contacts = [
-    { name: 'Bonnie Green', message: "That's awesome. I think our users..." },
-    { name: 'Alice Wong', message: "That's awesome. I think our users..." },
-    { name: 'John Doe', message: "That's awesome. I think our users..." },
-    { name: 'Sofie Janssens', message: "That's awesome. I think our users..." },
-    { name: 'Emma Wilson', message: "That's awesome. I think our users..." },
-    { name: 'Roger Peeters', message: "That's awesome. I think our users..." },
-    { name: 'Koen De Bast', message: "That's awesome. I think our users..." },
-];
-
 const ChatApp: React.FC = () => {
+    const [selectedContact, setSelectedContact] = useState<any | null>(null);
+
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
             <div className="w-1/3 p-6">
-                <Sidebar />
+                <Sidebar onSelectContact={setSelectedContact} />
             </div>
             <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
             <div className="flex-1 flex flex-col p-6">
-                <ChatSection />
+                {selectedContact ? (
+                    <ChatSection selectedContact={selectedContact} />
+                ) : (
+                    <div className="flex items-center justify-center h-full">
+                        <p className="text-lg text-gray-500">Select a contact to start chatting</p>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
+    const [matches, setMatches] = useState<any[]>([]);
+    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+
+    useEffect(() => {
+        const fetchMatches = async () => {
+
+            const { data: matchData, error: matchError } = await supabase
+                .from('Matches')
+                .select('*')
+                .or(`user_1.eq.${senderId},user_2.eq.${senderId}`);
+
+            if (matchError) {
+                console.error('Error fetching matches:', matchError);
+            } else if (matchData) {
+                const matchedContacts = matchData.map((match: any) => {
+                    return match.user_1 === senderId ? match.user_2 : match.user_1;
+                });
+
+
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('id, username')
+                    .in('id', matchedContacts);
+
+                if (userError) {
+                    console.error('Error fetching user details:', userError);
+                } else if (userData) {
+                    setMatches(userData);
+                }
+            }
+        };
+
+        fetchMatches();
+    }, [senderId]);
+
     return (
         <>
             <div className="mb-6">
@@ -39,9 +72,10 @@ const Sidebar: React.FC = () => {
                 />
             </div>
             <div className="space-y-5">
-                {contacts.map((contact, index) => (
+                {matches.map((contact, index) => (
                     <div
                         key={index}
+                        onClick={() => onSelectContact(contact)}
                         className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <div className="flex items-center gap-4">
@@ -51,9 +85,10 @@ const Sidebar: React.FC = () => {
                                 className="w-10 h-10 rounded-full"
                             />
                             <div className="flex-1 min-w-0">
-                                <div className="font-bold truncate">{contact.name}</div>
+                                <div className="font-bold truncate">{contact.username}</div>
+                                {/* Placeholder message */}
                                 <div className="text-gray-500 text-sm truncate">
-                                    {contact.message}
+                                    Start a conversation...
                                 </div>
                             </div>
                         </div>
@@ -64,43 +99,64 @@ const Sidebar: React.FC = () => {
     );
 };
 
-const ChatSection: React.FC = () => {
+const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
     const [messages, setMessages] = useState<any[]>([]);
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b'; // Your sender ID
-    const receiverId = '9ba9d983-1b17-49e2-9cc0-9dcd5bd0c9ba'; // Your receiver ID
+    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const receiverId = selectedContact.id;
 
     useEffect(() => {
         const fetchMessages = async () => {
             const { data, error } = await supabase
                 .from('message')
                 .select('*')
-                .or(`and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`)
+                .or(`and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`);
 
             if (error) {
-                console.error('Failed to fetch messages:', error.message);
-            } else {
-                setMessages(data || []);
+                console.error('Error fetching messages:', error);
+            } else if (data) {
+                setMessages(data);
             }
         };
 
         fetchMessages();
-    }, []);
+
+        const channel = supabase
+            .channel('realtime:message')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'message',
+            }, (payload) => {
+                const newMessage = payload.new;
+                if (
+                    (newMessage.sender === senderId && newMessage.receiver === receiverId) ||
+                    (newMessage.sender === receiverId && newMessage.receiver === senderId)
+                ) {
+                    setMessages((prevMessages) => [...prevMessages, newMessage]);
+                }
+            })
+            .subscribe();
+
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [senderId, receiverId]);
 
     return (
         <>
-            <ChatHeader />
+            <ChatHeader selectedContact={selectedContact} />
             <div className="flex-1 overflow-y-auto min-h-0">
                 {messages.map((message, index) => (
                     <ChatMessage key={index} message={message} senderId={senderId} />
                 ))}
             </div>
-            <MessageInput />
+            <MessageInput receiverId={receiverId} />
         </>
     );
 };
 
-
-const ChatHeader: React.FC = () => {
+const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
@@ -109,7 +165,7 @@ const ChatHeader: React.FC = () => {
                     alt="Profile"
                     className="w-10 h-10 rounded-full"
                 />
-                <h3 className="text-lg font-bold">Bonnie Green</h3>
+                <h3 className="text-lg font-bold">{selectedContact.username}</h3>
             </div>
         </div>
     );
@@ -132,7 +188,7 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
                             const text = await response.text();
                             setTextContent(text);
                         } else if (contentType?.startsWith('image/')) {
-                            setTextContent(mediaURL); // Use the URL directly for images
+                            setTextContent(mediaURL);
                         } else {
                             setTextContent('Unsupported content type.');
                         }
@@ -174,19 +230,16 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
     );
 };
 
-
-
-const MessageInput: React.FC = () => {
+const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     const [textContent, setTextContent] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b'; // Your sender ID
-    const receiverId = '9ba9d983-1b17-49e2-9cc0-9dcd5bd0c9ba'; // Your receiver ID
+    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             setSelectedFile(file);
-            setTextContent(''); // Clear text input if a file is selected
+            setTextContent('');
         }
     };
 
@@ -243,7 +296,6 @@ const MessageInput: React.FC = () => {
                 return;
             }
 
-            alert('Message saved to database successfully!');
             setTextContent('');
             setSelectedFile(null);
         } catch (e) {
@@ -277,6 +329,5 @@ const MessageInput: React.FC = () => {
         </div>
     );
 };
-
 
 export default ChatApp;
