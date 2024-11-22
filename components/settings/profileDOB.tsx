@@ -39,7 +39,6 @@ const ProfileDOB: React.FC<ProfileDOBProps> = ({ userId, dob }) => {
             }
 
             const responseData = await response.json();
-            setMessage('DOB updated successfully!');
         } catch (err: any) {
             setMessage(`Error: ${err.message}`);
         } finally {
