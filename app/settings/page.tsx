@@ -1,18 +1,25 @@
 // page.tsx (Server-side rendering)
-import { SubmitButton } from "@/components/submit-button";
-import Slider from "@/components/settings/slider";
-import ProfilePicture from "@/components/settings/profilePicture";
+import { SubmitButton } from "@components/submit-button";
+import Slider from "@components/settings/slider";
+import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
-import ProfileDOB from "@/components/settings/profileDOB";
+import ProfileDOB from "@components/settings/profileDOB";
 import { createClient } from "@/utils/supabase/server";
 import React from "react";
 import Link from "next/link";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
+import {redirect} from "next/navigation";
 
 
 const SettingsPage = async () => {
     const supabase = await createClient();
 
-    const user_id = 'abb0c0af-904c-4c52-b19b-5be0fc3da588';
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        return redirect("/sign-in");
+    }
+    const user_id = session.user.id;
 
     const { data: filter_data, error: filterError } = await supabase.rpc('get_all_filter_data');
     const { data: profile_data, error: profileError } = await supabase.rpc('get_all_profile_data', { userid: user_id });
