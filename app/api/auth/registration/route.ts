@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
                     username,
                     password: hashedPassword,
                     facility,
-                    supervisor
+                    supervisor,
+                    is_accepted : false
                 }
             ])
             .select()
