@@ -35,8 +35,8 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                 <Link
                     href="/sign-in"
                     className="text-sm hover:text-primary"
-                >
-                    Sign in
+                ><button className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300 min-w-16">Sign in</button>
+
                 </Link>
             )}
         </div>
