@@ -5,20 +5,20 @@ import { createClient } from '@/utils/supabase/client';
 const supabase = createClient();
 
 const ChatApp: React.FC = () => {
-    const [selectedContact, setSelectedContact] = useState<any | null>(null);
+    const [selectedGroupChat, setSelectedGroupChat] = useState<any | null>(null);
 
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
             <div className="w-1/3 p-6">
-                <Sidebar onSelectContact={setSelectedContact} />
+                <Sidebar onSelectGroupChat={setSelectedGroupChat} />
             </div>
             <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
             <div className="flex-1 flex flex-col p-6">
-                {selectedContact ? (
-                    <ChatSection selectedContact={selectedContact} />
+                {selectedGroupChat ? (
+                    <ChatSection selectedGroupChat={selectedGroupChat} />
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-lg text-gray-500">Select a contact to start chatting</p>
+                        <p className="text-lg text-gray-500">Select a group to start chatting</p>
                     </div>
                 )}
             </div>
@@ -26,12 +26,13 @@ const ChatApp: React.FC = () => {
     );
 };
 
-const Sidebar: React.FC<{ onSelectContact: (chat: any) => void }> = ({ onSelectContact }) => {
+const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelectGroupChat }) => {
     const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchChats = async () => {
+        const fetchGroups = async () => {
             try {
                 const { data, error } = await supabase
                     .from("discover_chats")
@@ -46,8 +47,13 @@ const Sidebar: React.FC<{ onSelectContact: (chat: any) => void }> = ({ onSelectC
             }
         };
 
-        fetchChats();
+        fetchGroups();
     }, []);
+
+    // Filter chats based on the search term
+    const filteredChats = chats?.filter((chat) =>
+        chat.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <>
@@ -56,14 +62,16 @@ const Sidebar: React.FC<{ onSelectContact: (chat: any) => void }> = ({ onSelectC
                     type="text"
                     placeholder="Zoek een groepsgesprek"
                     className="w-full p-3 rounded-lg border border-gray-300"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div className="space-y-5">
-                {chats ? (
-                    chats.map((chat) => (
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+                {filteredChats && filteredChats.length > 0 ? (
+                    filteredChats.map((chat) => (
                         <div
                             key={chat.id}
-                            onClick={() => onSelectContact(chat)}
+                            onClick={() => onSelectGroupChat(chat)} // Pass selected group chat
                             className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                         >
                             <div className="flex items-center gap-4">
@@ -84,24 +92,28 @@ const Sidebar: React.FC<{ onSelectContact: (chat: any) => void }> = ({ onSelectC
                 ) : error ? (
                     <div className="text-red-500">{error}</div>
                 ) : (
-                    <div>Loading chats...</div>
+                    <div>{chats ? "Geen resultaten gevonden." : "Loading chats..."}</div>
                 )}
             </div>
         </>
     );
 };
 
-const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
+
+
+const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }) => {
     const [messages, setMessages] = useState<any[]>([]);
     const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
-    const receiverId = selectedContact.id;
+    //const receiverId = selectedContact.id;
+    const receiverId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+
 
     useEffect(() => {
         const fetchMessages = async () => {
             const { data, error } = await supabase
-                .from('message')
+                .from('group_message') // Assuming the table is named 'group_message'
                 .select('*')
-                .or(`and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`);
+                .eq('group_id', selectedGroupChat.id); // Filter by the selected group ID
 
             if (error) {
                 console.error('Error fetching messages:', error);
@@ -110,19 +122,20 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             }
         };
 
+
         fetchMessages();
 
         const channel = supabase
-            .channel('realtime:message')
+            .channel('realtime:group_message')
             .on('postgres_changes', {
                 event: 'INSERT',
                 schema: 'public',
-                table: 'message',
+                table: 'group_message',
             }, (payload) => {
                 const newMessage = payload.new;
                 if (
-                    (newMessage.sender === senderId && newMessage.receiver === receiverId) ||
-                    (newMessage.sender === receiverId && newMessage.receiver === senderId)
+                    (newMessage.sender === senderId && newMessage.group_id === selectedGroupChat.id) ||
+                    (newMessage.sender === selectedGroupChat.id && newMessage.group_id === senderId)
                 ) {
                     setMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
@@ -133,31 +146,31 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [senderId, receiverId]);
+    }, [senderId, selectedGroupChat.id]);
 
     return (
         <>
-            <ChatHeader selectedContact={selectedContact} />
+            <ChatHeader selectedGroupChat={selectedGroupChat} />
             <div className="flex-1 overflow-y-auto min-h-0">
                 {messages.map((message, index) => (
                     <ChatMessage key={index} message={message} senderId={senderId} />
                 ))}
             </div>
-            <MessageInput receiverId={receiverId} />
+            <MessageInput receiverId={receiverId} selectedGroupChat={selectedGroupChat} />
         </>
     );
 };
 
-const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
+const ChatHeader: React.FC<{ selectedGroupChat: { title: string; image_url: string } }> = ({ selectedGroupChat }) => {
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
                 <img
-                    src="https://via.placeholder.com/40"
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full"
+                    src={selectedGroupChat.image_url || "https://via.placeholder.com/40"}
+                    alt={selectedGroupChat.title}
+                    className="w-10 h-10 rounded-full object-cover"
                 />
-                <h3 className="text-lg font-bold">{selectedContact.username}</h3>
+                <h3 className="text-lg font-bold">{selectedGroupChat.title}</h3>
             </div>
         </div>
     );
@@ -167,6 +180,9 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
     const { mediaURL, time_stamp, sender } = message;
     const [textContent, setTextContent] = useState<string | null>(null);
     const isSentByCurrentUser = sender === senderId;
+
+
+
 
     useEffect(() => {
         const fetchContent = async () => {
@@ -203,7 +219,7 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
     return (
         <div className={`flex items-start ${isSentByCurrentUser ? 'justify-end' : 'justify-start'} gap-3 mb-3`}>
             <div className="flex flex-col">
-                <div className="text-xs text-gray-400">{new Date(time_stamp).toLocaleTimeString()}</div>
+                <div className="text-xs text-gray-400">Rohan</div>
                 {isImage ? (
                     <img
                         src={textContent || mediaURL}
@@ -222,7 +238,7 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
     );
 };
 
-const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
+const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = ({ receiverId, selectedGroupChat }) =>  {
     const [textContent, setTextContent] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
@@ -271,13 +287,13 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
             }
 
             const { error: insertError } = await supabase
-                .from('message')
+                .from('group_message')
                 .insert([
                     {
                         sender: senderId,
-                        receiver: receiverId,
+                        group_id: selectedGroupChat.id,
                         mediaURL: publicURL,
-                        time_stamp: new Date(),
+                        timestamp: new Date(),
                         is_read: false
                     }
                 ]);
@@ -297,12 +313,12 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     };
 
     return (
-        <div className="mt-auto flex items-center p-4 bg-white rounded-lg">
+        <div className="     flex items-center p-4 bg-white rounded-lg">
             <textarea
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 p-2 rounded-lg border border-gray-300 outline-none"
+                className="flex-5 w-1/2 p-2 rounded-lg border border-gray-300 outline-none"
                 disabled={!!selectedFile}
             />
             <input
@@ -314,7 +330,7 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
             />
             <button
                 onClick={handleSend}
-                className="ml-4 text-2xl text-gray-500 hover:text-gray-700 transition-colors"
+                className="ml-2  text-2xl text-gray-500 hover:text-gray-700 transition-colors"
             >
                 &#128172;
             </button>
