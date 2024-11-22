@@ -1,20 +1,14 @@
-'use client';
+// pages/pricing.tsx
 import React from 'react';
-import Link from 'next/link';
+import PricingTable from 'components/PricingTable';  // Adjust the import path if needed
 
-const HomePage: React.FC = () => {
+const PricingPage: React.FC = () => {
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-blue-100">
-            <h1 className="text-3xl font-bold text-blue-700">Welcome to YapperDappers!</h1>
-            <p className="mt-4 text-gray-800">Choose your plan and start now!</p>
-            <Link
-                href="/checkout"
-                className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
-            >
-                View Plans
-            </Link>
+        <div className="container mx-auto py-10 w-screen h-screen">
+            <h1 className="text-center text-3xl font-bold mb-6">Choose Your Plan</h1>
+            <PricingTable />  {/* This will render the PricingTable component */}
         </div>
     );
 };
 
-export default HomePage;
+export default PricingPage;
