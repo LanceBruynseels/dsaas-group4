@@ -9,6 +9,7 @@ import UserDisplay from '@/components/UserDisplay';
 // import { getServerSession } from "next-auth/next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import Metrics from './metrics'
 
 export default async function RootLayout({
                                              children,
@@ -63,6 +64,7 @@ export default async function RootLayout({
           </footer>
         </main>
       </ThemeProvider>
+      <Metrics />
       </body>
       </html>
     );
