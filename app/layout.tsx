@@ -27,46 +27,50 @@ export default async function RootLayout({
 
     return (
 
-      <html lang="nl" className={GeistSans.className} suppressHydrationWarning>
-      <body className="bg-background text-foreground">
-      <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-      >
-        <main className="min-h-screen flex flex-col bg-red-50">
-          <nav className="w-full border-b border-red-950 h-16 flex justify-between items-center px-5">
-            {/* Logo + Navigation */}
-            <NavBar />
+        <html lang="nl" className={GeistSans.className} suppressHydrationWarning>
+        <head>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.1/dist/tailwind.min.css" rel="stylesheet"/>
+        </head>
+        <body className="bg-background text-foreground">
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <main className="min-h-screen flex flex-col bg-red-50">
+                <nav className="w-full border-b border-red-950 h-16 flex justify-between items-center px-5">
+                    {/* Logo + Navigation */}
+                    <NavBar/>
 
-            {/* User info if logged in*/}
-            <UserDisplay session={session} />
-          </nav>
+                    {/* User info if logged in*/}
+                    <UserDisplay session={session}/>
+                </nav>
 
-          {/* Main Content */}
-          <div className="flex-1 w-full">{children}</div>
+                {/* Main Content */}
+                <div className="flex-1 w-full">{children}</div>
 
-          {/* Footer */}
-          <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-            <p>
-              Powered by{" "}
-              <a
-                  href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-                  target="_blank"
-                  className="font-bold hover:underline"
-                  rel="noreferrer"
-              >
-                Supabase
-              </a>
-            </p>
-            <ThemeSwitcher />
-          </footer>
-        </main>
-      </ThemeProvider>
-      <Metrics />
-      </body>
-      </html>
+                {/* Footer */}
+                <footer
+                    className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+                    <p>
+                        Powered by{" "}
+                        <a
+                            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
+                            target="_blank"
+                            className="font-bold hover:underline"
+                            rel="noreferrer"
+                        >
+                            Supabase
+                        </a>
+                    </p>
+                    <ThemeSwitcher/>
+                </footer>
+            </main>
+        </ThemeProvider>
+        <Metrics/>
+        </body>
+        </html>
     );
 }
 
