@@ -14,7 +14,7 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                 <div className="flex items-center gap-2">
                     <div className="flex flex-col items-end">
                         
-                        <span className="text-sm font-medium">{session.user?.username}</span>
+                        <span className="text-sm font-medium">{session.user?.name}</span>
                         <Link
                             href="/api/auth/signout"
                             className="text-xs text-gray-500 hover:text-gray-700"
