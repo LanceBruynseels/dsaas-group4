@@ -5,9 +5,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import type { Notification_user } from "@components/notification";
-import NotificationItem from '@components/notification';  // Import your NotificationItem component
+import NotificationItem from '@components/notification';
 import ProfilePopup from '@components/profilePopUp';
-import React from "react"; // Import the client component
+import React from "react";
 import SliderSettings from "@components/settings/sliderSettings";
 import CustomSlider from "@components/customSlider";
 
@@ -57,6 +57,73 @@ export default async function HomePage() {
 
     return (
         <div className="flex flex-row w-full">
+            {/* Notifications Side Panel */}
+            <div className="flex flex-col basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+                <div className="flex flex-row justify-between items-center">
+                    <h2 className="font-bold">Meldingen</h2>
+                    <div>
+                        <Image src="/bell.png" alt="Bell Icon" height={25} width={25} />
+                    </div>
+                </div>
+                <div className="flex flex-col my-2">
+                    {/* Render Notifications */}
+                    {notification_data && notification_data.length > 0 ? (
+                        notification_data.map((notification: Notification_user) => (
+                            <NotificationItem key={notification.notification_id} notification={notification} />
+                        ))
+                    ) : (
+                        <p>No new notifications.</p>
+                    )}
+                </div>
+            </div>
+
+
+
+            {/* Profile Section */}
+            <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
+                <div className="flex flex-col p-4 w-full h-full">
+                    <div className="flex flex-row w-full max-h-[500px] h-full">
+                        {/* Left Image Section */}
+                        <div className="flex basis-1/2 justify-center">
+
+                            <div
+                                className=" m-2 relative bg-[url('/profile-picture.jpeg')] bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg ">
+                                <button className="left-4 text-3xl bold text-white">❮</button>
+                                <button className="right-4 text-3xl bold text-white">❯</button>
+                            </div>
+
+                        </div>
+
+                        {/* Right Info Section */}
+                        <div className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
+                            <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
+                            <p className="mt-2">Meer informatie over Jara...
+                            </p>
+                            <div className="mt-4 text-4xl">😍</div>
+                        </div>
+                    </div>
+
+                    {/* Interaction Buttons */}
+                    <div className="flex justify-around w-full bg-red-50 mt-4 p-4 rounded-lg">
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/thumbs-down.png"} alt={"thumbs-down"} fill />
+                        </button>
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/thumbs-up.png"} alt={"thumbs-up"} fill />
+                        </button>
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/heart.png"} alt={"heart"} fill />️
+                        </button>
+
+                        <button className="relative w-12 h-12 ">
+                            <Image src={"/message-circle.png"} alt={"message-circle"} fill />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {/* Search Settings Section */}
             <div className="basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <h2 className="text-xl font-bold mb-4 text-red-950">Zoek Instellingen</h2>
@@ -142,77 +209,14 @@ export default async function HomePage() {
                 {/* Distance Slider */}
                 <div className="mb-4">
                     <SliderSettings label="Afstand tot anderen"
-                            unit="km"
-                            min={5}
-                            max={30}
-                            defaultValue={filter_data.distance || 15}
-                            userId={user_id}
-                            sliderColor="#771D1D"
-                            table="search_distance"
+                                    unit="km"
+                                    min={5}
+                                    max={30}
+                                    defaultValue={filter_data.distance || 15}
+                                    userId={user_id}
+                                    sliderColor="#771D1D"
+                                    table="search_distance"
                     />
-                </div>
-            </div>
-
-            {/* Profile Section */}
-            <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
-                <div className="flex flex-col p-4 w-full h-full">
-                    <div className="flex flex-row w-full max-h-[500px] h-full">
-                        {/* Left Image Section */}
-                        <div className="flex basis-1/2 justify-center border-r">
-                            <button className="left-2 text-black">❮</button>
-                            <div className="relative bg-[url('/profile-picture.jpeg')] bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg ">
-
-                            </div>
-                            <button className="right-2 text-black">❯</button>
-                        </div>
-
-                        {/* Right Info Section */}
-                        <div className="flex basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
-                            <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
-                            <p className="mt-2">Meer informatie over Jara...
-                            </p>
-                            <div className="mt-4 text-4xl">😍</div>
-                        </div>
-                    </div>
-
-                    {/* Interaction Buttons */}
-                    <div className="flex justify-around w-full bg-red-50 mt-4 p-4 rounded-lg">
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/thumbs-down.png"} alt={"thumbs-down"} fill />
-                        </button>
-
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/thumbs-up.png"} alt={"thumbs-up"} fill />
-                        </button>
-
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/heart.png"} alt={"heart"} fill />️
-                        </button>
-
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/message-circle.png"} alt={"message-circle"} fill />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Notifications Side Panel */}
-            <div className="flex flex-col basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-                <div className="flex flex-row justify-between items-center">
-                    <h2 className="font-bold">Meldingen</h2>
-                    <div>
-                        <Image src="/bell.png" alt="Bell Icon" height={25} width={25} />
-                    </div>
-                </div>
-                <div className="flex flex-col my-2">
-                    {/* Render Notifications */}
-                    {notification_data && notification_data.length > 0 ? (
-                        notification_data.map((notification: Notification_user) => (
-                            <NotificationItem key={notification.notification_id} notification={notification} />
-                        ))
-                    ) : (
-                        <p>No new notifications.</p>
-                    )}
                 </div>
             </div>
 

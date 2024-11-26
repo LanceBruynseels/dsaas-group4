@@ -81,7 +81,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
                     base: classNames?.base || "max-w-md",
                     filler: classNames?.filler || "bg-[#771D1D]",
                     track: classNames?.track || "bg-[#FFFFFF]",
-                    thumb: classNames?.thumb || ["bg-[#771D1D] rounded-full shadow-md w-5 h-5"],
+                    thumb: classNames?.thumb || ["bg-[#771D1D] rounded-full shadow-md w-5 h-5 margint-1"],
                     step: classNames?.step || "data-[in-range=true]:bg-black/30 dark:data-[in-range=true]:bg-white/50",
                 }}
             />

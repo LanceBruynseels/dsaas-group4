@@ -15,8 +15,7 @@ export async function POST(req: Request) {
                     min_age: minAge,
                     max_age: maxAge,
                 },
-                { onConflict: "user_id" }
-            )
+                { onConflict: "user_id" })
             .select();
 
         if (error) {
