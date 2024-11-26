@@ -73,7 +73,7 @@ const SliderSettings: React.FC<ClientSliderProps> = ({
             <style jsx>{`
                 .slider {
                     -webkit-appearance: none;
-                    width: 600px;
+                    width: 100%;
                     height: 8px;
                     border-radius: 5px;
                     outline: none;
