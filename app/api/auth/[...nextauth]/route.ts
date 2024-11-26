@@ -80,21 +80,40 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     callbacks: {
-        async jwt({ token, user }) {
-            // Attach user info to the JWT token if a user exists
+        async jwt({ token, user, account, profile, trigger }) {
+            console.log('JWT Callback:', { token, user, trigger });
+
             if (user) {
-                token.id = user.id;
-                token.username = user.username;
+                // Initial sign in
+                return {
+                    ...token,
+                    id: user.id,
+                    username: user.username,
+                    name: user.username //username as name
+                };
             }
+            // On subsequent calls, token already contains the user info, good!
             return token;
         },
-        async session({ session, token }) {
-            // Attach user info to the session if a token exists
-            if (session.user) {
+        async session({ session, token, user, trigger }) {
+            console.log('Session Callback:', { session, token, trigger });
+
+            if (session.user && token) {
                 session.user.id = token.id as string;
                 session.user.username = token.username as string;
+                session.user.name = token.username as string; //username as name
             }
+
+            console.log('Returning session:', session);
             return session;
+        },
+        async signIn({ user, account, profile, credentials }) {
+            console.log('SignIn Callback:', { user, account, credentials });
+            return true;
+        },
+        async redirect({ url, baseUrl }) {
+            console.log('Redirect Callback:', { url, baseUrl });
+            return url.startsWith(baseUrl) ? url : baseUrl;
         }
     },
     pages: {
