@@ -1,3 +1,4 @@
+// api/settings/slider/route.ts
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req: Request) {
@@ -9,9 +10,8 @@ export async function POST(req: Request) {
 
         const { data, error } = await supabase
             .from(table)
-            .upsert(
-                { user_id, distance: key },
-                { onConflict: "user_id" })
+            .update({ distance: key })
+            .eq('user_id', user_id)
             .select()
 
         if (error) {

@@ -1,17 +1,27 @@
 'use client'
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 interface ClientSliderProps {
-    label: string;
-    unit: string;
-    min: number;
-    max: number;
-    defaultValue: number;
-    sliderColor: string;
-    userId: string;
+    label: string,
+    unit: string,
+    min: number,
+    max: number,
+    defaultValue: number,
+    sliderColor: string,
+    userId: string,
+    table: string
 }
 
-const Slider: React.FC<ClientSliderProps> = ({ label, unit, min, max, defaultValue, sliderColor, userId }) => {
+const SliderSettings: React.FC<ClientSliderProps> = ({
+                                                 label,
+                                                 unit,
+                                                 min,
+                                                 max,
+                                                 defaultValue,
+                                                 sliderColor,
+                                                 userId,
+                                                 table
+                                             }) => {
     const [value, setValue] = useState(defaultValue);
 
     // Function to send updated value to the backend
@@ -23,7 +33,7 @@ const Slider: React.FC<ClientSliderProps> = ({ label, unit, min, max, defaultVal
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    table: "profile_distance",
+                    table: table, // "profile_distance"
                     key: newValue,
                     user_id: userId,
                 }),
@@ -90,4 +100,4 @@ const Slider: React.FC<ClientSliderProps> = ({ label, unit, min, max, defaultVal
     );
 };
 
-export default Slider;
+export default SliderSettings;

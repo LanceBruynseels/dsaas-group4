@@ -75,7 +75,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate], // Use the imported plugin here
+  //plugins: [tailwindcssAnimate], // Use the imported plugin here
 };
 
 export default config;

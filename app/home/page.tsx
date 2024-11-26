@@ -6,7 +6,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import type { Notification_user } from "@components/notification";
 import NotificationItem from '@components/notification';  // Import your NotificationItem component
-import ProfilePopup from '@components/profilePopUp'; // Import the client component
+import ProfilePopup from '@components/profilePopUp';
+import React from "react"; // Import the client component
+import SliderSettings from "@components/settings/sliderSettings";
+import CustomSlider from "@components/customSlider";
 
 export default async function HomePage() {
     const supabase = await createClient();
@@ -14,6 +17,7 @@ export default async function HomePage() {
     if (!session) {
         return redirect("/sign-in");
     }
+
     const user_id = session.user.id;
     // Fetch user profile to check if it's created
     const { data: profileData, error: profileError } = await supabase
@@ -24,7 +28,7 @@ export default async function HomePage() {
 
     const { data: userProfile, error: userProfileError } = await supabase
         .from('users')
-        .select('has_completed_initial_settings')
+        .select('initial_settings')
         .eq('id', user_id)
         .single();
 
@@ -127,24 +131,25 @@ export default async function HomePage() {
                     user_id={user_id}
                 />
 
+                {/* Age Slider */}
+                <CustomSlider
+                    label="Zoek leeftijd"
+                    minValue={18}
+                    maxValue={99}
+                    defaultValue={[10, 20]}
+                    user_id={user_id}
+                />
                 {/* Distance Slider */}
                 <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Afstand</h3>
-                    <input type="range" min="5" max="30" defaultValue="5" className="w-full mt-2" />
-                    <div className="flex justify-between text-sm mt-1">
-                        <span>5 km</span>
-                        <span>30 km</span>
-                    </div>
-                </div>
-
-                {/* Age Slider */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Leeftijd</h3>
-                    <input type="range" min="24" max="30" defaultValue="24" className="w-full mt-2" />
-                    <div className="flex justify-between text-sm mt-1">
-                        <span>18</span>
-                        <span>30</span>
-                    </div>
+                    <SliderSettings label="Afstand tot anderen"
+                            unit="km"
+                            min={5}
+                            max={30}
+                            defaultValue={filter_data.distance || 15}
+                            userId={user_id}
+                            sliderColor="#771D1D"
+                            table="search_distance"
+                    />
                 </div>
             </div>
 

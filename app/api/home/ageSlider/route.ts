@@ -3,27 +3,28 @@ import { createClient } from "@/utils/supabase/server";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { table, key, user_id } = body; // Expect table, key (value), and user_id from the request
+        const { table, minAge, maxAge, user_id } = body; // Expect table, minAge, maxAge, and user_id from the request
 
         const supabase = await createClient();
 
         const { data, error } = await supabase
             .from(table)
             .upsert(
-                { user_id, distance: key },
-                { onConflict: "user_id" })
-            .select()
+                {
+                    user_id,
+                    min_age: minAge,
+                    max_age: maxAge,
+                },
+                { onConflict: "user_id" }
+            )
+            .select();
 
         if (error) {
-            console.error('Error updating distance:', error.message);
-        } else {
-            console.log('Distance updated successfully:', data);
-        }
-
-
-        if (error) {
+            console.error("Error updating/inserting age range:", error.message);
             return new Response(JSON.stringify({ error: error.message }), { status: 500 });
         }
+
+        console.log("Age range updated/inserted successfully:", data);
 
         return new Response(JSON.stringify(data), { status: 200 });
     } catch (err) {

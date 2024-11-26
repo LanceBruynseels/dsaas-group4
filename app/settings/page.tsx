@@ -1,6 +1,6 @@
 // page.tsx (Server-side rendering)
 import { SubmitButton } from "@components/submit-button";
-import Slider from "@components/settings/slider";
+import SliderSettings from "@components/settings/sliderSettings";
 import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
 import ProfileDOB from "@components/settings/profileDOB";
@@ -143,13 +143,14 @@ const SettingsPage = async () => {
                     {/* Sliders */}
                     <div className="flex flex-col w-full mt-4 mb-6">
                         <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
-                            <Slider label="Afstand tot anderen"
-                                    unit="km"
-                                    min={5}
-                                    max={30}
-                                    defaultValue={profile_data.distance || 15}
-                                    userId={user_id}
-                                    sliderColor="#771D1D"
+                            <SliderSettings label="Afstand tot anderen"
+                                            unit="km"
+                                            min={5}
+                                            max={30}
+                                            defaultValue={profile_data.distance || 15}
+                                            userId={user_id}
+                                            sliderColor="#771D1D"
+                                            table="profile_distance"
                             />
                         </div>
                     </div>
