@@ -1,19 +1,43 @@
+'use client'
+import { useEffect, useState } from "react";
 import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
 
-interface UserDisplayProps { // receive session
+// Initialize Supabase client
+const supabase = createClient();
+
+
+interface UserDisplayProps {
     session: Session | null;
 }
 
 const UserDisplay = ({ session }: UserDisplayProps) => {
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchProfilePicture = async () => {
+            if (session?.user?.id) {
+                const { data, error } = await supabase
+                    .rpc("get_profile_picture", { userid: session.user.id });
+
+                if (error) {
+                    console.error("Error fetching profile picture:", error);
+                } else if (data && data.profile_picture_url && data.profile_picture_url[0]) {
+                    setProfilePicture(data.profile_picture_url[0]); // Accessing the first item in the array
+                }
+            }
+        };
+
+        fetchProfilePicture();
+    }, [session]);
     return (
         <div className="flex items-center gap-4">
             {session ? (
                 // Logged in state
                 <div className="flex items-center gap-2">
                     <div className="flex flex-col items-end">
-                        
                         <span className="text-sm font-medium">{session.user?.username}</span>
                         <Link
                             href="/api/auth/signout"
@@ -23,7 +47,7 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                         </Link>
                     </div>
                     <Image
-                        src={session.user?.image || "/mock-picture.webp"}
+                        src={profilePicture || "/mock-picture.webp"}
                         alt="Profile Picture"
                         width={32}
                         height={32}
@@ -31,7 +55,7 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                     />
                 </div>
             ) : (
-                // logged out state
+                // Logged out state
                 <Link
                     href="/sign-in"
                     className="text-sm hover:text-primary"
