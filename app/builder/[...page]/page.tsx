@@ -15,7 +15,7 @@ interface PageProps {
     };
 }
 
-export default function Page({ params }: React.FC<PageProps>) {
+const Page = ({ params }: PageProps) => {
     const [content, setContent] = useState<any>(null); // Type can be improved based on `RenderBuilderContent` props
 
     useEffect(() => {
@@ -33,4 +33,6 @@ export default function Page({ params }: React.FC<PageProps>) {
     ) : (
         <p>Loading...</p>
     );
-}
+};
+
+export default Page;
