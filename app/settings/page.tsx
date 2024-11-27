@@ -7,7 +7,7 @@ import { createClient } from "@/utils/supabase/server";
 import React from "react";
 import Link from "next/link";
 import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/auth.config";
 import {redirect} from "next/navigation";
 import AddPictures from "@components/settings/addPictures";
 
