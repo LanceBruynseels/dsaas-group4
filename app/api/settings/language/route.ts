@@ -1,17 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
     if (req.method !== "POST") {
-        return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    const { targetLanguage, text } = req.body;
-
-    if (!targetLanguage || !text) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
     }
 
     try {
+        const body = await req.json();
+        const { targetLanguage, text } = body;
+
+        if (!targetLanguage || !text) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+
         const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANSLATE_API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -27,10 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             throw new Error(data.error.message);
         }
 
-        res.status(200).json({ translatedText: data.data.translations[0].translatedText });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        return NextResponse.json({ translatedText: data.data.translations[0].translatedText });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-
-export { handler as POST };
