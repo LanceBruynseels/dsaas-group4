@@ -1,19 +1,21 @@
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
-import {getServerSession, Session} from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/auth.config";
 import { redirect } from "next/navigation";
 import type { Notification_user } from "@components/notification";
 import NotificationItem from '@components/notification';  // Import your NotificationItem component
 import ProfilePopup from '@components/profilePopUp'; // Import the client component
 import { useSession } from "next-auth/react";
 
+
+
 export default async function HomePage() {
     const supabase = await createClient();
-    //const { data: session , status} = useSession();
-    //console.log(session);
     const session = await getServerSession(authOptions);
+
+    // const session = await getServerSession(authOptions);
     if (!session) {
         return redirect("/sign-in");
     }
@@ -25,16 +27,8 @@ export default async function HomePage() {
         .eq("user_id", user_id)
         .single();
 
-    const { data: userProfile, error: userProfileError } = await supabase
-        .from('users')
-        .select('has_completed_initial_settings')
-        .eq('id', user_id)
-        .single();
 
-    if (userProfileError) {
-        console.error("Error fetching user profile:", userProfileError);
-        return <p>Error loading profile</p>;
-    }
+
     if (profileError && profileError.code !== 'PGRST116') { // Handle error only if it's not a "no data" error
         console.error("Error fetching profile:", profileError);
         return <p>Error loading profile</p>;
