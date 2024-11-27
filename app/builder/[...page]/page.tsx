@@ -9,13 +9,8 @@ import React, { useEffect, useState } from 'react';
 // Your Builder.io API key
 builder.init('ab2c2ceb389045f397e3deaac91c4b88');
 
-interface PageProps {
-    params: {
-        page: string[]; // Optional to handle cases where no dynamic route is provided
-    };
-}
-
-const Page = ({ params }: PageProps) => {
+// No need to manually define PageProps
+export default function Page({ params }: { params: { page?: string[] } }) {
     const [content, setContent] = useState<any>(null); // Type can be improved based on `RenderBuilderContent` props
 
     useEffect(() => {
@@ -33,6 +28,4 @@ const Page = ({ params }: PageProps) => {
     ) : (
         <p>Loading...</p>
     );
-};
-
-export default Page;
+}
