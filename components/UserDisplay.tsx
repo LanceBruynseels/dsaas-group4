@@ -1,44 +1,31 @@
-'use client'
-import { useEffect, useState } from "react";
-import { Session } from "next-auth";
+// UserDisplay.tsx
+'use client';
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/client";
+import { SessionProvider } from "next-auth/react";
 
-// Initialize Supabase client
-const supabase = createClient();
+const UserDisplay = () => {
+    const { data: session, status } = useSession();
 
+    if (status === "loading") {
+        return (
+            <div className="flex items-center gap-4">
+                <div className="animate-pulse flex items-center gap-2">
+                    <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
+                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        );
+    }
 
-interface UserDisplayProps {
-    session: Session | null;
-}
-
-const UserDisplay = ({ session }: UserDisplayProps) => {
-    const [profilePicture, setProfilePicture] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchProfilePicture = async () => {
-            if (session?.user?.id) {
-                const { data, error } = await supabase
-                    .rpc("get_profile_picture", { userid: session.user.id });
-
-                if (error) {
-                    console.error("Error fetching profile picture:", error);
-                } else if (data && data.profile_picture_url && data.profile_picture_url[0]) {
-                    setProfilePicture(data.profile_picture_url[0]); // Accessing the first item in the array
-                }
-            }
-        };
-
-        fetchProfilePicture();
-    }, [session]);
     return (
         <div className="flex items-center gap-4">
-            {session ? (
+            {status === "authenticated" ? (
                 // Logged in state
                 <div className="flex items-center gap-2">
                     <div className="flex flex-col items-end">
-                        <span className="text-sm font-medium">{session.user?.username}</span>
+                        <span className="text-sm font-medium">{session?.user.name}</span>
                         <Link
                             href="/api/auth/signout"
                             className="text-xs text-gray-500 hover:text-gray-700"
@@ -47,7 +34,7 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                         </Link>
                     </div>
                     <Image
-                        src={profilePicture || "/mock-picture.webp"}
+                        src={session?.user.image || "/mock-picture.webp"}
                         alt="Profile Picture"
                         width={32}
                         height={32}
@@ -55,7 +42,7 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                     />
                 </div>
             ) : (
-                // Logged out state
+                // logged out state
                 <Link
                     href="/sign-in"
                     className="text-sm hover:text-primary"
