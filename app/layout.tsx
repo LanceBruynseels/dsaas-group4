@@ -2,7 +2,7 @@ import { GeistSans } from "geist/font/sans";
 import NavBar from '@/components/navbar';
 import "./globals.css";
 import UserDisplay from '@/components/UserDisplay';
-import Providers from '@/components/providers';
+import Providers from '@/components/Providers';
 
 
 export default function RootLayout({
