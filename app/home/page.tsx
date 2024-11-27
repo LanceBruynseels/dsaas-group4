@@ -7,9 +7,10 @@ import { redirect } from "next/navigation";
 import type { Notification_user } from "@components/notification";
 import NotificationItem from '@components/notification';
 import ProfilePopup from '@components/profilePopUp';
-import React from "react";
+import React, {Suspense} from "react";
 import SliderSettings from "@components/settings/sliderSettings";
 import CustomSlider from "@components/customSlider";
+import Loading from "@components/loading";
 
 export default async function HomePage() {
     const supabase = await createClient();
@@ -26,16 +27,6 @@ export default async function HomePage() {
         .eq("user_id", user_id)
         .single();
 
-    const { data: userProfile, error: userProfileError } = await supabase
-        .from('users')
-        .select('initial_settings')
-        .eq('id', user_id)
-        .single();
-
-    if (userProfileError) {
-        console.error("Error fetching user profile:", userProfileError);
-        return <p>Error loading profile</p>;
-    }
     if (profileError && profileError.code !== 'PGRST116') { // Handle error only if it's not a "no data" error
         console.error("Error fetching profile:", profileError);
         return <p>Error loading profile</p>;
@@ -65,6 +56,7 @@ export default async function HomePage() {
                         <Image src="/bell.png" alt="Bell Icon" height={25} width={25} />
                     </div>
                 </div>
+                <Suspense fallback={<p>Loading feed...</p>}>
                 <div className="flex flex-col my-2">
                     {/* Render Notifications */}
                     {notification_data && notification_data.length > 0 ? (
@@ -75,6 +67,7 @@ export default async function HomePage() {
                         <p>No new notifications.</p>
                     )}
                 </div>
+                </Suspense>
             </div>
 
 
@@ -85,17 +78,29 @@ export default async function HomePage() {
                     <div className="flex flex-row w-full max-h-[500px] h-full">
                         {/* Left Image Section */}
                         <div className="flex basis-1/2 justify-center">
-
                             <div
-                                className=" m-2 relative bg-[url('/profile-picture.jpeg')] bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg ">
-                                <button className="left-4 text-3xl bold text-white">❮</button>
-                                <button className="right-4 text-3xl bold text-white">❯</button>
-                            </div>
+                                className="m-2 relative bg-[url('/profile-picture.jpeg')] bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg"
+                            >
+                                {/* Left arrow */}
+                                <button
+                                    className="absolute top-1/2 left-4 text-3xl font-bold text-white"
+                                >
+                                    ❮
+                                </button>
 
+                                {/* Right arrow */}
+                                <button
+                                    className="absolute top-1/2 right-4 text-3xl font-bold text-white"
+                                >
+                                    ❯
+                                </button>
+                            </div>
                         </div>
 
+
                         {/* Right Info Section */}
-                        <div className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
+                        <div
+                            className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
                             <h2 className="text-2xl font-bold text-white">Jara, 25 jaar</h2>
                             <p className="mt-2">Meer informatie over Jara...
                             </p>
@@ -103,23 +108,20 @@ export default async function HomePage() {
                         </div>
                     </div>
 
-                    {/* Interaction Buttons */}
-                    <div className="flex justify-around w-full bg-red-50 mt-4 p-4 rounded-lg">
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/thumbs-down.png"} alt={"thumbs-down"} fill />
-                        </button>
-
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/thumbs-up.png"} alt={"thumbs-up"} fill />
-                        </button>
-
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/heart.png"} alt={"heart"} fill />️
-                        </button>
-
-                        <button className="relative w-12 h-12 ">
-                            <Image src={"/message-circle.png"} alt={"message-circle"} fill />
-                        </button>
+                    <div className="flex justify-around mt-6">
+                        {["thumbs-down", "thumbs-up", "heart", "message-circle"].map((icon) => (
+                            <button
+                                key={icon}
+                                className="bg-gray-200 p-3 rounded-full hover:bg-gray-300 transition"
+                            >
+                                <Image
+                                    src={`/${icon}.png`}
+                                    alt={icon}
+                                    width={24}
+                                    height={24}
+                                />
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -127,7 +129,7 @@ export default async function HomePage() {
             {/* Search Settings Section */}
             <div className="basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <h2 className="text-xl font-bold mb-4 text-red-950">Zoek Instellingen</h2>
-
+                <Suspense fallback={<Loading></Loading>}>
                 {/* Personality Options */}
                 <FilterSection
                     title="Persoonlijkheid"
@@ -218,6 +220,7 @@ export default async function HomePage() {
                                     table="search_distance"
                     />
                 </div>
+                </Suspense>
             </div>
 
             {/* Pop-up screen for first login */}
