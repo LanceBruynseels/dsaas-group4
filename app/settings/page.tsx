@@ -1,5 +1,4 @@
 // page.tsx (Server-side rendering)
-import { SubmitButton } from "@components/submit-button";
 import Slider from "@components/settings/slider";
 import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
@@ -10,7 +9,7 @@ import Link from "next/link";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 import {redirect} from "next/navigation";
-
+import AddPictures from "@components/settings/addPictures";
 
 const SettingsPage = async () => {
     const supabase = await createClient();
@@ -25,9 +24,6 @@ const SettingsPage = async () => {
     const { data: profile_data, error: profileError } = await supabase.rpc('get_all_profile_data', { userid: user_id });
     const { data: picture, error: pictureError } = await supabase.rpc('get_profile_picture', { userid: user_id });
 
-    console.log(profile_data)
-
-
     if (filterError || profileError || pictureError) {
         console.error("Error fetching data:", filterError || profileError || pictureError);
         return <p>Error loading profile data</p>;
@@ -39,12 +35,6 @@ const SettingsPage = async () => {
             <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Instellingen</h2>
-                    <SubmitButton
-                        className="px-6 py-2 text-white font-bold rounded-md hover:bg-red-600"
-                        style={{ backgroundColor: "#771D1D" }}
-                    >
-                        Log uit
-                    </SubmitButton>
                 </div>
                 <ul className="space-y-4 flex-1">
                     <li className="text-base font-semibold text-[#771D1D] cursor-pointer hover:text-[#771D1D]">
@@ -56,7 +46,10 @@ const SettingsPage = async () => {
                 </ul>
             </div>
 
+            {/* Main Content */}
             <div className="flex flex-col basis-3/4 p-4 m-2 flex-grow bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+
+                {/* Profile Section */}
                 <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
                     <div className="flex flex-col justify-center items-center mb-6">
                         <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
@@ -67,8 +60,27 @@ const SettingsPage = async () => {
                     <ProfileDOB userId={user_id} dob={profile_data.dob} />
                 </div>
 
+                {/* Add More Pictures Section */}
+                <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                        Voeg meer foto's toe
+                    </h2>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <AddPictures
+                            maxPictures={3}
+                            userId={user_id}
+                        />
+                    </div>
+                    <p className="text-sm text-center text-gray-600 mt-4">
+                        Voeg tot 3 extra foto's toe aan je profiel
+                    </p>
+                </div>
+
+                {/* Personality and Filters Section */}
                 <div className="rounded-lg p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">Dit moet je ook weten over mij...</h2>
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                        Dit moet je ook weten over mij...
+                    </h2>
 
                     {/* Personality Options */}
                     <ProfileFiltersSection
@@ -143,13 +155,14 @@ const SettingsPage = async () => {
                     {/* Sliders */}
                     <div className="flex flex-col w-full mt-4 mb-6">
                         <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
-                            <Slider label="Afstand tot anderen"
-                                    unit="km"
-                                    min={5}
-                                    max={30}
-                                    defaultValue={profile_data.distance || 15}
-                                    userId={user_id}
-                                    sliderColor="#771D1D"
+                            <Slider
+                                label="Afstand tot anderen"
+                                unit="km"
+                                min={5}
+                                max={30}
+                                defaultValue={profile_data.distance || 15}
+                                userId={user_id}
+                                sliderColor="#771D1D"
                             />
                         </div>
                     </div>
