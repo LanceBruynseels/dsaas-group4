@@ -1,15 +1,18 @@
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
-import { getServerSession } from "next-auth";
+import {getServerSession, Session} from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import type { Notification_user } from "@components/notification";
 import NotificationItem from '@components/notification';  // Import your NotificationItem component
 import ProfilePopup from '@components/profilePopUp'; // Import the client component
+import { useSession } from "next-auth/react";
 
 export default async function HomePage() {
     const supabase = await createClient();
+    //const { data: session , status} = useSession();
+    //console.log(session);
     const session = await getServerSession(authOptions);
     if (!session) {
         return redirect("/sign-in");
