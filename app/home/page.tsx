@@ -22,16 +22,8 @@ export default async function HomePage() {
         .eq("user_id", user_id)
         .single();
 
-    const { data: userProfile, error: userProfileError } = await supabase
-        .from('users')
-        .select('has_completed_initial_settings')
-        .eq('id', user_id)
-        .single();
 
-    if (userProfileError) {
-        console.error("Error fetching user profile:", userProfileError);
-        return <p>Error loading profile</p>;
-    }
+
     if (profileError && profileError.code !== 'PGRST116') { // Handle error only if it's not a "no data" error
         console.error("Error fetching profile:", profileError);
         return <p>Error loading profile</p>;
