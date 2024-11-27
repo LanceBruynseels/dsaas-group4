@@ -14,7 +14,7 @@ export default async function RootLayout({
                                              children,
                                          }: {
     children: React.ReactNode;
-}) {
+}): Promise<JSX.Element> { // Explicit return type for the async component
 
     const session = await getServerSession(authOptions); // for session handler
     // console.log('Session in layout:', session);

@@ -6,9 +6,9 @@
     "@typescript-eslint/no-explicit-any": "off",
     "react/no-unescaped-entities": "off",
     "@typescript-eslint/no-empty-object-type": "off",
-    "@typescript-eslint/ban-types": "off"
-  },
-  "ignorePatterns": [
-    "app/builder/[...page]/page.tsx" // Ignore this file
-  ]
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-unsafe-function-type": "off",
+    "@typescript-eslint/no-require-imports": "off"
+  }
 }

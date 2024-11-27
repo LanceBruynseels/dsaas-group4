@@ -1,9 +1,9 @@
+// route.ts
 import { NextAuthOptions, DefaultSession } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { createClient } from "@/utils/supabase/server";
-
 
 declare module "next-auth" {
     interface Session {
@@ -19,9 +19,7 @@ declare module "next-auth" {
     }
 }
 
-// export const authOptions: NextAuthOptions = {
-// changed to const to resolving pipeline failure
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
             credentials: {
@@ -34,13 +32,22 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 try {
-                    const supabase = await createClient();
+                    // create an async context
+                    const getSupabaseClient = async () => {
+                        return await createClient();
+                    };
+
+                    // console.log('Attempting to fetch user');
+
+                    const supabase = await getSupabaseClient();
 
                     const { data: user, error } = await supabase
                         .from('users')
                         .select('id, username, password')
                         .eq('username', credentials.username)
                         .single();
+
+                    // console.log('Database response:', { user, error });
 
                     if (error || !user) {
                         return null;
@@ -64,19 +71,40 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, account, profile, trigger }) {
+            // console.log('JWT Callback:', { token, user, trigger });
+
             if (user) {
-                token.id = user.id;
-                token.username = user.username;
+                // Initial sign in
+                return {
+                    ...token,
+                    id: user.id,
+                    username: user.username,
+                    name: user.username //username as name
+                };
             }
+            // On subsequent calls, token already contains the user info, GOOD!
             return token;
         },
-        async session({ session, token }) {
-            if (session.user) {
+        async session({ session, token, user, trigger }) {
+            // console.log('Session Callback:', { session, token, trigger });
+
+            if (session.user && token) {
                 session.user.id = token.id as string;
                 session.user.username = token.username as string;
+                session.user.name = token.username as string; //username as name
             }
+
+            // console.log('Returning session:', session);
             return session;
+        },
+        async signIn({ user, account, profile, credentials }) {
+            // console.log('SignIn Callback:', { user, account, credentials });
+            return true;
+        },
+        async redirect({ url, baseUrl }) {
+            // console.log('Redirect Callback:', { url, baseUrl });
+            return url.startsWith(baseUrl) ? url : baseUrl;
         }
     },
     pages: {
@@ -87,6 +115,7 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days
     }
+
 };
 
 const handler = NextAuth(authOptions);

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 // If using TypeScript, add the following snippet to your file as well.
 declare global {

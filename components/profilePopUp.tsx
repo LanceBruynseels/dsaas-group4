@@ -64,14 +64,6 @@ export default function ProfilePopup({ userId, initialShowPopup, initialImageUrl
             <div className="bg-[#771D1D] p-8 rounded-lg shadow-md w-full max-w-sm">
                 <h2 className="text-white text-2xl font-semibold mb-4">Vul hier je persoonlijke gegevens in</h2>
                 <form>
-                    {/* Profile Picture upload component */}
-                    <label className="block text-white text-center">Upload hier een foto van jezelf:</label>
-                    <div className="flex justify-center items-center mb-4">
-                        <ProfilePicture
-                            imageUrl={profileImageUrl}
-                            userId={userId}
-                        />
-                    </div>
                     {/* First Name Input */}
                     <label className="block mb-4 text-white">
                         Voornaam (Verplicht):
