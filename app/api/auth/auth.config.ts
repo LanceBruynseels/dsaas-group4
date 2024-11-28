@@ -100,10 +100,10 @@ export const authOptions: NextAuthOptions = {
             // console.log('SignIn Callback:', { user, account, credentials });
             return true;
         },
-        async redirect({ url, baseUrl }) {
-            // console.log('Redirect Callback:', { url, baseUrl });
-            return url.startsWith(baseUrl) ? url : baseUrl;
-        }
+        // async redirect({ url, baseUrl }) {
+        //     // console.log('Redirect Callback:', { url, baseUrl });
+        //     return url.startsWith(baseUrl) ? url : baseUrl;
+        // }
     },
     pages: {
         signIn: '/sign-in',
