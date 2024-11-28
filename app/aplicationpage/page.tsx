@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 function VlinderPage() {
     return (
         <div className="flex w-screen h-screen flex-row overflow-x-hidden overflow-y-hidden">
@@ -47,7 +49,7 @@ function VlinderPage() {
 
             <div
                 className="absolute flex flex-col w-1/4 items-center z-50  shadow-sm shadow-black p-[3vh] gap-[3vh] m-16 border aspect-[20/32]  bg-[#FDFDFD]">
-                <img src="vlinder.png" alt="Vlinder Logo" className="w-3/5 aspect-square rounded-xl "></img>
+                <Image src="vlinder.png" alt="Vlinder Logo" width={50} height={50} className="aspect-square rounded-xl "></Image>
                 <p className="text-center text-gray-700 text-2xl font-bold mx-4">A VERY INSPIRATIONAL QUOTE WE WORK BY</p>
                 <p className="text-center text-gray-700 mx-4 h-max-^[20vh]">A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.A lot more text here.</p>
             </div>

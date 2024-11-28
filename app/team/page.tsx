@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Image from "next/image";
 
 
 const teamMembers = [
@@ -27,7 +28,8 @@ const TeamSection = () => {
             </div>
             <div className="flex flex-row w-screen h-3/6 justify-center gap-8">
                 <div className="flex w-3/12 h-full aspect-square">
-                    <img className="w-full h-full  border-4 border-[#6f5956] rounded-2xl " src={currentImage}/>
+                    <Image fill className="w-full h-full  border-4 border-[#6f5956] rounded-2xl " src={currentImage}
+                           alt={'someImage'}/>
                 </div>
                 <div className="flex flex-col w-5/12 h-full gap-4 p-3">
                     <p className="text-5xl bg-[#a0d5c0] text-white p-4"> {currentName}</p>
@@ -57,7 +59,7 @@ const TeamSection = () => {
                                  setCurrentDescription(member.description);
                              }}>
 
-                            <img className="border-2 border-[#6f5956] rounded-2xl hover:border-[#a0d5c0] hover:border-4" src={member.picture}/>
+                            <Image className="border-2 border-[#6f5956] rounded-2xl hover:border-[#a0d5c0] hover:border-4" src={member.picture} alt={'memberPicture'}/>
                         </div>
                     </div>
                 ))}

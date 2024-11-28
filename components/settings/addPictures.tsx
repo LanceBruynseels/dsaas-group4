@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client"; // Assuming this initializes the Supabase client
+import { createClient } from "@/utils/supabase/client";
+import Image from "next/image"; // Assuming this initializes the Supabase client
 
 interface AddPicturesProps {
     maxPictures?: number;
@@ -151,9 +152,10 @@ const AddPictures: React.FC<AddPicturesProps> = ({ maxPictures = 3, onPicturesCh
         <div className="flex flex-wrap justify-center gap-8">
             {pictures.map((picture, index) => (
                 <div key={index} className="relative w-44 h-44">
-                    <img
+                    <Image
                         src={picture}
                         alt={`Uploaded ${index + 1}`}
+                        fill
                         className="w-full h-full object-cover rounded-md"
                     />
                     <button

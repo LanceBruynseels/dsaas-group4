@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
+import Image from "next/image";
 
 type ProfilePictureProps = {
     imageUrl: string; // URL passed from the server
@@ -63,10 +64,12 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
 
     return (
         <div className="relative">
-            <img
+            <Image
                 src={currentImageUrl || "/mock-picture.webp"}
+                width={44}
+                height={44}
                 alt="Profile"
-                className="w-44 h-44 rounded-full object-cover"
+                className="rounded-full object-cover"
             />
             <div className="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow-md cursor-pointer">
                 <svg
