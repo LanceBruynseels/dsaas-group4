@@ -57,7 +57,8 @@ export const signInAction = async (formData: FormData) => {
         return encodedRedirect("error", "/sign-in-caretaker", error.message);
     }
 
-    return redirect("/protected");
+    // return redirect("/protected");
+    return redirect("/caretaker");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {

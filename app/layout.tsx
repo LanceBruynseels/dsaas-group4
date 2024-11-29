@@ -19,11 +19,11 @@ export default async function RootLayout({
 
     const session = await getServerSession(authOptions); // for session handler
     // console.log('Session in layout:', session);
-    console.log('Layout - Session:', {
-        exists: !!session,
-        user: session?.user,
-        expires: session?.expires
-    });
+    // console.log('Layout - Session:', {
+    //     exists: !!session,
+    //     user: session?.user,
+    //     expires: session?.expires
+    // });
 
     return (
 
