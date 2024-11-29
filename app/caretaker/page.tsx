@@ -2,13 +2,14 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
 
 interface User {
     id: string;
-    username: string;
-    facility: string;
-    first_name: string;
-    last_name: string;
+    username: string | null;
+    facility: string | null;
+    first_name: string | null;
+    last_name: string | null;
     is_accepted: boolean;
 }
 
@@ -16,6 +17,8 @@ export default function CaretakerHome() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const supabase = createClient();
 
     useEffect(() => {
@@ -39,7 +42,7 @@ export default function CaretakerHome() {
                 throw userError;
             }
 
-            setUsers(userData);
+            setUsers(userData || []);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
@@ -58,7 +61,6 @@ export default function CaretakerHome() {
                 throw error;
             }
 
-            // Update local state to reflect the change
             setUsers(users.map(user =>
                 user.id === userId
                     ? { ...user, is_accepted: true }
@@ -70,6 +72,15 @@ export default function CaretakerHome() {
         }
     };
 
+    const filteredUsers = users.filter(user => {
+        const query = searchQuery.toLowerCase();
+        return (
+            (user.first_name?.toLowerCase() || '').includes(query) ||
+            (user.last_name?.toLowerCase() || '').includes(query) ||
+            (user.username?.toLowerCase() || '').includes(query)
+        );
+    });
+
     if (loading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     }
@@ -79,70 +90,97 @@ export default function CaretakerHome() {
     }
 
     return (
-        <div className="p-8 max-w-7xl mx-auto">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">My Users</h1>
-                <p className="mt-2 text-gray-600">Manage and view your assigned users</p>
+        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+            {/* Left Sidebar */}
+            <div className="w-1/3 p-6 border-r border-gray-200">
+                <div className="mb-6 relative">
+                    <input
+                        type="text"
+                        placeholder="Zoek een cliënt"
+                        className="w-full p-3 pl-10 rounded-lg border border-gray-300"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
+                </div>
+
+                <div className="space-y-4">
+                    {filteredUsers.map((user) => (
+                        <div
+                            key={user.id}
+                            onClick={() => setSelectedUser(user)}
+                            className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                        >
+                            <div className="flex items-center gap-4">
+                                <img
+                                    src="https://via.placeholder.com/40"
+                                    alt="Profile"
+                                    className="w-10 h-10 rounded-full"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-bold truncate">
+                                        {user.first_name || ''} {user.last_name || ''}
+                                    </div>
+                                    <div className="text-gray-500 text-sm truncate">
+                                        {user.facility || ''}
+                                    </div>
+                                </div>
+                                {!user.is_accepted && (
+                                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                                        Pending
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {users.map((user) => (
-                    <div
-                        key={user.id}
-                        className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
-                    >
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                    {user.first_name} {user.last_name}
-                                </h3>
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm ${
-                                        user.is_accepted
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-yellow-100 text-yellow-800'
-                                    }`}
-                                >
-                                    {user.is_accepted ? 'Accepted' : 'Pending'}
-                                </span>
-                            </div>
-
-                            <div className="space-y-2">
-                                <div className="flex items-center text-gray-600">
-                                    <span className="text-sm">Username:</span>
-                                    <span className="ml-2 text-sm font-medium text-gray-900">
-                                        {user.username}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center text-gray-600">
-                                    <span className="text-sm">Facility:</span>
-                                    <span className="ml-2 text-sm font-medium text-gray-900">
-                                        {user.facility}
-                                    </span>
+            {/* Right Content Area */}
+            <div className="flex-1 flex flex-col p-6">
+                {selectedUser ? (
+                    <>
+                        <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
+                            <div className="flex items-center gap-3">
+                                <img
+                                    src="https://via.placeholder.com/40"
+                                    alt="Profile"
+                                    className="w-10 h-10 rounded-full"
+                                />
+                                <div>
+                                    <h3 className="text-lg font-bold">
+                                        {selectedUser.first_name || ''} {selectedUser.last_name || ''}
+                                    </h3>
+                                    <p className="text-sm text-gray-500">{selectedUser.facility || ''}</p>
                                 </div>
                             </div>
-
-                            {!user.is_accepted ? (
+                            {!selectedUser.is_accepted && (
                                 <button
-                                    className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition-colors duration-200"
-                                    onClick={() => handleApprove(user.id)}
+                                    onClick={() => handleApprove(selectedUser.id)}
+                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
                                 >
-                                    Approve
+                                    Approve User
                                 </button>
-                            ) : (
-                                <div className="mt-4 w-full py-2 px-4 text-center text-green-700 bg-green-50 rounded-md">
-                                    Approved
-                                </div>
                             )}
                         </div>
-                    </div>
-                ))}
-
-                {users.length === 0 && (
-                    <div className="col-span-full flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border border-gray-200">
-                        <p className="text-gray-500 text-lg">No users assigned yet</p>
-                        <p className="text-gray-400 text-sm mt-2">Users will appear here once they are assigned to you</p>
+                        <div className="flex-1 bg-[hsl(10,100%,95%)] rounded-lg p-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <span className="font-semibold">Username:</span>
+                                    <span className="ml-2">{selectedUser.username || ''}</span>
+                                </div>
+                                <div>
+                                    <span className="font-semibold">Status:</span>
+                                    <span className={`ml-2 ${selectedUser.is_accepted ? 'text-green-600' : 'text-yellow-600'}`}>
+                                        {selectedUser.is_accepted ? 'Accepted' : 'Pending Approval'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                        Select a user to view details
                     </div>
                 )}
             </div>
