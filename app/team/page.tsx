@@ -25,7 +25,7 @@ const TeamSection = () => {
 
 
         <section
-            className="md:w-screen md:h-screen bg-white flex flex-col items-center justify-between gap-4 overflow-x-hidden overflow-y-auto p-8 h-fit space-y-4">
+            className="lg:w-screen lg:h-screen bg-white flex flex-col items-center justify-between gap-4 overflow-x-hidden overflow-y-auto p-8 h-fit space-y-4">
 
             <div className="flex flex-col h-fit w-screen items-center justify-center">
                 <h2 className="flex items-center justify-center text-center w-5/6 h-full font-bold text-[5vw] text-white bg-red-950">
@@ -33,18 +33,18 @@ const TeamSection = () => {
                 </h2>
             </div>
 
-            <div className="flex md:flex-row md:justify-center md:items-center h-fit md:w-4/6 w-5/6  gap-8 flex-col items-center  ">
-                <div className="flex flex-col justify-center md:w-[40%] w-[70%] aspect-square ">
+            <div className="flex lg:flex-row lg:justify-center lg:items-center h-fit lg:w-4/6 w-5/6  gap-8 flex-col items-center  ">
+                <div className="flex flex-col justify-center lg:w-[40%] w-[70%] aspect-square ">
                     <img
-                        className="flex flex-col aspect-square md:h-full object-cover border-4 border-red-950 rounded-2xl"
+                        className="flex flex-col aspect-square lg:h-full object-cover border-4 border-red-950 rounded-2xl"
                         src={currentImage}
                         alt="Team member"
                     />
                 </div>
-                <div className="flex flex-col justify-center md:w-[60%] sm:h-full gap-4 p-3 w-full">
+                <div className="flex flex-col justify-center lg:w-[60%] sm:h-full gap-4 p-3 w-full">
                     <p className="flex flex-row justify-start items-center h-fit text-[3vw] bg-red-700 text-white p-4  ">{currentName}</p>
-                    <p className="h-fit md:text-[2vw] text-[2.5vw] mx-2 ">{currentFunction}</p>
-                    <p className="h-fit md:text-[1vw] text-[2vw] mx-2">{currentDescription}</p>
+                    <p className="h-fit lg:text-[2vw] text-[2.5vw] mx-2 ">{currentFunction}</p>
+                    <p className="h-fit lg:text-[1vw] text-[2vw] mx-2">{currentDescription}</p>
                 </div>
             </div>
 
