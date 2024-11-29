@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 export const signUpAction = async (formData: FormData) => {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
+    const displayName = formData.get("displayName")?.toString();
     const supabase = await createClient();
     const origin = (await headers()).get("origin");
 
@@ -24,6 +25,9 @@ export const signUpAction = async (formData: FormData) => {
         password,
         options: {
             emailRedirectTo: `${origin}/auth/callback`,
+            data: {
+                display_name: displayName
+            }
         },
     });
 
@@ -50,7 +54,7 @@ export const signInAction = async (formData: FormData) => {
     });
 
     if (error) {
-        return encodedRedirect("error", "/sign-in", error.message);
+        return encodedRedirect("error", "/sign-in-caretaker", error.message);
     }
 
     return redirect("/protected");
