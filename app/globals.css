@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "flowbite";
+
 @layer base {
   :root {
     --background: 10 100% 90%;

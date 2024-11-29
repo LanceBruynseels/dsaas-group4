@@ -11,6 +11,8 @@ import React, {Suspense} from "react";
 import SliderSettings from "@components/settings/sliderSettings";
 import CustomSlider from "@components/customSlider";
 import Loading from "@components/loading";
+import { Carousel } from "flowbite-react";
+import {FlowbiteCarousel} from "@components/flowbiteCarousel";
 
 interface ProfileData {
     genders: string[];         // or a specific type for gender values
@@ -69,12 +71,13 @@ export default async function HomePage() {
 
     // Ensure data is typed correctly as an array of MatchingUser objects
     const typedMatchData: MatchingUsersResponse = matchData;
+    console.log(matchData)
 
     const { data: pictures, error: pictures_error } = await supabase
         .storage
         .from('picturesExtra')  // The storage bucket name
         .list(typedMatchData[0].user_id);
-    //console.log(data);
+    console.log(pictures);
 
     const firstMatch = matchData[0];
 
@@ -127,29 +130,30 @@ export default async function HomePage() {
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
                 <div className="flex flex-col p-4 w-full h-full">
                     <div className="flex flex-row w-full max-h-[500px] h-full">
-                        {/* Left Image Section */}
-                        <div className="flex basis-1/2 justify-center">
-                            <div
-                                className="m-2 relative bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg"
-                                style={{backgroundImage: `url('${firstMatch.profile_picture_url}')`}}
-                            >
-                                {/* Left arrow */}
-                                <button className="absolute top-1/2 left-4 text-3xl font-bold text-white">❮</button>
 
-                                {/* Right arrow */}
-                                <button className="absolute top-1/2 right-4 text-3xl font-bold text-white">❯</button>
-                            </div>
+                        <div className="flex w-full justify-center">
+                            <FlowbiteCarousel></FlowbiteCarousel>
+                        {/*    <div*/}
+                        {/*        className="m-2 relative bg-cover bg-center bg-no-repeat w-full h-full max-h-[500px] rounded-lg"*/}
+                        {/*        style={{backgroundImage: `url('${firstMatch.profile_picture_url}')`}}*/}
+                        {/*    >*/}
+                        {/*        /!* Left arrow *!/*/}
+                        {/*        <button className="absolute top-1/2 left-4 text-3xl font-bold text-white">❮</button>*/}
+
+                        {/*        /!* Right arrow *!/*/}
+                        {/*        <button className="absolute top-1/2 right-4 text-3xl font-bold text-white">❯</button>*/}
+                        {/*    </div>*/}
                         </div>
 
-                        {/* Right Info Section */}
-                        <div
-                            className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">
-                            <h2 className="text-2xl font-bold text-white">
-                                {firstMatch.first_name}, {firstMatch.dob && new Date(firstMatch.dob).getFullYear() - new Date().getFullYear()} jaar
-                            </h2>
-                            <p className="mt-2">Meer informatie over {firstMatch.first_name}...</p>
-                            <div className="mt-4 text-4xl">😍</div>
-                        </div>
+                        {/*/!* Right Info Section *!/*/}
+                        {/*<div*/}
+                        {/*    className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg">*/}
+                        {/*    <h2 className="text-2xl font-bold text-white">*/}
+                        {/*        {firstMatch.first_name}, {firstMatch.dob && new Date().getFullYear() - new Date(firstMatch.dob).getFullYear()} jaar*/}
+                        {/*    </h2>*/}
+                        {/*    <p className="mt-2">Meer informatie over {firstMatch.first_name}...</p>*/}
+                        {/*    <div className="mt-4 text-4xl">😍</div>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className="flex justify-around mt-6">

@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate"; // Replace require() with ES module import
+const flowbite = require("flowbite-react/tailwind");
 
 const config: Config = {
   darkMode: ["class"],
@@ -8,6 +9,7 @@ const config: Config = {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    flowbite.content(),
   ],
   prefix: "",
   theme: {
@@ -75,6 +77,9 @@ const config: Config = {
       },
     },
   },
+  plugins: [
+    flowbite.plugin(),
+  ],
   //plugins: [tailwindcssAnimate], // Use the imported plugin here
 };
 
