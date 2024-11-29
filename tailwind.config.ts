@@ -10,7 +10,6 @@ const config: Config = {
 
     // Or if using `src` directory:
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    flowbite.content(),
   ],
   prefix: "",
   theme: {
