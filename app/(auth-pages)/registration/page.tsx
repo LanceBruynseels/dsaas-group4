@@ -78,8 +78,34 @@ const Registration: React.FC = () => {
                                 type="text"
                                 id="username"
                                 name="username"
-                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black" required/>
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black"
+                                required/>
                         </div>
+                        <div>
+                            <label htmlFor="first_name" className="block text-sm font-medium">
+                                Voornaam
+                            </label>
+                            <input
+                                type="text"
+                                id="first_name"
+                                name="first_name"
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="last_name" className="block text-sm font-medium">
+                                Achternaam
+                            </label>
+                            <input
+                                type="text"
+                                id="last_name"
+                                name="last_name"
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 text-black"
+                                required
+                            />
+                        </div>
+
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium">
                                 Paswoord
@@ -127,7 +153,7 @@ const Registration: React.FC = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            style={{ backgroundColor: '#FCA5A5' }}
+                            style={{backgroundColor: '#FCA5A5'}}
                             className="w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-md font-semibold disabled:opacity-50"
                         >
                             {isLoading ? "Bezig met registreren..." : "Registreer"}
