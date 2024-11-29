@@ -1,11 +1,35 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
 
 const ChatApp: React.FC = () => {
     const [selectedGroupChat, setSelectedGroupChat] = useState<any | null>(null);
+    const searchParams = useSearchParams();
+    const chatID = searchParams.get('chatId');
+
+    useEffect(() => {
+        if (chatID) {
+            const fetchChat = async () => {
+                const { data, error } = await supabase
+                    .from('discover_chats')
+                    .select('*')
+                    .eq('id', chatID)
+                    .single();
+
+                if (error) {
+                    console.error('Failed to fetch chat:', error);
+                } else {
+                    setSelectedGroupChat(data);  // Set the selected chat from the database
+                }
+            };
+
+            fetchChat();
+        }
+    }, [chatID]);
+
 
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
@@ -27,6 +51,7 @@ const ChatApp: React.FC = () => {
 };
 
 const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelectGroupChat }) => {
+    const router = useRouter();  // Add this line to access the router
     const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -55,6 +80,12 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
         chat.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleChatSelect = (chat: any) => {
+        // Update the URL to reflect the selected chat
+        router.push(`/group-messaging?chatId=${chat.id}`);  // Change the URL with the selected chat ID
+        onSelectGroupChat(chat);  // Update the selected chat state
+    };
+
     return (
         <>
             <div className="mb-6">
@@ -71,7 +102,7 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                     filteredChats.map((chat) => (
                         <div
                             key={chat.id}
-                            onClick={() => onSelectGroupChat(chat)} // Pass selected group chat
+                            onClick={() => handleChatSelect(chat)} // Call the handler instead of directly setting state
                             className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                         >
                             <div className="flex items-center gap-4">
@@ -98,7 +129,6 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
         </>
     );
 };
-
 
 
 const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }) => {
@@ -162,6 +192,11 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
 };
 
 const ChatHeader: React.FC<{ selectedGroupChat: { title: string; image_url: string } }> = ({ selectedGroupChat }) => {
+    // Example function for handling button click
+    const handleButtonClick = () => {
+        alert('Button clicked!');
+    };
+
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
@@ -172,6 +207,13 @@ const ChatHeader: React.FC<{ selectedGroupChat: { title: string; image_url: stri
                 />
                 <h3 className="text-lg font-bold">{selectedGroupChat.title}</h3>
             </div>
+
+            <button
+                onClick={handleButtonClick}
+                className="ml-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
+             >
+                🚩 Probleem melden
+            </button>
         </div>
     );
 };
@@ -230,7 +272,7 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
                     <div
                         className={`p-3 rounded-lg max-w-xs ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}
                     >
-                        <p>{textContent || 'Content could not be loaded'}</p>
+                        <p>{textContent || 'Sending...'}</p>
                     </div>
                 )}
             </div>

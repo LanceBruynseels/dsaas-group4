@@ -103,8 +103,7 @@ const Discover: React.FC = () => {
                                 <button
                                     key={chat.id}
                                     className="bg-white p-4 rounded-lg text-center hover:bg-rose-400 hover:scale-105 focus:outline-none"
-                                    onClick={() => (window.location.href = '/group-messaging')}
-                                >
+                                    onClick={() => (window.location.href = `/group-messaging?chatId=${chat.id}`)}                                >
                                     {chat.image_url ? (
                                         <img
                                             src={chat.image_url}
