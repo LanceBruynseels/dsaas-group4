@@ -21,3 +21,5 @@ export const useIsMobile = () => {
 
     return isMobile;
 };
+
+export const variableMobile = useIsMobile();
