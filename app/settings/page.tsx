@@ -24,9 +24,6 @@ const SettingsPage = async () => {
     const { data: profile_data, error: profileError } = await supabase.rpc('get_all_profile_data', { userid: user_id });
     const { data: picture, error: pictureError } = await supabase.rpc('get_profile_picture', { userid: user_id });
 
-    console.log(filter_data)
-    console.log(profile_data)
-
     if (filterError || profileError || pictureError) {
         console.error("Error fetching data:", filterError || profileError || pictureError);
         return <p>Error loading profile data</p>;
