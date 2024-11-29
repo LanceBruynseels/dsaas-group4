@@ -95,7 +95,7 @@ const SettingsPage = async () => {
                     {/* Relationship goals Options */}
                     <ProfileFiltersSection
                         title="Relatiedoel"
-                        table="relationship_goal"
+                        table="relationship_goals"
                         data={filter_data.relationship_goals}
                         keyField="relationship_goals_id"
                         labelField="relationship_goals"

@@ -1,24 +1,38 @@
-// UserDisplay.tsx
-'use client';
-import { useSession } from "next-auth/react";
+// UserDisplay.tsx (Server-side fetching)
+import { createClient } from "@/utils/supabase/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/auth.config";
 import Image from "next/image";
 import Link from "next/link";
-import { SessionProvider } from "next-auth/react";
+import { redirect } from "next/navigation";
 
-const UserDisplay = () => {
-    const { data: session, status } = useSession();
+const UserDisplay = async () => {
+    // Initialize Supabase client
+    const supabase = await createClient();
 
-    if (status === "loading") {
+    // Fetch session server-side
+    const session = await getServerSession(authOptions);
+    if (!session) {
         return (
             <div className="flex items-center gap-4">
                 <div className="animate-pulse flex items-center gap-2">
                     <div className="h-fit w-fit bg-gray-200 rounded-full"></div>
                     <div className="h-fit w-fit bg-gray-200 rounded"></div>
                 </div>
-            </div>
+            </div
         );
     }
 
+    const user_id = session.user.id;
+
+    // Fetch profile picture and user data from Supabase
+    const { data: picture, error: pictureError } = await supabase.rpc("get_profile_picture", { userid: user_id });
+
+    if (pictureError) {
+        console.error("Error fetching profile picture:", pictureError);
+    }
+
+    // Render the component with the profile data
     return (
         <div className="flex items-center gap-4">
             {status === "authenticated" ? (
@@ -50,6 +64,7 @@ const UserDisplay = () => {
                     Sign in
                 </Link>
             )}
+
         </div>
     );
 };
