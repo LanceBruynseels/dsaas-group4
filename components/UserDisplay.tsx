@@ -1,55 +1,52 @@
-// UserDisplay.tsx
-'use client';
-import { useSession } from "next-auth/react";
+// UserDisplay.tsx (Server-side fetching)
+import { createClient } from "@/utils/supabase/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/auth.config";
 import Image from "next/image";
 import Link from "next/link";
-import { SessionProvider } from "next-auth/react";
+import { redirect } from "next/navigation";
 
-const UserDisplay = () => {
-    const { data: session, status } = useSession();
+const UserDisplay = async () => {
+    // Initialize Supabase client
+    const supabase = await createClient();
 
-    if (status === "loading") {
+    // Fetch session server-side
+    const session = await getServerSession(authOptions);
+    if (!session) {
         return (
-            <div className="flex items-center gap-4">
-                <div className="animate-pulse flex items-center gap-2">
-                    <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
-                </div>
-            </div>
+            <Link href="/sign-in" className="text-sm hover:text-primary">
+                Sign in
+            </Link>
         );
     }
 
+    const user_id = session.user.id;
+
+    // Fetch profile picture and user data from Supabase
+    const { data: picture, error: pictureError } = await supabase.rpc("get_profile_picture", { userid: user_id });
+
+    if (pictureError) {
+        console.error("Error fetching profile picture:", pictureError);
+    }
+
+    // Render the component with the profile data
     return (
         <div className="flex items-center gap-4">
-            {status === "authenticated" ? (
-                // Logged in state
-                <div className="flex items-center gap-2">
-                    <div className="flex flex-col items-end">
-                        <span className="text-sm font-medium">{session?.user.name}</span>
-                        <Link
-                            href="/api/auth/signout"
-                            className="text-xs text-gray-500 hover:text-gray-700"
-                        >
-                            Sign out
-                        </Link>
-                    </div>
-                    <Image
-                        src={session?.user.image || "/mock-picture.webp"}
-                        alt="Profile Picture"
-                        width={32}
-                        height={32}
-                        className="rounded-full border border-gray-500"
-                    />
+            <div className="flex items-center gap-2">
+                <div className="flex flex-col items-end">
+                    <span className="text-sm font-medium">{session.user?.username}</span>
+                    <Link href="/api/auth/signout" className="text-xs text-gray-500 hover:text-gray-700">
+                        Sign out
+                    </Link>
                 </div>
-            ) : (
-                // logged out state
-                <Link
-                    href="/sign-in"
-                    className="text-sm hover:text-primary"
-                >
-                    Sign in
-                </Link>
-            )}
+                <Image
+                    src={picture?.profile_picture_url[0] || "/mock-picture.webp"}
+                    alt="Profile Picture"
+                    width={44}
+                    height={44}
+                    className="rounded-full border border-gray-500"
+                />
+            </div>
         </div>
     );
 };

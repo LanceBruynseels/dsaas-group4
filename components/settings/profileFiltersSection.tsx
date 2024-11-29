@@ -10,7 +10,14 @@ type FilterSectionProps = {
     user_id: string;
 };
 
-const ProfileFilterSection: React.FC<FilterSectionProps> = async ({ title, table, data, keyField, labelField, user_id }) => {
+const ProfileFilterSection: ({title, table, data, keyField, labelField, user_id}: {
+    title: any;
+    table: any;
+    data: any;
+    keyField: any;
+    labelField: any;
+    user_id: any
+}) => Promise<JSX.Element> = async ({ title, table, data, keyField, labelField, user_id }) => {
     const supabase = await createClient();
 
     const { data: isSelectedData, error } = await supabase
