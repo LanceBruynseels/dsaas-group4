@@ -92,7 +92,7 @@ export default function NavBar() {
                     </div>
                 )}
 
-                <div className="w-fit text-[4vh] mx-10">
+                <div className=" w-fit text-[4vh] mx-10">
                     <UserDisplay/>
                 </div>
             </nav>
