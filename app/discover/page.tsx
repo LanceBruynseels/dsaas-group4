@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client"; // Adjust the import path
 
 const Discover: React.FC = () => {
-    const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
+    const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [filteredChats, setFilteredChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
+    const [filteredChats, setFilteredChats] = useState<{ id: number; title: string; image_url: string }[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const chatsPerPage = 6; // Number of chats per page

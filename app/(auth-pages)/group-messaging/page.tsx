@@ -117,7 +117,7 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                                 <div className="flex-1 min-w-0">
                                     <div className="font-bold truncate">{chat.title}</div>
                                     <div className="text-gray-500 text-sm truncate">
-                                        Klik om deel te nemen...
+                                        Klik om te chatten...
                                     </div>
                                 </div>
                             </div>
@@ -194,15 +194,13 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
 };
 
 const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; image_url: string } }> = ({ selectedGroupChat }) => {
-    // State to control the modal visibility and the text field input
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [problemDescription, setProblemDescription] = useState('');
-    const [people, setPeople] = useState<string[]>([]); // State for people list (empty for now)
+    const [people, setPeople] = useState<{ username: string; user_id: number; isSelected: boolean }[]>([]);
 
     useEffect(() => {
         const fetchGroupUsers = async () => {
             if (selectedGroupChat) {
-                // First, get the user IDs from groupchat_users table
                 const { data: groupUsers, error: groupUsersError } = await supabase
                     .from('groupchat_users')
                     .select('user_id')
@@ -213,49 +211,98 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                     return;
                 }
 
-                // Now, get the usernames for those user_ids
                 if (groupUsers) {
                     const userIds = groupUsers.map((user) => user.user_id);
                     const { data: users, error: usersError } = await supabase
                         .from('users')
-                        .select('username')
-                        .in('id', userIds); // Query usernames based on the user IDs
+                        .select('id, username')
+                        .in('id', userIds);
 
                     if (usersError) {
                         console.error('Error fetching usernames:', usersError);
                     } else {
-                        // Map the result to get the usernames
-                        setPeople(users.map((user) => user.username));
+                        setPeople(users.map((user) => ({
+                            username: user.username,
+                            user_id: user.id,
+                            isSelected: false,
+                        })));
                     }
                 }
             }
         };
 
         fetchGroupUsers();
-    }, [selectedGroupChat]); // Run when the selected group chat changes
+    }, [selectedGroupChat]);
 
-    // Function to handle text input change
+    const handleCheckboxChange = (user_id: number) => {
+        setPeople(prevPeople =>
+            prevPeople.map(user =>
+                user.user_id === user_id
+                    ? { ...user, isSelected: !user.isSelected }
+                    : user
+            )
+        );
+    };
+
     const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setProblemDescription(event.target.value);
     };
 
-    // Function to open the modal
     const handleButtonClick = () => {
         setIsModalOpen(true);
     };
 
-    // Function to close the modal
+    const handleReportSubmit = async () => {
+        // Filter selected users (including the reporter)
+        const selectedUsers = people.filter(user => user.isSelected);
+
+        if (selectedUsers.length === 0) {
+            console.error("No users selected");
+            return;
+        }
+
+        // Assuming the first selected user is the reporter
+        const reporter = selectedUsers[0];  // This is the reporter
+
+        try {
+            // Insert one row for each selected user (reporter + selected users) in the reports table
+            const insertPromises = selectedUsers.map(user =>
+                supabase
+                    .from('reports')
+                    .insert({
+                        description: problemDescription, // The problem description
+                        user_id: user.user_id,            // The user ID for each selected user (reporter + targets)
+                    })
+            );
+
+            // Wait for all insertions to finish
+            await Promise.all(insertPromises);
+
+            console.log("Report submitted successfully");
+            // Reset the checkboxes and problem description after submission
+            setPeople(prevPeople =>
+                prevPeople.map(user => ({
+                    ...user,
+                    isSelected: false,  // Reset selected state
+                }))
+            );
+            setProblemDescription(''); // Clear the problem description text field
+            closeModal();  // Close the modal
+        } catch (error) {
+            console.error("Error submitting report:", error);
+        }
+    };
+
     const closeModal = () => {
-        setIsModalOpen(false);
+        setIsModalOpen(false);  // Close the modal
+        setPeople(prevPeople =>
+            prevPeople.map(user => ({
+                ...user,
+                isSelected: false,  // Uncheck all checkboxes
+            }))
+        );
+        setProblemDescription(''); // Clear the problem description
     };
-
-    // Function to handle report submission
-    const handleReportSubmit = () => {
-        console.log("Reported issue:", problemDescription);
-        console.log("People involved:", people); // Logging the people list for now
-        closeModal(); // Close modal after submission
-    };
-
     return (
         <div>
             <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
@@ -283,7 +330,6 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                         <h2 className="text-xl font-semibold">Probleem melden</h2>
                         <p>Heb je een probleem dat je wil melden?</p>
 
-                        {/* Text field for problem description */}
                         <textarea
                             value={problemDescription}
                             onChange={handleTextChange}
@@ -292,21 +338,27 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                             placeholder="Beschrijf hier het probleem..."
                         />
 
-                        {/* List of people */}
                         <div className="mt-4 max-h-40 overflow-y-auto">
-                            <h3 className="font-semibold">Betrokken personen:</h3>
+                            <h3 className="font-semibold">Is er iemand betrokken?</h3>
                             <ul className="list-disc pl-5">
                                 {people.length === 0 ? (
-                                    <li className="text-gray-500">Geen personen geselecteerd</li>
+                                    <li className="text-gray-500">Geen personen om te selecteren...</li>
                                 ) : (
-                                    people.map((userId, index) => (
-                                        <li key={index}>{userId}</li>  // Displaying user IDs here, modify as needed
+                                    people.map((user, index) => (
+                                        <li key={index} className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                checked={user.isSelected}
+                                                onChange={() => handleCheckboxChange(user.user_id)}
+                                                className="form-checkbox"
+                                            />
+                                            <span>{user.username}</span>
+                                        </li>
                                     ))
                                 )}
                             </ul>
                         </div>
 
-                        {/* Close and Melden buttons */}
                         <div className="mt-4 flex gap-4">
                             <button
                                 onClick={closeModal}
