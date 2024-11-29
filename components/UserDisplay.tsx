@@ -1,20 +1,31 @@
-import { Session } from "next-auth";
+// UserDisplay.tsx
+'use client';
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { SessionProvider } from "next-auth/react";
 
-interface UserDisplayProps { // receive session
-    session: Session | null;
-}
+const UserDisplay = () => {
+    const { data: session, status } = useSession();
 
-const UserDisplay = ({ session }: UserDisplayProps) => {
+    if (status === "loading") {
+        return (
+            <div className="flex items-center gap-4">
+                <div className="animate-pulse flex items-center gap-2">
+                    <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
+                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex items-center gap-4">
-            {session ? (
+            {status === "authenticated" ? (
                 // Logged in state
                 <div className="flex items-center gap-2">
                     <div className="flex flex-col items-end">
-                        
-                        <span className="text-sm font-medium">{session.user?.username}</span>
+                        <span className="text-sm font-medium">{session?.user.name}</span>
                         <Link
                             href="/api/auth/signout"
                             className="text-xs text-gray-500 hover:text-gray-700"
@@ -23,7 +34,7 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                         </Link>
                     </div>
                     <Image
-                        src={session.user?.image || "/mock-picture.webp"}
+                        src={session?.user.image || "/mock-picture.webp"}
                         alt="Profile Picture"
                         width={32}
                         height={32}
@@ -35,8 +46,8 @@ const UserDisplay = ({ session }: UserDisplayProps) => {
                 <Link
                     href="/sign-in"
                     className="text-sm hover:text-primary"
-                ><button className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300 min-w-16">Sign in</button>
-
+                >
+                    Sign in
                 </Link>
             )}
         </div>
