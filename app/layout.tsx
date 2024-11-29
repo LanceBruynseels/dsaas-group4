@@ -23,9 +23,8 @@ export default function RootLayout({
       <body className="bg-background text-foreground">
       <Providers>
         <main className="min-h-screen flex flex-col">
-          <nav className="w-full border-b border-red-950 h-16 flex justify-between items-center px-5">
+          <nav className="w-full h-16 flex justify-between items-center ">
             <NavBar />
-            <UserDisplay />
           </nav>
           <div className="flex-1 w-full">{children}</div>
           <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">

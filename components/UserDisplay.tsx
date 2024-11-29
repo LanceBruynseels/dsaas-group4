@@ -12,8 +12,8 @@ const UserDisplay = () => {
         return (
             <div className="flex items-center gap-4">
                 <div className="animate-pulse flex items-center gap-2">
-                    <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-fit w-fit bg-gray-200 rounded-full"></div>
+                    <div className="h-fit w-fit bg-gray-200 rounded"></div>
                 </div>
             </div>
         );
@@ -25,7 +25,7 @@ const UserDisplay = () => {
                 // Logged in state
                 <div className="flex items-center gap-2">
                     <div className="flex flex-col items-end">
-                        <span className="text-sm font-medium">{session?.user.name}</span>
+                        <span className="font-medium">{session?.user.name}</span>
                         <Link
                             href="/api/auth/signout"
                             className="text-xs text-gray-500 hover:text-gray-700"
@@ -45,7 +45,7 @@ const UserDisplay = () => {
                 // logged out state
                 <Link
                     href="/sign-in"
-                    className="text-sm hover:text-primary"
+                    className=" hover:text-primary"
                 >
                     Sign in
                 </Link>
