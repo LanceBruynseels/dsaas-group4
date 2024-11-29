@@ -45,7 +45,7 @@ const UserDisplay = () => {
                 // logged out state
                 <Link
                     href="/sign-in"
-                    className=" hover:text-primary"
+                    className="flex items-center h-fit"
                 >
                     Sign in
                 </Link>

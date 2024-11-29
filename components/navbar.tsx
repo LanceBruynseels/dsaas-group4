@@ -36,31 +36,31 @@ export default function NavBar() {
     if (path === '/' || path === '/sign-in' || path === '/registration') {
         return (
 
-            <nav className="flex flex-row w-screen h-fit text-white justify-between border-b border-red-950 text-[4vh]">
-                <div className="hidden w-[60%] h-16 md:flex md:flex-row md:justify-between md:items-center mx-10 my-2 gap-2">
+            <nav className="flex flex-row w-screen h-fit text-white justify-between items-start border-b border-red-950 text-[4vh] py-5">
+                <div className="hidden w-[60%] h-fit md:flex md:flex-row md:justify-between md:items-center mx-10 gap-2">
                     {/* Logo */}
                     <Link href="/">
                         <Image src="/vlinder.webp" alt="Vlinder Logo" width={35} height={35}/>
                     </Link>
 
                     {/* Full Menu (hidden on small screens) */}
-                    <a href="/" className="flex hover:text-red-950">
+                    <Link href="/" className="flex hover:text-red-950">
                         Home
-                    </a>
-                    <a href="/about" className="flex hover:text-red-950">
+                    </Link>
+                    <Link href="/about" className="flex hover:text-red-950">
                         About
-                    </a>
-                    <a href="/contact" className="flex hover:text-red-950">
+                    </Link>
+                    <Link href="/contact" className="flex hover:text-red-950">
                         Contact
-                    </a>
+                    </Link>
                 </div>
 
 
                 {/* Hamburger Menu (visible on small screens) */}
-                <div className="md:hidden flex mx-10">
+                <div className="md:hidden flex flex-col mx-10">
                     <button
                         onClick={toggleMenu}
-                        className="inline-flex items-center justify-center rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                        className="inline-flex rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                     >
                         {isOpen ? (
                             <XMarkIcon className="block h-8 w-8" aria-hidden="true"/>
@@ -74,25 +74,25 @@ export default function NavBar() {
                 {/* Dropdown Menu (visible when isOpen is true) */}
                 {isOpen && (
                     <div ref={menuRef}
-                         className="md:hidden flex flex-col items-center justify-center w-screen h-fit absolute z-40  bg-red-400 l">
-                        <div className="flex flex-col justify-center items-center my-4 gap-4 ">
-                            <a href="/"
+                         className="md:hidden flex flex-col my-2 items-start justify-center w-fit h-fit z-50  ">
+                        <div className="flex w-full flex-col justify-center items-center my-4 gap-4  ">
+                            <Link href="/"
                                className="text-red-950 text-center w-[80%] h-full hover:text-white  transition-all duration-300 text-xl">
                                 Home
-                            </a>
-                            <a href="/about"
+                            </Link>
+                            <Link href="/about"
                                className="text-red-950 text-center w-[80%] h-full hover:text-white  transition-all duration-300 text-xl">
                                 About
-                            </a>
-                            <a href="/contact"
+                            </Link>
+                            <Link href="/contact"
                                className="text-red-950 text-center w-[80%] h-full hover:text-white  transition-all duration-300 text-xl">
                                 Contact
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 )}
 
-                <div className="flex text-[4vh] mx-10 my-2 z-50">
+                <div className="w-fit text-[4vh] mx-10">
                     <UserDisplay/>
                 </div>
             </nav>
@@ -144,7 +144,7 @@ export default function NavBar() {
                 {/* Dropdown Menu (visible when isOpen is true) */}
                 {isOpen && (
                     <div ref={menuRef}
-                         className="md:hidden flex flex-col items-center justify-center w-screen h-fit absolute z-40  bg-red-400 l">
+                         className="md:hidden flex flex-col items-center justify-center w-screen h-fit absolute z-40  ">
                         <div className="flex flex-col justify-center items-center my-4 gap-4 ">
                             <a href="/"
                                className="text-red-950 text-center w-[80%] h-full hover:text-white  transition-all duration-300 text-xl">
