@@ -51,15 +51,16 @@ const ChatApp: React.FC = () => {
 };
 
 const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelectGroupChat }) => {
-    const router = useRouter();  // Add this line to access the router
+    const router = useRouter();  // Access the router
     const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [selectedChat, setSelectedChat] = useState<{ id: number; title: string } | null>(null);  // Add selected chat state
 
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const { data, error } = await supabase
+                const {data, error} = await supabase
                     .from("discover_chats")
                     .select("id, title, image_url");
 
@@ -81,7 +82,7 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
     );
 
     const handleChatSelect = (chat: any) => {
-        // Update the URL to reflect the selected chat
+        setSelectedChat(chat);  // Update selected chat state
         router.push(`/group-messaging?chatId=${chat.id}`);  // Change the URL with the selected chat ID
         onSelectGroupChat(chat);  // Update the selected chat state
     };
@@ -102,8 +103,10 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                     filteredChats.map((chat) => (
                         <div
                             key={chat.id}
-                            onClick={() => handleChatSelect(chat)} // Call the handler instead of directly setting state
-                            className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                            onClick={() => handleChatSelect(chat)}
+                            className={`p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer ${
+                                selectedChat?.id === chat.id ? "bg-blue-100" : "bg-[hsl(10,100%,95%)]"
+                            }`}  // Conditional styling for the selected chat
                         >
                             <div className="flex items-center gap-4">
                                 <img
@@ -129,7 +132,6 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
         </>
     );
 };
-
 
 const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }) => {
     const [messages, setMessages] = useState<any[]>([]);
@@ -191,40 +193,148 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
     );
 };
 
-const ChatHeader: React.FC<{ selectedGroupChat: { title: string; image_url: string } }> = ({ selectedGroupChat }) => {
-    // Example function for handling button click
+const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; image_url: string } }> = ({ selectedGroupChat }) => {
+    // State to control the modal visibility and the text field input
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [problemDescription, setProblemDescription] = useState('');
+    const [people, setPeople] = useState<string[]>([]); // State for people list (empty for now)
+
+    useEffect(() => {
+        const fetchGroupUsers = async () => {
+            if (selectedGroupChat) {
+                // First, get the user IDs from groupchat_users table
+                const { data: groupUsers, error: groupUsersError } = await supabase
+                    .from('groupchat_users')
+                    .select('user_id')
+                    .eq('group_id', selectedGroupChat.id);
+
+                if (groupUsersError) {
+                    console.error('Error fetching group users:', groupUsersError);
+                    return;
+                }
+
+                // Now, get the usernames for those user_ids
+                if (groupUsers) {
+                    const userIds = groupUsers.map((user) => user.user_id);
+                    const { data: users, error: usersError } = await supabase
+                        .from('users')
+                        .select('username')
+                        .in('id', userIds); // Query usernames based on the user IDs
+
+                    if (usersError) {
+                        console.error('Error fetching usernames:', usersError);
+                    } else {
+                        // Map the result to get the usernames
+                        setPeople(users.map((user) => user.username));
+                    }
+                }
+            }
+        };
+
+        fetchGroupUsers();
+    }, [selectedGroupChat]); // Run when the selected group chat changes
+
+    // Function to handle text input change
+    const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setProblemDescription(event.target.value);
+    };
+
+    // Function to open the modal
     const handleButtonClick = () => {
-        alert('Button clicked!');
+        setIsModalOpen(true);
+    };
+
+    // Function to close the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    // Function to handle report submission
+    const handleReportSubmit = () => {
+        console.log("Reported issue:", problemDescription);
+        console.log("People involved:", people); // Logging the people list for now
+        closeModal(); // Close modal after submission
     };
 
     return (
-        <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
-            <div className="flex items-center gap-3">
-                <img
-                    src={selectedGroupChat.image_url || "https://via.placeholder.com/40"}
-                    alt={selectedGroupChat.title}
-                    className="w-10 h-10 rounded-full object-cover"
-                />
-                <h3 className="text-lg font-bold">{selectedGroupChat.title}</h3>
+        <div>
+            <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
+                <div className="flex items-center gap-3">
+                    <img
+                        src={selectedGroupChat.image_url || "https://via.placeholder.com/40"}
+                        alt={selectedGroupChat.title}
+                        className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <h3 className="text-lg font-bold">{selectedGroupChat.title}</h3>
+                </div>
+
+                <button
+                    onClick={handleButtonClick}
+                    className="ml-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
+                >
+                    🚩 Probleem melden
+                </button>
             </div>
 
-            <button
-                onClick={handleButtonClick}
-                className="ml-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
-             >
-                🚩 Probleem melden
-            </button>
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg w-96">
+                        <h2 className="text-xl font-semibold">Probleem melden</h2>
+                        <p>Heb je een probleem dat je wil melden?</p>
+
+                        {/* Text field for problem description */}
+                        <textarea
+                            value={problemDescription}
+                            onChange={handleTextChange}
+                            rows={4}
+                            className="mt-4 w-full p-2 border rounded-md"
+                            placeholder="Beschrijf hier het probleem..."
+                        />
+
+                        {/* List of people */}
+                        <div className="mt-4 max-h-40 overflow-y-auto">
+                            <h3 className="font-semibold">Betrokken personen:</h3>
+                            <ul className="list-disc pl-5">
+                                {people.length === 0 ? (
+                                    <li className="text-gray-500">Geen personen geselecteerd</li>
+                                ) : (
+                                    people.map((userId, index) => (
+                                        <li key={index}>{userId}</li>  // Displaying user IDs here, modify as needed
+                                    ))
+                                )}
+                            </ul>
+                        </div>
+
+                        {/* Close and Melden buttons */}
+                        <div className="mt-4 flex gap-4">
+                            <button
+                                onClick={closeModal}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                            >
+                                Sluiten
+                            </button>
+                            <button
+                                onClick={handleReportSubmit}
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                            >
+                                Melden
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
 
 const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, senderId }) => {
     const { mediaURL, time_stamp, sender } = message;
     const [textContent, setTextContent] = useState<string | null>(null);
     const isSentByCurrentUser = sender === senderId;
-
-
-
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchContent = async () => {
@@ -258,6 +368,16 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
 
     const isImage = mediaURL && ['.jpeg', '.jpg', '.gif', '.png'].some(ext => mediaURL.endsWith(ext));
 
+    const handleImageClick = (image: string) => {
+        setSelectedImage(image);  // Set the selected image to show in modal
+        setIsImageModalOpen(true);  // Open the modal
+    };
+
+    const closeImageModal = () => {
+        setIsImageModalOpen(false);  // Close the modal
+        setSelectedImage(null);  // Clear selected image
+    };
+
     return (
         <div className={`flex items-start ${isSentByCurrentUser ? 'justify-end' : 'justify-start'} gap-3 mb-3`}>
             <div className="flex flex-col">
@@ -266,7 +386,8 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
                     <img
                         src={textContent || mediaURL}
                         alt="Media content"
-                        className="w-40 h-40 object-cover rounded-lg"
+                        className="w-40 h-40 object-cover rounded-lg cursor-pointer"
+                        onClick={() => handleImageClick(textContent || mediaURL)}  // Add click handler
                     />
                 ) : (
                     <div
@@ -276,9 +397,30 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
                     </div>
                 )}
             </div>
+
+            {/* Modal for enlarged image */}
+            {isImageModalOpen && selectedImage && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+                    <div className="relative bg-white p-4 rounded-lg">
+                        <img
+                            src={selectedImage}
+                            alt="Enlarged Media"
+                            className="max-w-full max-h-[80vh] object-contain"
+                        />
+                        <button
+                            onClick={closeImageModal}
+                            className="absolute top-2 right-2 text-white text-3xl bg-black bg-opacity-50 p-2 rounded-full shadow-md z-50"
+                        >
+                            &times;
+                        </button>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
 
 const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = ({ receiverId, selectedGroupChat }) =>  {
     const [textContent, setTextContent] = useState('');
