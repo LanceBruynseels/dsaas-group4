@@ -1,9 +1,11 @@
-export default async function Layout({
-  children,
-}: {
-  children: React.ReactNode;
+// app/auth-pages/layout.tsx
+export default function Layout({
+                                   children,
+                               }: {
+    children: React.ReactNode;
 }) {
-  return (
-    <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
-  );
+    return (
+        <div className="w-full flex flex-col gap-12 justify-center">{children}</div>
+    );
 }
+
