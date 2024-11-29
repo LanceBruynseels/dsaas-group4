@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className="bg-background text-foreground">
       <Providers>
         <main className="min-h-screen flex flex-col">
-          <nav className="w-full h-16 flex justify-between items-center ">
+          <nav className="w-full h-16">
             <NavBar />
           </nav>
           <div className="flex-1 w-full">{children}</div>
