@@ -12,14 +12,17 @@ export const useIsMobile = () => {
             setIsMobile(e.matches);
         };
 
+        // Set initial value
         setIsMobile(mediaQuery.matches);
 
+        // Add listener
         mediaQuery.addEventListener("change", handleMediaChange);
 
-        return () => mediaQuery.removeEventListener("change", handleMediaChange);
+        // Cleanup listener on unmount
+        return () => {
+            mediaQuery.removeEventListener("change", handleMediaChange);
+        };
     }, []);
 
     return isMobile;
 };
-
-export const variableMobile = useIsMobile();

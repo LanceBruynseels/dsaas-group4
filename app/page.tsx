@@ -42,12 +42,12 @@ const ResponsiveLayout: React.FC = () => {
                     isMobile ? "flex-col space-y-4" : "flex-row space-x-4"
                 } w-full max-w-md mx-auto mt-8`}
             >
-                <a href="http://localhost:3000/sign-in" className="flex-1">
+                <a href="/sign-in" className="flex-1">
                     <button className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-3 rounded-xl text-sm transition duration-300">
                         LOGIN
                     </button>
                 </a>
-                <a href="http://localhost:3000/registration" className="flex-1">
+                <a href="/registration" className="flex-1">
                     <button className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-3 rounded-xl text-sm transition duration-300">
                         REGISTRATIE
                     </button>
