@@ -4,9 +4,20 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+interface User {
+    id: string;
+    name: string;
+    username: string;
+}
+
+interface UserData {
+    user: User;
+    picture: { profile_picture_url: string[] };  // Updated to reflect the correct structure
+}
+
 const UserDisplay = () => {
-    const [user, setUser] = useState(null);
-    const [picture, setPicture] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [picture, setPicture] = useState<string | null>(null); // Explicitly typed as string | null
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,9 +27,14 @@ const UserDisplay = () => {
                 if (!res.ok) {
                     throw new Error("Failed to fetch user data");
                 }
-                const data = await res.json();
+                const data: UserData = await res.json();  // Ensure the response is typed as UserData
                 setUser(data.user);
-                setPicture(data.picture);
+
+                if (data.picture && data.picture.profile_picture_url && data.picture.profile_picture_url.length > 0) {
+                    setPicture(data.picture.profile_picture_url[0]);
+                } else {
+                    setPicture("/mock-picture.webp");
+                }
             } catch (error) {
                 console.error(error);
             } finally {
@@ -58,7 +74,7 @@ const UserDisplay = () => {
                 </Link>
             </div>
             <Image
-                src={picture || "/mock-picture.webp"}
+                src={picture || "/mock-picture.webp"}  // Ensure picture is a string or fallback URL
                 alt="Profile Picture"
                 width={32}
                 height={32}
