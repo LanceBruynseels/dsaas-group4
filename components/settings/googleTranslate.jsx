@@ -1,6 +1,16 @@
 'use client';
 import React, { useEffect } from 'react';
 
+
+// type declaration ---------->
+declare global {
+    interface Window {
+        googleTranslateElementInit: any;
+        google: any;
+    }
+}
+// ===============================
+
 const GoogleTranslate = () => {
     useEffect(() => {
         if (!window.googleTranslateElementInit) {
@@ -17,7 +27,8 @@ const GoogleTranslate = () => {
                     {
                         pageLanguage: 'en',
                         includedLanguages: 'en,fr,de,nl',
-                        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                        // layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
                     },
                     'google_translate_element'
                 );
