@@ -12,6 +12,7 @@ const GoogleTranslate = () => {
             document.head.appendChild(script);
 
             window.googleTranslateElementInit = function () {
+                // @ts-ignore
                 new window.google.translate.TranslateElement(
                     {
                         pageLanguage: 'en',
