@@ -1,14 +1,14 @@
 name: CI/CD Pipeline with Cypress and Vercel Deployment
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
+#on:
+#  push:
+#    branches:
+#      - main
+#      - develop
+#  pull_request:
+#    branches:
+#      - main
+#      - develop
 
 jobs:
   build:
