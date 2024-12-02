@@ -1,14 +1,25 @@
 name: Vercel Preview Deployment
 
+
+
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 on:
-  workflow_run:
-    workflows: ["Node.js CI with Cypress Tests"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+#on:
+#  workflow_run:
+#    workflows: ["Node.js CI with Cypress Tests"]
+#    types:
+#      - completed
 
 jobs:
   Deploy-Preview:

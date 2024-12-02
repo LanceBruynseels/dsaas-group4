@@ -141,7 +141,7 @@ export default async function HomePage() {
                 <div className="flex flex-col p-4 w-full h-full">
                     <div className="flex flex-row basis-1/2 h-[500px]">
                         <Suspense fallback={<p>Loading feed...</p>}>
-                            <div className="flex flex-row lg:basis-1/2  md:w-full h-[500px]">
+                            <div className="flex flex-row lg:basis-1/2  md:w-full sm:w-full min-w-[300px] h-[500px]">
                                 <FlowbiteCarousel
                                     pictures={publicUrls}
                                     infoSection={
