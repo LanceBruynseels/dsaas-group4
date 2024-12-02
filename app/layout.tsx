@@ -9,6 +9,7 @@ import UserDisplay from '@/components/UserDisplay';
 // import { getServerSession } from "next-auth/next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import Link from "next/link";
 
 export default async function RootLayout({
                                              children,

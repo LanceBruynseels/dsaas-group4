@@ -137,6 +137,7 @@ export default async function HomePage() {
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
                 <div className="flex flex-col p-4 w-full h-full">
                     <div className="flex flex-row w-full max-h-[500px] h-full">
+                        <Suspense fallback={<p>Loading feed...</p>}>
                         <div className="flex w-1/2 justify-center">
                             <FlowbiteCarousel pictures={publicUrls}></FlowbiteCarousel>
                         </div>
@@ -172,6 +173,7 @@ export default async function HomePage() {
 
                             <div className="mt-4 text-4xl">😍</div>
                         </div>
+                        </Suspense>
                     </div>
 
                     <div className="flex justify-around mt-6">
