@@ -79,6 +79,7 @@ const config: Config = {
   },
   plugins: [
     flowbite.plugin(),
+    require('tailwind-scrollbar')({ preferredStrategy: 'pseudoelements'}),
   ],
   //plugins: [tailwindcssAnimate], // Use the imported plugin here
 };
