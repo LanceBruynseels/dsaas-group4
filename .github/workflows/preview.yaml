@@ -11,10 +11,12 @@ on:
     branches:
       - main
       - develop
+      - matching
   pull_request:
     branches:
       - main
       - develop
+      - matching
 #on:
 #  workflow_run:
 #    workflows: ["Node.js CI with Cypress Tests"]
