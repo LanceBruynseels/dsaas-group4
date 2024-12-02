@@ -34,7 +34,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification }) => 
     const senderImage = notification.sender_profile_image || "/mock-picture.webp";
 
     // Set background color based on read status
-    const bgColor = notification.is_read ? "bg-gray-100" : "bg-red-200";
+    const bgColor = notification.is_read ? "" : "bg-red-300";
 
     // Function to handle notification click and mark it as read
     const handleNotificationClick = async () => {
@@ -63,7 +63,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification }) => 
 
     return (
         <div
-            className={`flex flex-row my-2 items-center p-2 rounded-md shadow-md cursor-pointer ${bgColor}`}
+            className={`flex flex-row items-center p-2 cursor-pointer ${bgColor}`}
             onClick={handleNotificationClick} // Add click handler
         >
             {/* Profile Image */}

@@ -114,9 +114,9 @@ export default async function HomePage() {
     return (
         <div className="flex flex-row w-full">
             {/* Notifications Side Panel */}
-            <div className="flex flex-col basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-                <div className="flex flex-row justify-between items-center">
-                    <h2 className="font-bold">Meldingen</h2>
+            <div className="flex flex-col basis-1/4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+                <div className="flex flex-row p-4 justify-between items-center">
+                    <h2 className="text-xl font-bold text-red-950 ">Meldingen</h2>
                     <div>
                         <Image src="/bell.png" alt="Bell Icon" height={25} width={25}/>
                     </div>
@@ -136,8 +136,8 @@ export default async function HomePage() {
             </div>
 
 
-            <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
-
+            <div className="flex flex-col basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
+                <h2 className={"text-xl font-bold mb-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
                 <div className="flex flex-col p-4 w-full h-full">
                     <div className="flex flex-row basis-1/2 max-h-[500px] h-full">
                         <Suspense fallback={<p>Loading feed...</p>}>
