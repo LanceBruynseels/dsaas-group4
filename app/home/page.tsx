@@ -70,28 +70,30 @@ export default async function HomePage() {
         return <p>Error loading profile</p>;
     }
 
-    const {data: matchData, error: matchProfileError} = await supabase.rpc('find_potential_matches', {request_user_id: "42a20f25-a201-4706-b8a3-2c4fafa58f4b"})
+    const {data: matchData, error: matchProfileError} = await supabase.rpc('find_potential_matches', {request_user_id: user_id})
 
     // Ensure data is typed correctly as an array of MatchingUser objects
     const typedMatchData: MatchingUsersResponse = matchData;
     console.log(matchData)
 
-    const { data: fileList, error: listError } = await supabase
-        .storage
-        .from('picturesExtra') // The storage bucket name
-        .list(typedMatchData[0].user_id);
+    let publicUrls : string[];
+    if(typedMatchData.length > 0){
+        const { data: fileList, error: listError } = await supabase
+            .storage
+            .from('picturesExtra') // The storage bucket name
+            .list(typedMatchData[0].user_id);
 
-    // Generate public URLs for each file in the list
-    const publicUrls = fileList.map((file) =>
-        supabase.storage.from('picturesExtra').getPublicUrl(`${typedMatchData[0].user_id}/${file.name}`).data.publicUrl
-    );
-    console.log(publicUrls)
-    const firstMatch = matchData[0];
+        // Generate public URLs for each file in the list
+        publicUrls = fileList.map((file) =>
+            supabase.storage.from('picturesExtra').getPublicUrl(`${typedMatchData[0].user_id}/${file.name}`).data.publicUrl
+        );
+        //console.log(publicUrls)
+    }
 
     // Check if there are matches
     if (typedMatchData.length > 0) {
-        console.log("Matching user data:", typedMatchData);
-        console.log("Profile data of the first match:", typedMatchData[0].profile_data);
+        // console.log("Matching user data:", typedMatchData);
+        // console.log("Profile data of the first match:", typedMatchData[0].profile_data);
     } else {
         console.log("No matches found");
     }
@@ -134,45 +136,132 @@ export default async function HomePage() {
             </div>
 
 
-            <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
+            <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
+
                 <div className="flex flex-col p-4 w-full h-full">
-                    <div className="flex flex-row w-full max-h-[500px] h-full">
+                    <div className="flex flex-row basis-1/2 max-h-[500px] h-full">
                         <Suspense fallback={<p>Loading feed...</p>}>
-                        <div className="flex w-1/2 justify-center">
-                            <FlowbiteCarousel pictures={publicUrls}></FlowbiteCarousel>
-                        </div>
+                            {publicUrls.length > 0 ? (
+                                <FlowbiteCarousel pictures={publicUrls}></FlowbiteCarousel>
+                            ) : (
+                                <p>No images available</p>
+                            )}
 
-                        {/* Right Info Section */}
-                        <div
-                            className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b from-red-700 to-pink-950 text-white rounded-lg mt-2">
-                            <h2 className="text-2xl font-bold text-white">
-                                {firstMatch.first_name}, {firstMatch.dob && new Date().getFullYear() - new Date(firstMatch.dob).getFullYear()} jaar
-                            </h2>
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 "><strong>Genders:</strong> {typedMatchData[0]?.profile_data?.genders.join(', ') || 'N/A'}
-                            </p>
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 ">
-                                <strong>Interests:</strong> {typedMatchData[0]?.profile_data?.interests.length > 0 ? typedMatchData[0].profile_data.interests.join(', ') : 'None'}
-                            </p>
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 ">
-                                <strong>Religions:</strong> {typedMatchData[0]?.profile_data?.religions.length > 0 ? typedMatchData[0].profile_data.religions.join(', ') : 'None'}
-                            </p>
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 "><strong>Home
-                                Status:</strong> {typedMatchData[0]?.profile_data?.home_status.length > 0 ? typedMatchData[0].profile_data.home_status.join(', ') : 'None'}
-                            </p>
-                            { typedMatchData[0]?.profile_data?.disabilities && typedMatchData[0]?.profile_data?.disabilities.length > 0 ? (
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 ">
-                                <strong>Disabilities:</strong> {typedMatchData[0]?.profile_data?.disabilities.join(', ') || 'None'}
-                            </p> ):(<p></p>)
-                            }
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 ">
-                                <strong>Personalities:</strong> {typedMatchData[0]?.profile_data?.personalities.length > 0 ? typedMatchData[0].profile_data.personalities.join(', ') : 'None'}
-                            </p>
-                            <p className="px-3 py-1 text-sm text-white rounded-full shadow-sm border border-gray-300 hover:bg-gray-100"><strong>Relationship
-                                Goals:</strong> {typedMatchData[0]?.profile_data?.relationship_goals.length > 0 ? typedMatchData[0].profile_data.relationship_goals.join(', ') : 'None'}
-                            </p>
+                            {/* Right Info Section */}
+                            <div
+                                className="flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 y-50 text-white rounded-lg mt-2">
+                                <h2 className="text-2xl font-bold text-red-950">
+                                    {typedMatchData[0].first_name}, {typedMatchData[0].dob && new Date().getFullYear() - new Date(typedMatchData[0].dob).getFullYear()} jaar
+                                </h2>
 
-                            <div className="mt-4 text-4xl">😍</div>
-                        </div>
+                                {/* Conditional Rendering for Each Category */}
+                                {typedMatchData[0]?.profile_data?.genders?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Genders:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.genders.map((gender, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {gender}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {typedMatchData[0]?.profile_data?.interests?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Interests:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.interests.map((interest, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {interest}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {typedMatchData[0]?.profile_data?.religions?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Religions:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.religions.map((religion, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {religion}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {typedMatchData[0]?.profile_data?.home_status?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Home Status:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.home_status.map((status, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {status}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {typedMatchData[0]?.profile_data?.disabilities?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Disabilities:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.disabilities.map((disability, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {disability}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {typedMatchData[0]?.profile_data?.personalities?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Personalities:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.personalities.map((personality, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {personality}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {typedMatchData[0]?.profile_data?.relationship_goals?.length > 0 && (
+                                    <div className="mt-4 text-red-950">
+                                        <strong>Relationship Goals:</strong>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {typedMatchData[0].profile_data.relationship_goals.map((goal, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                        {goal}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="mt-4 text-4xl ">😍</div>
+                            </div>
                         </Suspense>
                     </div>
 
@@ -185,6 +274,7 @@ export default async function HomePage() {
                     </div>
                 </div>
             </div>
+
 
             {/* Search Settings Section */}
             <div className="basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
