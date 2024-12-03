@@ -112,9 +112,9 @@ export default async function HomePage() {
     }
 
     return (
-        <div className="flex flex-row w-full text-red-950">
+        <div className="flex flex-row w-full justify-center text-red-950">
             {/* Notifications Side Panel */}
-            <div className="flex flex-col basis-1/4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div className="sm:hidden md:hidden lg:flex shadow-md lg:flex-col lg:basis-1/4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex flex-row p-4 justify-between items-center">
                     <h2 className="text-xl font-bold ">Meldingen</h2>
                     <div>
@@ -135,8 +135,8 @@ export default async function HomePage() {
                 </Suspense>
             </div>
 
-
-            <div className="flex flex-col basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
+            {/* middle section with matching and liking*/}
+            <div className="flex flex-col basis-1/2 bg-gradient-to-b shadow-md from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
                 <h2 className={"text-xl font-bold mb-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
                 <div className="flex flex-col p-4 w-full h-full">
                     <div className="flex flex-row basis-1/2 h-[500px]">
@@ -281,20 +281,61 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </div>
-                    <div className="flex justify-around mt-6">
-                        {['thumbs-down', 'thumbs-up', 'heart', 'message-circle'].map((icon) => (
-                            <button key={icon} className="bg-gray-200 p-3 rounded-full hover:bg-gray-300 transition">
-                                <Image src={`/${icon}.png`} alt={icon} width={24} height={24}/>
-                            </button>
-                        ))}
+                <div className="flex justify-around mt-6">
+                    {/*'thumbs-down', 'thumbs-up', 'heart', 'message-circle'*/}
+                    <div className="flex flex-col justify-center align-middle">
+                        <button
+                            className="bg-gradient-to-br from-blue-400  max-w-[48px] to-blue-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
+                            <svg className="w-6 h-6 text-white dark:text-white" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path fill-rule="evenodd"
+                                      d="M8.97 14.316H5.004c-.322 0-.64-.08-.925-.232a2.022 2.022 0 0 1-.717-.645 2.108 2.108 0 0 1-.242-1.883l2.36-7.201C5.769 3.54 5.96 3 7.365 3c2.072 0 4.276.678 6.156 1.256.473.145.925.284 1.35.404h.114v9.862a25.485 25.485 0 0 0-4.238 5.514c-.197.376-.516.67-.901.83a1.74 1.74 0 0 1-1.21.048 1.79 1.79 0 0 1-.96-.757 1.867 1.867 0 0 1-.269-1.211l1.562-4.63ZM19.822 14H17V6a2 2 0 1 1 4 0v6.823c0 .65-.527 1.177-1.177 1.177Z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <p className="text-white justify-center align-middle pt-2">DISLIKE</p>
                     </div>
+
+                    <div className="flex flex-col justify-center align-middle ">
+                        <button
+                            className="bg-gradient-to-br from-red-400  max-w-[48px] to-red-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
+                            <svg className="w-6 h-6 text-white dark:text-white" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path
+                                    d="m12.75 20.66 6.184-7.098c2.677-2.884 2.559-6.506.754-8.705-.898-1.095-2.206-1.816-3.72-1.855-1.293-.034-2.652.43-3.963 1.442-1.315-1.012-2.678-1.476-3.973-1.442-1.515.04-2.825.76-3.724 1.855-1.806 2.201-1.915 5.823.772 8.706l6.183 7.097c.19.216.46.34.743.34a.985.985 0 0 0 .743-.34Z"/>
+                            </svg>
+                        </button>
+                        <p className="text-white justify-center align-middle pt-2">DISLIKE</p>
+                    </div>
+
+                    <div className="flex flex-col justify-center align-middle ">
+                        <button
+                            className="bg-gradient-to-br from-green-400  max-w-[48px] to-green-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
+                        <svg className="w-6 h-6 text-white dark:text-white" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path fill-rule="evenodd"
+                                      d="M15.03 9.684h3.965c.322 0 .64.08.925.232.286.153.532.374.717.645a2.109 2.109 0 0 1 .242 1.883l-2.36 7.201c-.288.814-.48 1.355-1.884 1.355-2.072 0-4.276-.677-6.157-1.256-.472-.145-.924-.284-1.348-.404h-.115V9.478a25.485 25.485 0 0 0 4.238-5.514 1.8 1.8 0 0 1 .901-.83 1.74 1.74 0 0 1 1.21-.048c.396.13.736.397.96.757.225.36.32.788.269 1.211l-1.562 4.63ZM4.177 10H7v8a2 2 0 1 1-4 0v-6.823C3 10.527 3.527 10 4.176 10Z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <p className="text-white justify-center align-middle pt-2">DISLIKE</p>
+                    </div>
+                    {/*{['thumbs-down', 'heart', 'thumbs-up'].map((icon) => (*/}
+
+                    {/*    <Image src={`/${icon}.png`} alt={icon} width={24} height={24}/>*/}
+                    {/*    */}
+                    {/*    ))}*/}
+                </div>
 
             </div>
 
 
-
             {/* Search Settings Section */}
-            <div className="basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] ">
+            <div
+                className="sm:hidden md:hidden shadow-md lg:flex lg:flex-col lg:basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] ">
                 <h2 className="text-xl px-4 font-bold mb-4 text-red-950">Zoek Instellingen</h2>
                 <div className={"flex flex-col h-full px-4 overflow-y-auto max-h-[650px] " +
                     "scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-red-950 scrollbar-track-red-50 h-32 overflow-"}>
