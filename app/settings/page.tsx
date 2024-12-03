@@ -1,4 +1,6 @@
 // page.tsx (Server-side rendering)
+
+//'use client'
 import Slider from "@components/settings/slider";
 import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
@@ -10,7 +12,7 @@ import {getServerSession} from "next-auth";
 import { authOptions } from "@/app/api/auth/auth.config";
 import {redirect} from "next/navigation";
 import AddPictures from "@components/settings/addPictures";
-
+//import {useIsMobile} from "@/components/mediaQuery";
 const SettingsPage = async () => {
     const supabase = await createClient();
 
@@ -28,11 +30,166 @@ const SettingsPage = async () => {
         console.error("Error fetching data:", filterError || profileError || pictureError);
         return <p>Error loading profile data</p>;
     }
+    var isMobile = true;
 
-    return (
+
+    return isMobile ? (
+        // mobile version ------------------------------------------------------------------
+        <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-center items-center md:items-start p-2 md:p-8 gap-4">
+                {/* Main Content */}
+                <div
+                    className="flex flex-col w-full md:w-3/4 p-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] rounded-lg">
+                    {/* Floating button for mobile version- this is to replace the sidebar in the laptop version */}
+                    <div className="fixed top-20 left-4 z-50">
+                        <div className="group inline-block relative">
+                            <button
+                                className="text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                style={{ backgroundColor: "hsl(10, 100%, 90%)" }}
+                            >
+                                <svg
+                                    className="h-6 w-6"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M3 5h14a1 1 0 010 2H3a1 1 0 010-2zm0 6h14a1 1 0 010 2H3a1 1 0 010-2zm0 6h14a1 1 0 010 2H3a1 1 0 010-2z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+
+                            <div
+                                className="absolute hidden group-hover:block mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+                            >
+                                <div className="py-1">
+                                    <a href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profiel</a>
+                                    <a href="/settings/language" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Taal Instellingen
+                                        </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {/* Profile Section */}
+                    <div className="rounded-lg mb-6 p-4 bg-[#FFDFDB]">
+                        <div className="flex flex-col justify-center items-center mb-6">
+                            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-[#771D1D] font-serif">
+                                {profile_data.first_name} {profile_data.last_name}
+                            </h2>
+                            <ProfilePicture imageUrl={picture.profile_picture_url || "/mock-picture.webp"}
+                                            userId={user_id}/>
+                        </div>
+                        <ProfileDOB userId={user_id} dob={profile_data.dob}/>
+                    </div>
+
+                    {/* Add More Pictures Section */}
+                    <div className="rounded-lg mb-6 p-4 bg-[#FFDFDB]">
+                        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-[#771D1D] font-serif">
+                            Voeg meer foto's toe
+                        </h2>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <AddPictures
+                                maxPictures={3}
+                                userId={user_id}
+                            />
+                        </div>
+                        <p className="text-sm text-center text-gray-600 mt-4">
+                            Voeg tot 3 extra foto's toe aan je profiel
+                        </p>
+                    </div>
+
+                    {/* Personality and Filters Section */}
+                    <div className="rounded-lg p-4 w-full bg-[#FFDFDB]">
+                        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-[#771D1D] font-serif">
+                            Dit moet je ook weten over mij...
+                        </h2>
+
+                        {/* Profile Filter Sections */}
+                        <div className="flex flex-col gap-4">
+                            <ProfileFiltersSection
+                                title="Persoonlijkheid"
+                                table="personality"
+                                data={filter_data.personalities}
+                                keyField="personality_id"
+                                labelField="personality"
+                                user_id={user_id}
+                            />
+                            <ProfileFiltersSection
+                                title="Relatiedoel"
+                                table="relationship_goal"
+                                data={filter_data.relationship_goals}
+                                keyField="relationship_goals_id"
+                                labelField="relationship_goals"
+                                user_id={user_id}
+                            />
+                            <ProfileFiltersSection
+                                title="Gender"
+                                table="gender"
+                                data={filter_data.genders}
+                                keyField="gender_id"
+                                labelField="gender"
+                                user_id={user_id}
+                            />
+                            <ProfileFiltersSection
+                                title="Interesses"
+                                table="interest"
+                                data={filter_data.interests}
+                                keyField="id"
+                                labelField="interest"
+                                user_id={user_id}
+                            />
+                            <ProfileFiltersSection
+                                title="Beperking"
+                                table="disability"
+                                data={filter_data.disabilities}
+                                keyField="disability_id"
+                                labelField="disability"
+                                user_id={user_id}
+                            />
+                            <ProfileFiltersSection
+                                title="Thuis status"
+                                table="home_status"
+                                data={filter_data.home_statuses}
+                                keyField="home_status_id"
+                                labelField="home_status"
+                                user_id={user_id}
+                            />
+                            <ProfileFiltersSection
+                                title="Religie"
+                                table="religion"
+                                data={filter_data.religions}
+                                keyField="religion_id"
+                                labelField="religion"
+                                user_id={user_id}
+                            />
+                        </div>
+
+                        {/* Sliders */}
+                        <div className="flex flex-col w-full mt-4 mb-6">
+                            <div className="flex flex-col w-full mt-6 justify-center items-center px-4 md:px-20">
+                                <Slider
+                                    label="Afstand tot anderen"
+                                    unit="km"
+                                    min={5}
+                                    max={30}
+                                    defaultValue={profile_data.distance || 15}
+                                    userId={user_id}
+                                    sliderColor="#771D1D"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    ) : ( // laptop version ------------------------------------------------------------------
         <div className="flex">
             {/* Sidebar */}
-            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div
+                className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Instellingen</h2>
                 </div>
@@ -50,7 +207,7 @@ const SettingsPage = async () => {
             <div className="flex flex-col basis-3/4 p-4 m-2 flex-grow bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
 
                 {/* Profile Section */}
-                <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
+                <div className="rounded-lg mb-6 p-4" style={{backgroundColor: "#FFDFDB" }}>
                     <div className="flex flex-col justify-center items-center mb-6">
                         <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
                             {profile_data.first_name} {profile_data.last_name}

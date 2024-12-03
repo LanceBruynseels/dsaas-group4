@@ -3,9 +3,11 @@
 import {usePathname, useRouter} from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-
+import "@/components/mediaQuery"
+import {useIsMobile} from "@components/mediaQuery";
 export default function NavBar() {
     const path = usePathname();
+    const isMobile = useIsMobile();
 
     if (path === '/' || path === '/sign-in' || path === '/registration') {
         return (
@@ -32,7 +34,7 @@ export default function NavBar() {
                     <Link href="/" className="text-gray-700 hover:text-red-700">Start</Link>
                     <Link href="/messaging" className="text-gray-700 hover:text-red-700">Berichten</Link>
                     <Link href="/ontdek" className="text-gray-700 hover:text-red-700">Ontdek</Link>
-                    <Link href="/settings" className="text-gray-700 hover:text-red-700">Instellingen</Link>
+                    <Link href={`/settings?isMobile=${isMobile}`} className="text-gray-700 hover:text-red-700">Instellingen</Link>
                 </div>
             </nav>
         );

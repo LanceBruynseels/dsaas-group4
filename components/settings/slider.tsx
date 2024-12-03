@@ -1,5 +1,6 @@
 'use client'
 import React, { useState } from "react";
+import {useIsMobile} from "@components/mediaQuery";
 
 interface ClientSliderProps {
     label: string;
@@ -13,6 +14,7 @@ interface ClientSliderProps {
 
 const Slider: React.FC<ClientSliderProps> = ({ label, unit, min, max, defaultValue, sliderColor, userId }) => {
     const [value, setValue] = useState(defaultValue);
+    const isMobile = useIsMobile();
 
     // Function to send updated value to the backend
     const updateDistance = async (newValue: number) => {
@@ -44,7 +46,50 @@ const Slider: React.FC<ClientSliderProps> = ({ label, unit, min, max, defaultVal
         updateDistance(newValue); // Update backend with the new value
     };
 
-    return (
+    return isMobile ? (
+        <div>
+            <h3 className="text-lg font-semibold">
+                {label}: {value} {unit}
+            </h3>
+            <input
+                type="range"
+                min={min}
+                max={max}
+                value={value}
+                onChange={handleChange}
+                className="w-full mt-2 slider"
+                style={{
+                    background: `linear-gradient(to right, ${sliderColor} ${(value - min) / (max - min) * 100}%, #ddd 0%)`,
+                }}
+            />
+            <style jsx>{`
+                .slider {
+                    -webkit-appearance: none;
+                    width: 250px;
+                    height: 8px;
+                    border-radius: 5px;
+                    outline: none;
+                    background: linear-gradient(to right, ${sliderColor} 0%, ${sliderColor} 50%, #ddd 50%, #ddd 100%);
+                    transition: background 0.3s ease-in-out;
+                }
+
+                .slider::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    background: ${sliderColor};
+                    cursor: pointer;
+                    transition: background-color 0.3s ease-in-out;
+                }
+
+                .slider::-webkit-slider-thumb:hover {
+                    background: #9e2a2a;
+                }
+            `}</style>
+        </div>
+        ) : (
         <div>
             <h3 className="text-lg font-semibold">
                 {label}: {value} {unit}
