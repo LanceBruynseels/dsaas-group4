@@ -3,6 +3,7 @@
 import React, {Suspense, useEffect, useState} from "react";
 import {FlowbiteCarousel} from "@components/flowbiteCarousel";
 import {NextResponse} from "next/server";
+import Loading from "@components/loading";
 
 interface ProfileData {
     genders: string[];         // or a specific type for gender values
@@ -102,14 +103,13 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
 
     return (
         <>
-            <h2 className={"text-xl font-bold mb-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
+        <Suspense fallback={<Loading/>}>
             {currentMatch ? (
                 <>
+                <h2 className={"text-xl font-bold mb-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
                     <div className="flex flex-row p-4 w-full h-full">
                         {currentMatch ? (
-                            <div className="flex flex-row basis-1/2 h-[500px]">
-                                <Suspense fallback={<p>Loading feed...</p>}>
-                                    <div className="flex flex-row w-full min-w-[300px] h-[500px]">
+                            <div className="flex flex-row basis-1/2 h-[500px] min-w-[300px]">
                                         <FlowbiteCarousel
                                             pictures={currentMatch.publicUrls || []}
                                             infoSection={<div className="flex flex-col items-start">
@@ -121,8 +121,6 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                                                 </h2>
                                                 {/* Render other profile data */}
                                             </div>}/>
-                                    </div>
-                                </Suspense>
                             </div>
                         ) : (
                             <p>No matches found</p>
@@ -134,6 +132,7 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                                 {currentMatch.first_name}, {currentMatch.dob && new Date().getFullYear() - new Date(currentMatch.dob).getFullYear()} jaar
                             </h2>
                             {currentMatch?.profile_data?.genders?.length > 0 && (
+
                                 <div className="mt-4">
                                     <strong>Gender</strong>
                                     <div className="flex flex-wrap gap-2 mt-1">
@@ -147,15 +146,67 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                                     </div>
                                 </div>
                             )}
+
+                            <div className="mt-4">
+                                <strong>persoonlijkheid</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {currentMatch.profile_data.personalities.map((personalities, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                            {personalities}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <strong>Intresses</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {currentMatch.profile_data.interests.map((interests, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                            {interests}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <strong>Intresses</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {currentMatch.profile_data.interests.map((interests, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                            {interests}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <strong></strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {currentMatch.profile_data.interests.map((interests, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                            {interests}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Additional details here as per the original layout */}
                         </div>
                     </div>
-                    <div className="flex justify-around mt-6">
-                        {/*'thumbs-down', 'thumbs-up', 'heart', 'message-circle'*/}
-                        <div className="flex flex-col justify-center align-middle">
+                    <div className="flex justify-center align-middle items-center mt-6">
+                        <div className="flex flex-col w-[100px] justify-center align-middle items-center">
                             <button
                                 onClick={() => buttonMatchingAction("dislike")}
-                                className="bg-gradient-to-br from-blue-400  max-w-[48px] to-blue-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
+                                className="bg-gradient-to-br justify-center align-middle from-blue-400  max-w-[48px] to-blue-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
                                 <svg className="w-6 h-6 text-white dark:text-white" aria-hidden="true"
                                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                                      viewBox="0 0 24 24">
@@ -167,7 +218,7 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                             <p className="text-white justify-center align-middle pt-2">DISLIKE</p>
                         </div>
 
-                        <div className="flex flex-col justify-center align-middle ">
+                        <div className="flex flex-col w-[100px] justify-center align-middle items-center">
                             <button
                                 onClick={() => buttonMatchingAction("heart")}
                                 className="bg-gradient-to-br from-red-400  max-w-[48px] to-red-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
@@ -178,10 +229,10 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                                         d="m12.75 20.66 6.184-7.098c2.677-2.884 2.559-6.506.754-8.705-.898-1.095-2.206-1.816-3.72-1.855-1.293-.034-2.652.43-3.963 1.442-1.315-1.012-2.678-1.476-3.973-1.442-1.515.04-2.825.76-3.724 1.855-1.806 2.201-1.915 5.823.772 8.706l6.183 7.097c.19.216.46.34.743.34a.985.985 0 0 0 .743-.34Z"/>
                                 </svg>
                             </button>
-                            <p className="text-white justify-center align-middle pt-2">DISLIKE</p>
+                            <p className="text-white justify-center align-middle pt-2">LOVE</p>
                         </div>
 
-                        <div className="flex flex-col justify-center align-middle ">
+                        <div className="flex flex-col w-[100px] justify-center align-middle items-center">
                             <button
                                 onClick={() => buttonMatchingAction("like")}
                                 className="bg-gradient-to-br from-green-400  max-w-[48px] to-green-700 p-3 justify-center align-middle rounded-full hover:bg-gray-300 transition">
@@ -193,12 +244,39 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                                           clipRule="evenodd"/>
                                 </svg>
                             </button>
-                            <p className="text-white justify-center align-middle pt-2">DISLIKE</p>
+                            <p className="text-white justify-center align-middle pt-2">LIKE</p>
                         </div>
                     </div>
                 </>
-                ): (<p>No matches found</p>
-                )}
+                ): (
+                <div
+                    className="flex flex-col items-center justify-center w-full h-full ">
+                    <div className="flex flex-col items-center p-8">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-16 h-16 text-red-800 mb-4"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 6.75l.002 5.378a2.625 2.625 0 11-2.382 0V6.75m7.5 8.25a6.375 6.375 0 10-12.75 0"
+                            />
+                        </svg>
+                        <h2 className="text-2xl font-semibold text-red-800 mb-2">
+                            No Matches Found
+                        </h2>
+                        <p className="text-red-700 text-center">
+                            Try adjusting your search settings or come back later. We’re always
+                            working to find the best matches for you!
+                        </p>
+                    </div>
+                </div>
+            )}
+            </Suspense>
         </>
     );
 }
