@@ -105,28 +105,80 @@ export default async function HomePage() {
                     </div>
                 </div>
                 <Suspense fallback={<p>Loading feed...</p>}>
-                    <div className="flex flex-col my-2">
+                    <div className="flex flex-col my-2 h-full">
                         {/* Render Notifications */}
                         {notification_data && notification_data.length > 0 ? (
                             notification_data.map((notification: Notification_user) => (
                                 <NotificationItem key={notification.notification_id} notification={notification}/>
                             ))
                         ) : (
-                            <p>No new notifications.</p>
+                            <div
+                                className="flex flex-col items-center justify-center w-full h-full ">
+                                <div className="flex flex-col items-center p-8">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className="w-16 h-16 text-red-800 mb-4"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M15 17h5l-1.405 2.81A2.25 2.25 0 0116.5 21h-9a2.25 2.25 0 01-2.095-1.19L4 17h5m6 0V8.25a3 3 0 10-6 0V17m6 0H9"
+                                        />
+                                    </svg>
+                                    <h2 className="text-2xl font-semibold text-red-800 mb-2">
+                                        No Notifications
+                                    </h2>
+                                    <p className="text-red-700 text-center">
+                                        You're all caught up! Check back later for new updates.
+                                    </p>
+                                </div>
+                            </div>
+
                         )}
                     </div>
                 </Suspense>
             </div>
 
             {/* middle section with matching and liking*/}
-            {allMatchData ? (
-            <div className="flex flex-col basis-1/2 bg-gradient-to-b shadow-md from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
-                <MatchingCard matchData={allMatchData} userId={userId}/>
-            </div>
-            ): (
-                    <p>No matches found</p>
-            )}
 
+            <div
+                className="flex flex-col basis-1/2 bg-gradient-to-b shadow-md from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
+                {allMatchData ? (
+                    <MatchingCard matchData={allMatchData} userId={userId}/>
+                ) : (
+                    <div
+                        className="flex flex-col items-center justify-center w-full h-full ">
+                        <div className="flex flex-col items-center p-8">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-16 h-16 text-red-800 mb-4"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 6.75l.002 5.378a2.625 2.625 0 11-2.382 0V6.75m7.5 8.25a6.375 6.375 0 10-12.75 0"
+                                />
+                            </svg>
+                            <h2 className="text-2xl font-semibold text-red-800 mb-2">
+                                No Matches Found
+                            </h2>
+                            <p className="text-red-700 text-center">
+                                Try adjusting your search settings or come back later. We’re always
+                                working to find the best matches for you!
+                            </p>
+                        </div>
+                    </div>
+
+                )}
+            </div>
 
             {/* Search Settings Section */}
             <div
