@@ -1,7 +1,6 @@
 // pages/pricing.tsx
 import React from 'react';
-import PricingTable from 'components/PricingTable';
-import CreateSubscription from "@components/CreateSubscription";  // Adjust the import path if needed
+import CreateSubscription from "@components/CreateSubscription";
 
 const PricingPage: React.FC = () => {
     return (

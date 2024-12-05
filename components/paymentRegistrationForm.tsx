@@ -1,85 +1,131 @@
-"use client"; // Make sure the component is treated as a client component in Next.js
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 
-const CreateCustomer = () => {
-    const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
-    const [response, setResponse] = useState(null);
+const PaymentForm = () => {
+    const { productId } = useParams(); // Get productId from the URL
+    const router = useRouter(); // Router for redirection
+    const stripe = useStripe();
+    const elements = useElements();
+
+    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [institution, setInstitution] = useState("");
+    const [password, setPassword] = useState(""); // Password field
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const handleSubmit = async (e) => { //handels the sumbit of the form
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null); // Reset any previous errors
-        setResponse(null); // Reset the previous response
+        setLoading(true);
+        setError(null);
+
+        if (!stripe || !elements) {
+            setError("Stripe.js is not loaded");
+            setLoading(false);
+            return;
+        }
 
         try {
-            const res = await fetch('/api/payment/registration', { //calls the api to get the data out of the page
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, name}),
+            // Call your backend to create a subscription and PaymentIntent
+            const res = await fetch("/api/payment/CreatePaymentIntent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productId,
+                    email,
+                    name,
+                    phone,
+                    institution,
+                    password, // Include password in the payload
+                }),
             });
 
             if (!res.ok) {
-                throw new Error('Failed to create customer');
+                throw new Error("Failed to create PaymentIntent");
             }
 
-            const data = await res.json();
-            console.log('Customer created:', data);
-            setResponse(data); // Save the response data to state
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            setError(error.message); // Save the error message to state
+            const { clientSecret, customerId } = await res.json();
+
+            // Confirm the payment with Stripe
+            const cardElement = elements.getElement(CardElement);
+            const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name,
+                        email,
+                        phone,
+                    },
+                },
+                setup_future_usage: "off_session", // Save the card for future subscriptions
+            });
+
+            if (stripeError) {
+                throw new Error(stripeError.message);
+            }
+
+            console.log("Payment successful:", paymentIntent);
+
+            // Redirect to the subscription completed page
+            router.push("/subscriptionComplete")
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => {
-                        setEmail(e.target.value);
-                        console.log("email updated:", e.target.value)
-                    }}
-                    required
-                />
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    value={name}
-                    onChange={(e) => {
-                        setName(e.target.value);
-                        console.log("name updated:", e.target.value)
-                    }}
-                    required
-                />
-                <button type="submit">Create Customer</button>
-            </form>
+        <form onSubmit={handleSubmit}>
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+            />
+            <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+            />
+            <input
+                type="tel"
+                placeholder="Phone Number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+            />
+            <input
+                type="text"
+                placeholder="Institution Name"
+                value={institution}
+                onChange={(e) => setInstitution(e.target.value)}
+                required
+            />
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+            />
 
-            {/* Display the response after customer is created */}
-            {response && (
-                <div>
-                    <h3>Customer Created</h3>
-                    <pre>{JSON.stringify(response, null, 2)}</pre>
-                </div>
-            )}
+            <CardElement options={{ hidePostalCode: true }} />
 
-            {/* Display any errors if the API call fails */}
-            {error && (
-                <div style={{ color: 'red' }}>
-                    <h3>Error:</h3>
-                    <p>{error}</p>
-                </div>
-            )}
-        </div>
+            <button type="submit" disabled={loading}>
+                {loading ? "Processing..." : "Subscribe"}
+            </button>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
+        </form>
     );
 };
 
-export default CreateCustomer;
+export default PaymentForm;

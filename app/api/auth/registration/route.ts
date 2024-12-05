@@ -8,15 +8,12 @@ export async function POST(request: NextRequest) {
         const { username, password, facility, supervisor } = await request.json();
         const supabase = await createClient();
 
-
-
         if (!username || !password || !facility || !supervisor) {
             return NextResponse.json(
                 { error: "Alle velden zijn verplicht" },
                 { status: 400 }
             );
         }
-
 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -41,7 +38,6 @@ export async function POST(request: NextRequest) {
                 { status: 500 }
             );
         }
-
 
         // return success with redirect information
         return NextResponse.json({
