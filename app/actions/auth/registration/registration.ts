@@ -29,7 +29,7 @@ export async function register(formData: FormData): Promise<RegistrationResponse
         }
 
         // invoke api
-        const response = await fetch('http://localhost:3000/api/auth/registration', {
+        const response = await fetch('/api/auth/registration', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

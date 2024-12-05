@@ -1,7 +1,8 @@
 import { createClient } from '@/utils/supabase/server';
+import Image from "next/image";
 
 export default async function Notes() {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Fetch notes data
     const { data: notes } = await supabase.from("notes").select();
@@ -24,7 +25,7 @@ export default async function Notes() {
     return (
         <div>
             <pre>{JSON.stringify(notes, null, 2)}</pre>
-            {imageUrl && <img src={imageUrl} alt="Profile icon" />}
+            {imageUrl && <Image src={imageUrl} alt="Profile icon" fill/>}
 
             {profileInfo && (
                 <div>
