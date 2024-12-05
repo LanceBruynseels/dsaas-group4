@@ -28,7 +28,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ title, table, data, keyFi
                 }
 
                 const result = await response.json();
-                const ids = new Set(result.map((item: any) => item[`${table}_id`]));
+                const ids : Set<number> = new Set(result.map((item: any) => item[`${table}_id`]));
                 setSelectedIds(ids);
             } catch (err: any) {
                 setError(err.message || 'An unexpected error occurred');

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/auth.config";
 import { redirect } from "next/navigation";
 import ProfilePopup from '@components/profilePopUp';
 import React, {Suspense} from "react";
