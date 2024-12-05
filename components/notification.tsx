@@ -21,9 +21,10 @@ export type Notification_user = {
 
 interface NotificationItemProps {
     notification: Notification_user;
+    expanded: boolean;
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification }) => {
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expanded }) => {
     const router = useRouter();
     const supabase = createClientComponentClient(); // Initialize Supabase client
 
@@ -75,7 +76,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification }) => 
                 className="rounded-full border border-gray-500"
             />
             {/* Notification Content */}
-            <div className="text-sm mx-2">
+            <div className={`text-sm mx-2 overflow-hidden  ${
+                expanded ? "" : "hidden"
+            }`}>
                 <span className="font-semibold">{senderName}</span>
                 <p>{notification.content}</p>
             </div>

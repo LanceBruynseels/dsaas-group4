@@ -21,15 +21,15 @@ interface CustomSliderProps {
 }
 
 const CustomSlider: React.FC<CustomSliderProps> = ({
-                                                       label,
-                                                       minValue,
-                                                       maxValue,
-                                                       defaultValue,
-                                                       step = 1,
-                                                       onChange,
-                                                       classNames,
-                                                       user_id
-                                                   }) => {
+                                                             label,
+                                                             minValue,
+                                                             maxValue,
+                                                             defaultValue,
+                                                             step = 1,
+                                                             onChange,
+                                                             classNames,
+                                                             user_id
+                                                         }) => {
     const [sliderValue, setSliderValue] = useState<number[]>(defaultValue);
 
     // Function to send updated age range to the backend

@@ -106,7 +106,7 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
         <Suspense fallback={<Loading/>}>
             {currentMatch ? (
                 <>
-                <h2 className={"text-xl font-bold mb-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
+                <h2 className={"text-xl font-bold mb-4 p-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
                     <div className="flex flex-row p-4 w-full h-full">
                         {currentMatch ? (
                             <div className="flex flex-row basis-1/2 h-[500px] min-w-[300px]">

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import {Promise} from "cypress/types/cy-bluebird";
 
 // Function to call the API route to insert label into the user's search table
 async function addLabelToUser(table: string, labelKey: number, user_id: string) {
@@ -45,13 +46,15 @@ function ToggleLabel({
                          labelKey,
                          table,
                          isSelected: initialSelected,
-                         user_id
+                         user_id,
+                         onToggle
                      }: {
     tag: string,
     labelKey: number,
     table: string,
     isSelected: boolean,
-    user_id: string
+    user_id: string,
+    onToggle?: () => Promise<void>
 }) {
     const [selected, setSelected] = useState(initialSelected);
 
