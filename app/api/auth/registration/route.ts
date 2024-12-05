@@ -5,8 +5,10 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
     try {
-        const { username, password, facility, supervisor } = await request.json();
-        const supabase = await createClient();
+
+        const { username, first_name, last_name,  password, facility, supervisor } = await request.json();
+        const supabase = createClient();
+
 
 
 
@@ -26,9 +28,12 @@ export async function POST(request: NextRequest) {
             .insert([
                 {
                     username,
+                    first_name,
+                    last_name,
                     password: hashedPassword,
                     facility,
-                    supervisor
+                    supervisor,
+                    is_accepted : false
                 }
             ])
             .select()

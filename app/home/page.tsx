@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/auth.config";
 import { redirect } from "next/navigation";
@@ -45,12 +46,14 @@ export default async function HomePage() {
 
     if (filter_data_error || notification_error) {
         console.error("Error fetching data:", filter_data_error || notification_error);
+
         return <p>Error loading data</p>;
     }
 
     return (
         <div className="flex flex-row w-full">
             {/* Search Settings Section */}
+
             <div className="basis-1/4 p-4 rounded-lg m-4 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <h2 className="text-xl font-bold mb-4 text-red-950">Zoek Instellingen</h2>
 
@@ -141,9 +144,11 @@ export default async function HomePage() {
                     <div className="flex justify-between text-sm mt-1">
                         <span>18</span>
                         <span>30</span>
+
                     </div>
                 </div>
             </div>
+
 
             {/* Profile Section */}
             <div className="flex flex-row basis-1/2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg">
@@ -219,3 +224,4 @@ export default async function HomePage() {
         </div>
     );
 }
+
