@@ -29,7 +29,7 @@ const SignInPage: React.FC = () => {
       if (result?.error) {
         // default error is "CredentialsSignin" when a user has not been approved, here changed the print content
         if (result.error === "CredentialsSignin") {
-          setError("Uw account is nog niet goedgekeurd. Neem contact op met uw begeleider.");
+          setError("Uw account is nog niet goedgekeurd of geblokkeerd. Neem contact op met uw begeleider.");
         } else {
           setError("Ongeldige gebruikersnaam of wachtwoord");
         }

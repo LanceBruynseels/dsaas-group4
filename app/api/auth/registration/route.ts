@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
                     password: hashedPassword,
                     facility,
                     supervisor,
-                    is_accepted : false
+                    is_accepted : false,
+                    is_banned : false
                 }
             ])
             .select()

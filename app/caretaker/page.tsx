@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Search } from "lucide-react";
 
 interface User {
@@ -11,6 +11,7 @@ interface User {
     first_name: string | null;
     last_name: string | null;
     is_accepted: boolean;
+    is_banned: boolean;
 }
 
 export default function CaretakerHome() {
@@ -20,6 +21,18 @@ export default function CaretakerHome() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const supabase = createClient();
+
+    // use useMemo to improve filtering performance
+    const filteredUsers = useMemo(() => {
+        return users.filter(user => {
+            const query = searchQuery.toLowerCase();
+            return (
+                (user.first_name?.toLowerCase() || '').includes(query) ||
+                (user.last_name?.toLowerCase() || '').includes(query) ||
+                (user.username?.toLowerCase() || '').includes(query)
+            );
+        });
+    }, [users, searchQuery]);
 
     useEffect(() => {
         fetchUsers();
@@ -57,29 +70,64 @@ export default function CaretakerHome() {
                 .update({ is_accepted: true })
                 .eq('id', userId);
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
-            setUsers(users.map(user =>
-                user.id === userId
-                    ? { ...user, is_accepted: true }
-                    : user
-            ));
+            const updatedUsers = users.map(user =>
+                user.id === userId ? { ...user, is_accepted: true } : user
+            );
+            setUsers(updatedUsers);
+            setSelectedUser(prevUser =>
+                prevUser?.id === userId ? { ...prevUser, is_accepted: true } : prevUser
+            );
         } catch (err) {
             console.error('Error approving user:', err);
             alert('Failed to approve user. Please try again.');
         }
     };
 
-    const filteredUsers = users.filter(user => {
-        const query = searchQuery.toLowerCase();
-        return (
-            (user.first_name?.toLowerCase() || '').includes(query) ||
-            (user.last_name?.toLowerCase() || '').includes(query) ||
-            (user.username?.toLowerCase() || '').includes(query)
-        );
-    });
+    const handleBan = async (userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('users')
+                .update({ is_banned: true })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            const updatedUsers = users.map(user =>
+                user.id === userId ? { ...user, is_banned: true } : user
+            );
+            setUsers(updatedUsers);
+            setSelectedUser(prevUser =>
+                prevUser?.id === userId ? { ...prevUser, is_banned: true } : prevUser
+            );
+        } catch (err) {
+            console.error('Error banning user:', err);
+            alert('Failed to ban user. Please try again.');
+        }
+    };
+
+    const handleResume = async (userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('users')
+                .update({ is_banned: false })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            const updatedUsers = users.map(user =>
+                user.id === userId ? { ...user, is_banned: false } : user
+            );
+            setUsers(updatedUsers);
+            setSelectedUser(prevUser =>
+                prevUser?.id === userId ? { ...prevUser, is_banned: false } : prevUser
+            );
+        } catch (err) {
+            console.error('Error resuming user:', err);
+            alert('Failed to resume user. Please try again.');
+        }
+    };
 
     if (loading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
@@ -92,7 +140,7 @@ export default function CaretakerHome() {
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
             {/* Left Sidebar */}
-            <div className="w-1/3 p-6 border-r border-gray-200">
+            <div className="w-1/3 p-6 border-r border-gray-200 flex flex-col">
                 <div className="mb-6 relative">
                     <input
                         type="text"
@@ -104,7 +152,7 @@ export default function CaretakerHome() {
                     <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 overflow-y-auto">
                     {filteredUsers.map((user) => (
                         <div
                             key={user.id}
@@ -128,6 +176,11 @@ export default function CaretakerHome() {
                                 {!user.is_accepted && (
                                     <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
                                         Pending
+                                    </span>
+                                )}
+                                {user.is_banned && (
+                                    <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                                        Banned
                                     </span>
                                 )}
                             </div>
@@ -154,14 +207,32 @@ export default function CaretakerHome() {
                                     <p className="text-sm text-gray-500">{selectedUser.facility || ''}</p>
                                 </div>
                             </div>
-                            {!selectedUser.is_accepted && (
-                                <button
-                                    onClick={() => handleApprove(selectedUser.id)}
-                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                                >
-                                    Approve User
-                                </button>
-                            )}
+                            <div className="space-x-2">
+                                {!selectedUser.is_accepted && !selectedUser.is_banned && (
+                                    <button
+                                        onClick={() => handleApprove(selectedUser.id)}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                                    >
+                                        Approve User
+                                    </button>
+                                )}
+                                {selectedUser.is_accepted && !selectedUser.is_banned && (
+                                    <button
+                                        onClick={() => handleBan(selectedUser.id)}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                                    >
+                                        Ban User
+                                    </button>
+                                )}
+                                {selectedUser.is_banned && (
+                                    <button
+                                        onClick={() => handleResume(selectedUser.id)}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                                    >
+                                        Resume User
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         <div className="flex-1 bg-[hsl(10,100%,95%)] rounded-lg p-6">
                             <div className="space-y-4">
@@ -171,8 +242,18 @@ export default function CaretakerHome() {
                                 </div>
                                 <div>
                                     <span className="font-semibold">Status:</span>
-                                    <span className={`ml-2 ${selectedUser.is_accepted ? 'text-green-600' : 'text-yellow-600'}`}>
-                                        {selectedUser.is_accepted ? 'Accepted' : 'Pending Approval'}
+                                    <span className={`ml-2 ${
+                                        selectedUser.is_banned
+                                            ? 'text-red-600'
+                                            : selectedUser.is_accepted
+                                                ? 'text-green-600'
+                                                : 'text-yellow-600'
+                                    }`}>
+                                        {selectedUser.is_banned
+                                            ? 'Banned'
+                                            : selectedUser.is_accepted
+                                                ? 'Active'
+                                                : 'Pending Approval'}
                                     </span>
                                 </div>
                             </div>
