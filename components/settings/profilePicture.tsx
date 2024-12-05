@@ -36,8 +36,6 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
 
             const publicUrl = `https://legfcpyiwzvfhacgnpkw.supabase.co/storage/v1/object/public/profilePictures/profile-pics/${userId}/${file.name}`;
 
-            console.log("Uploaded file public URL:", publicUrl);
-
             const response = await fetch("/api/settings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -66,7 +64,7 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
     return (
         <div className="relative">
             <img
-                src={currentImageUrl || "/profileImage.png"}
+                src={currentImageUrl || "/mock-picture.webp"}
                 alt="Profile"
                 className="w-44 h-44 rounded-full object-cover"
             />
@@ -93,7 +91,6 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ imageUrl, userId }) => 
                 />
             </div>
             {isUploading && <p className="absolute text-xs text-gray-500 mt-2">Uploading...</p>}
-            {errorMessage && <p className="absolute text-xs text-red-500 mt-2">{errorMessage}</p>}
         </div>
     );
 };

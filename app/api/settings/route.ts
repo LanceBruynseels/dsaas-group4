@@ -1,9 +1,14 @@
 import {NextRequest, NextResponse} from "next/server";
 import {createClient} from "@/utils/supabase/server";
+import {getServerSession} from "next-auth";
+import { authOptions } from "@/app/api/auth/auth.config";
+import {redirect} from "next/navigation";
 
 export async function GET(request: NextRequest) {
-    const userId = 'abb0c0af-904c-4c52-b19b-5be0fc3da588';
     try {
+        const session = await getServerSession(authOptions);
+        const userId = session.user.id;
+
         const supabase = await createClient();
         const { data: profileData, error: profileError } = await supabase.rpc("get_all_profile_data", { userid: userId });
         const { data: filterData, error: filterError } = await supabase.rpc("get_all_filter_data");

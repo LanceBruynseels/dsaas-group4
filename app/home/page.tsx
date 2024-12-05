@@ -1,24 +1,40 @@
 import Image from "next/image";
 import { createClient } from '@/utils/supabase/server';
 import FilterSection from '@components/filterselection';
-import profileImage from 'public/profile-picture.jpeg';
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/auth.config";
 import { redirect } from "next/navigation";
 import type { Notification_user } from "@components/notification";
-import { PostgrestError } from "@supabase/supabase-js";
 import NotificationItem from '@components/notification';  // Import your NotificationItem component
+import ProfilePopup from '@components/profilePopUp'; // Import the client component
+import { useSession } from "next-auth/react";
+
+
 
 export default async function HomePage() {
     const supabase = await createClient();
     const session = await getServerSession(authOptions);
 
+    // const session = await getServerSession(authOptions);
     if (!session) {
         return redirect("/sign-in");
     }
-
     const user_id = session.user.id;
-    console.log(user_id);
+    // Fetch user profile to check if it's created
+    const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("user_id", user_id)
+        .single();
+
+
+
+    if (profileError && profileError.code !== 'PGRST116') { // Handle error only if it's not a "no data" error
+        console.error("Error fetching profile:", profileError);
+        return <p>Error loading profile</p>;
+    }
+
+    const showProfilePopup = !profileData; // Show popup if no profile found
 
     const { data: filter_data, error: filter_data_error } = await supabase.rpc('get_all_filter_data');
 
@@ -153,21 +169,20 @@ export default async function HomePage() {
 
                     {/* Interaction Buttons */}
                     <div className="flex justify-around w-full bg-red-50 mt-4 p-4 rounded-lg">
-
                         <button className="relative w-12 h-12 ">
-                            <Image src={"/thumbs-down.png"} alt={"thumbs-down"} fill/>
+                            <Image src={"/thumbs-down.png"} alt={"thumbs-down"} fill />
                         </button>
 
                         <button className="relative w-12 h-12 ">
-                            <Image src={"/thumbs-up.png"} alt={"thumbs-up"} fill/>
+                            <Image src={"/thumbs-up.png"} alt={"thumbs-up"} fill />
                         </button>
 
                         <button className="relative w-12 h-12 ">
-                            <Image src={"/heart.png"} alt={"heart"} fill/>️
+                            <Image src={"/heart.png"} alt={"heart"} fill />️
                         </button>
 
                         <button className="relative w-12 h-12 ">
-                            <Image src={"/message-circle.png"} alt={"message-circle"} fill/>
+                            <Image src={"/message-circle.png"} alt={"message-circle"} fill />
                         </button>
                     </div>
                 </div>
@@ -184,7 +199,7 @@ export default async function HomePage() {
                 <div className="flex flex-col my-2">
                     {/* Render Notifications */}
                     {notification_data && notification_data.length > 0 ? (
-                        notification_data.map((notification : Notification_user) => (
+                        notification_data.map((notification: Notification_user) => (
                             <NotificationItem key={notification.notification_id} notification={notification} />
                         ))
                     ) : (
@@ -192,6 +207,15 @@ export default async function HomePage() {
                     )}
                 </div>
             </div>
+
+            {/* Pop-up screen for first login */}
+            {showProfilePopup && (
+                <ProfilePopup
+                    userId={user_id}
+                    initialImageUrl={"mock-picture.webp"}
+                    initialShowPopup={showProfilePopup}
+                />
+            )}
         </div>
     );
 }
