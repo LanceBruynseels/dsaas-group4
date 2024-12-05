@@ -18,7 +18,8 @@ export default function SearchSettings({filterData, userId, sliderAgeRange} : Se
     const [expanded, setExpanded] = useState(true)
 
     return (
-        <div className="flex flex-row align-middle lg:basis-1/2 ">
+        <div className="flex flex-row align-middle lg:basis-1/2">
+
             <div className={`flex flex-row items-center justify-end transition-all ${
                 expanded ? "" : "w-full"
             }`}>
@@ -30,9 +31,10 @@ export default function SearchSettings({filterData, userId, sliderAgeRange} : Se
                 </button>
             </div>
             <div
-                className={`sm:hidden md:hidden shadow-md lg:flex lg:flex-col  rounded-lg bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] transition-all ${
-                    expanded ? "p-4 w-full m-4" : "w-10 m-4"
-                }`}>
+                className={` sm:hidden md:hidden shadow-md lg:flex lg:flex-col  rounded-lg bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] transition-all ${
+                    expanded ? "p-4 w-full m-4" : "w-10 m-4 cursor-pointer"
+                }`}
+                onClick={() => setExpanded((curr) => curr === false ? true : curr)}>
                 <div
                      className={`flex flex-row justify-between items-center ${
                          expanded ? "p-4" : "px-1 py-4"

@@ -13,12 +13,13 @@ export default function Sidebar({notifications_data} : NotificationProps) {
     const [expanded, setExpanded] = useState(true)
 
     return (
-        <div className={`flex flex-row align-middle lg:basis-1/2`}>
+        <div className={`flex flex-row align-middle basis-1/2`}>
             <div
-                className={`sm:hidden md:hidden lg:flex  shadow-md lg:flex-col rounded-lg bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] transition-all 
+                className={`flex shadow-md flex-col rounded-lg bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] transition-all 
                 ${
-                    expanded ? "w-full m-4 p-4" : "w-10 m-4"
-                }`}>
+                    expanded ? "w-full m-4 p-4" : "w-10 m-4 cursor-pointer"
+                }`}
+                onClick={() => setExpanded((curr) => curr === false ? true : curr)}>
 
                 <div className={`flex flex-row justify-between items-center ${
                     expanded ? "p-4" : "px-1 py-4"
@@ -63,7 +64,7 @@ export default function Sidebar({notifications_data} : NotificationProps) {
                                     No Notifications
                                 </h2>
                                 <p className="text-red-700 text-center">
-                                    You're all caught up! Check back later for new updates.
+                                    Start using the application to get your first notification!
                                 </p>
                             </div>
                         </div>
