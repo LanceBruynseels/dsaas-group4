@@ -18,7 +18,7 @@ export default function NavBar() {
                         <Image src="/vlinder.webp" alt="Vlinder Logo" width={35} height={35}/>
                     </Link>
                     <Link href="/" className="hover:text-red-700"><h4>Home</h4></Link>
-                    <Link href="/about" className="text-gray-700 hover:text-red-700">About Us</Link>
+                    <Link href="/aplicationpage" className="text-gray-700 hover:text-red-700">About Us</Link>
                     <Link href="/contact-us" className="text-gray-700 hover:text-red-700">Contact</Link>
                 </div>
             </nav>
