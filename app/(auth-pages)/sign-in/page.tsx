@@ -11,32 +11,6 @@ const SignInPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // async function handleSubmit(event: React.FormEvent) {
-  //   event.preventDefault();
-  //   setIsLoading(true);
-  //   setError(null);
-  //
-  //   const formData = new FormData(event.target as HTMLFormElement);
-  //
-  //   try {
-  //     const result = await login(formData);
-  //
-  //     if (result.success) {
-  //       console.log("Login successful, navigating to /protected/home");
-  //       // Redirect using the URL provided by the server (from result.redirect)
-  //       // router.push(result.redirect);  // Use `result.redirect` to ensure correct redirection
-  //       router.push(result.redirect.destination);
-  //     } else {
-  //       setError(result.error || "An unexpected error occurred");
-  //       console.log("Login failed:", result.error);
-  //     }
-  //   } catch (err) {
-  //     setError(err instanceof Error ? err.message : "An unexpected error occurred");
-  //     console.error("Error during login:", err);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setIsLoading(true);
@@ -54,7 +28,12 @@ const SignInPage: React.FC = () => {
       });
 
       if (result?.error) {
-        setError(result.error);
+        // default error is "CredentialsSignin" when a user has not been approved, here changed the print content
+        if (result.error === "CredentialsSignin") {
+          setError("Uw account is nog niet goedgekeurd of geblokkeerd. Neem contact op met uw begeleider.");
+        } else {
+          setError("Ongeldige gebruikersnaam of wachtwoord");
+        }
       } else {
         router.push('/home');
         router.refresh();
