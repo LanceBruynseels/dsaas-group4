@@ -272,6 +272,7 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                     .insert({
                         description: problemDescription, // The problem description
                         user_id: user.user_id,            // The user ID for each selected user (reporter + targets)
+                        groupchat_id: selectedGroupChat.id,
                     })
             );
 

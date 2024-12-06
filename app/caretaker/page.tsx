@@ -13,8 +13,16 @@ interface User {
     is_accepted: boolean;
 }
 
+interface Report {
+    id: string;
+    title: string;
+    description: string | null;
+    groupchat_title: string; // Added groupchat_title
+}
+
 export default function CaretakerHome() {
     const [users, setUsers] = useState<User[]>([]);
+    const [reports, setReports] = useState<Report[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -25,28 +33,72 @@ export default function CaretakerHome() {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        if (selectedUser) {
+            fetchReports(selectedUser.id);
+        }
+    }, [selectedUser]);
+
     async function fetchUsers() {
         try {
             const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-            if (authError || !user) {
-                throw new Error('Not authenticated');
-            }
+            if (authError || !user) throw new Error('Not authenticated');
 
             const { data: userData, error: userError } = await supabase
                 .from('users')
                 .select('*')
                 .eq('caretaker_id', user.id);
 
-            if (userError) {
-                throw userError;
-            }
+            if (userError) throw userError;
 
             setUsers(userData || []);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function fetchReports(userId: string) {
+        try {
+            const { data: reportData, error: reportError } = await supabase
+                .from('reports')
+                .select('*')
+                .eq('user_id', userId);
+
+            if (reportError) throw reportError;
+
+            // Map reports to assign a title starting from 1 and add groupchat title
+            const enrichedReports = await Promise.all(
+                (reportData || []).map(async (report, index) => {
+                    // Fetch the group chat title based on the groupchat_id
+                    const { data: groupchatData, error: groupchatError } = await supabase
+                        .from('discover_chats')
+                        .select('title')
+                        .eq('id', report.groupchat_id)
+                        .single();  // Use .single() as we expect only one result
+
+                    if (groupchatError) {
+                        console.error('Error fetching group chat title:', groupchatError);
+                        return {
+                            ...report,
+                            title: `Report ${index + 1}`,  // Default title if groupchat fetch fails
+                            groupchat_title: 'Unknown',  // Default fallback value for the group chat title
+                        };
+                    }
+
+                    return {
+                        ...report,
+                        title: `Report ${index + 1}`,  // Start numbering from 1
+                        groupchat_title: groupchatData?.title || 'No Title',  // Use the fetched title
+                    };
+                })
+            );
+
+            setReports(enrichedReports);
+        } catch (err) {
+            console.error('Error fetching reports:', err);
+            setReports([]);
         }
     }
 
@@ -57,9 +109,7 @@ export default function CaretakerHome() {
                 .update({ is_accepted: true })
                 .eq('id', userId);
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
             setUsers(users.map(user =>
                 user.id === userId
@@ -81,17 +131,11 @@ export default function CaretakerHome() {
         );
     });
 
-    if (loading) {
-        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-    }
-
-    if (error) {
-        return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
-    }
+    if (loading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    if (error) return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
 
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-            {/* Left Sidebar */}
             <div className="w-1/3 p-6 border-r border-gray-200">
                 <div className="mb-6 relative">
                     <input
@@ -104,8 +148,8 @@ export default function CaretakerHome() {
                     <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
                 </div>
 
-                <div className="space-y-4">
-                    {filteredUsers.map((user) => (
+                <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-100px)]">
+                    {filteredUsers.map(user => (
                         <div
                             key={user.id}
                             onClick={() => setSelectedUser(user)}
@@ -136,7 +180,6 @@ export default function CaretakerHome() {
                 </div>
             </div>
 
-            {/* Right Content Area */}
             <div className="flex-1 flex flex-col p-6">
                 {selectedUser ? (
                     <>
@@ -163,19 +206,27 @@ export default function CaretakerHome() {
                                 </button>
                             )}
                         </div>
-                        <div className="flex-1 bg-[hsl(10,100%,95%)] rounded-lg p-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <span className="font-semibold">Username:</span>
-                                    <span className="ml-2">{selectedUser.username || ''}</span>
-                                </div>
-                                <div>
-                                    <span className="font-semibold">Status:</span>
-                                    <span className={`ml-2 ${selectedUser.is_accepted ? 'text-green-600' : 'text-yellow-600'}`}>
-                                        {selectedUser.is_accepted ? 'Accepted' : 'Pending Approval'}
-                                    </span>
-                                </div>
-                            </div>
+                        <div className="space-y-4 bg-[hsl(10,100%,95%)] rounded-lg p-4 mb-6">
+                            <p>
+                                <span className="font-semibold">Status:</span>{' '}
+                                <span className={selectedUser.is_accepted ? 'text-green-600' : 'text-yellow-600'}>
+                                    {selectedUser.is_accepted ? 'Accepted' : 'Pending Approval'}
+                                </span>
+                            </p>
+                            <h4 className="font-semibold text-l mb-4">Reports</h4>
+                            {reports.length > 0 ? (
+                                <ul className="space-y-3">
+                                    {reports.map(report => (
+                                        <li key={report.id} className="p-3 bg-white rounded-lg shadow">
+                                            <h5 className="font-bold">{report.title}</h5>
+                                            <p className="text-gray-600">{report.description || 'No description'}</p>
+                                            <h4 className="text-gray-500 font-bold">Group Chat: {report.groupchat_title}</h4>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-500">No reports available for this user.</p>
+                            )}
                         </div>
                     </>
                 ) : (
