@@ -1,5 +1,5 @@
 // page.tsx (Server-side rendering)
-import Slider from "@components/settings/slider";
+import Slider from "@components/settings/sliderSettings";
 import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
 import ProfileDOB from "@components/settings/profileDOB";
