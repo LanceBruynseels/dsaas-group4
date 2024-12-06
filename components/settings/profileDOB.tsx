@@ -39,7 +39,6 @@ const ProfileDOB: React.FC<ProfileDOBProps> = ({ userId, dob }) => {
             }
 
             const responseData = await response.json();
-            setMessage('DOB updated successfully!');
         } catch (err: any) {
             setMessage(`Error: ${err.message}`);
         } finally {
@@ -61,12 +60,12 @@ const ProfileDOB: React.FC<ProfileDOBProps> = ({ userId, dob }) => {
                 <button
                     onClick={handleUpdateClick}
                     disabled={loading}
-                    style={{backgroundColor: "#771D1D"}}
                     className={`px-4 py-2 rounded-md font-semibold ${
                         loading
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-blue-500 text-white hover:bg-blue-600 transition'
+                            ? 'bg-gray-400 text-white cursor-not-allowed'
+                            : 'bg-[#771D1D] text-white hover:bg-[#FFAB9F]'
                     }`}
+                    // Remove inline style to avoid conflict with Tailwind classes
                 >
                     {loading ? 'Updating...' : 'Pas aan'}
                 </button>

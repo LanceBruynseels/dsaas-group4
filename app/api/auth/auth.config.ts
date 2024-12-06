@@ -10,6 +10,7 @@ declare module "next-auth" {
             id: string;
             username: string;
             is_accepted: boolean; //
+            is_banned : boolean;
         } & DefaultSession["user"]
     }
 
@@ -17,6 +18,7 @@ declare module "next-auth" {
         id: string;
         username: string;
         is_accepted: boolean;
+        is_banned : boolean;
     }
 }
 export const authOptions: NextAuthOptions = {
@@ -43,7 +45,7 @@ export const authOptions: NextAuthOptions = {
 
                     const { data: user, error } = await supabase
                         .from('users')
-                        .select('id, username, password, is_accepted')
+                        .select('id, username, password, is_accepted, is_banned')
                         .eq('username', credentials.username)
                         .single();
 
@@ -58,6 +60,10 @@ export const authOptions: NextAuthOptions = {
                         throw new Error("Uw account is nog niet goedgekeurd. Neem contact op met uw begeleider.");
                     }
 
+                    if (user.is_banned) {
+                        throw new Error("Uw account is nog niet goedgekeurd of geblokkeerd.");
+                    }
+
                     const isValidPassword = await compare(credentials.password, user.password);
 
                     if (!isValidPassword) {
@@ -67,7 +73,8 @@ export const authOptions: NextAuthOptions = {
                     return {
                         id: user.id,
                         username: user.username,
-                        is_accepted: user.is_accepted // remove??
+                        is_accepted: user.is_accepted, // remove??
+                        is_banned: user.is_banned // remove??
                     };
                 } catch (error) {
                     console.error("Authorization error:", error);

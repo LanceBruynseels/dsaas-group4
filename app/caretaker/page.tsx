@@ -2,7 +2,8 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState, useMemo } from "react";
-import { Search } from "lucide-react";
+import { Search, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface User {
     id: string;
@@ -30,6 +31,7 @@ export default function CaretakerHome() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const supabase = createClient();
+    const router = useRouter(); // for sign out
 
     // use useMemo to improve filtering performance
     const filteredUsers = useMemo(() => {
@@ -126,16 +128,19 @@ export default function CaretakerHome() {
 
             if (error) throw error;
 
-            setUsers(users.map(user =>
-                user.id === userId
-                    ? { ...user, is_accepted: true }
-                    : user
-            ));
+            const updatedUsers = users.map(user =>
+                user.id === userId ? { ...user, is_accepted: true } : user
+            );
+            setUsers(updatedUsers);
+            setSelectedUser(prevUser =>
+                prevUser?.id === userId ? { ...prevUser, is_accepted: true } : prevUser
+            );
         } catch (err) {
             console.error('Error approving user:', err);
             alert('Failed to approve user. Please try again.');
         }
     };
+
 
     const handleBan = async (userId: string) => {
         try {
@@ -189,6 +194,23 @@ export default function CaretakerHome() {
         return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
     }
 
+    const handleSignOut = async () => {
+        try {
+            await supabase.auth.signOut();
+            router.push('/sign-in');
+        } catch (err) {
+            console.error('Error signing out:', err);
+            alert('Failed to sign out. Please try again.');
+        }
+    };
+    if (loading) {
+        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
+    }
+
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
             {/* Left Sidebar */}
@@ -201,8 +223,16 @@ export default function CaretakerHome() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
+                    <Search className="absolute left-3 top-3.5 text-gray-400" size={20}/>
                 </div>
+
+                <button
+                    onClick={handleSignOut}
+                    className="p-2 hover:bg-red-100 rounded-full transition-colors"
+                    title="Sign out"
+                >
+                    <LogOut className="text-red-600" size={24}/>
+                </button>
 
                 <div className="space-y-4 overflow-y-auto">
                     {filteredUsers.map((user) => (

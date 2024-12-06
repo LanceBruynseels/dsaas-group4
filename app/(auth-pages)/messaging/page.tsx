@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Mic, Send } from 'lucide-react';
 const supabase = createClient();
+import Image from "next/image";
 
 const ChatApp: React.FC = () => {
     const [selectedContact, setSelectedContact] = useState<any | null>(null); // holds the current selected contact from the side bar
@@ -91,10 +92,12 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSele
                     >
                         <div className="flex items-center gap-4">
                             {/* Placeholder profile image */}
-                            <img
+                            <Image
                                 src="https://via.placeholder.com/40"
                                 alt="Profile" // Alternative text for the image
-                                className="w-10 h-10 rounded-full" // Styling for a circular profile picture
+                                width={10}
+                                height={10}
+                                className="rounded-full" // Styling for a circular profile picture
                             />
                             <div className="flex-1 min-w-0">
                                 {/* Display the username of the contact */}
@@ -161,7 +164,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     // Handle the new message payload
                     const newMessage = payload.new;
 
-                    {
+                     {
                         // Add the new message to the existing state
                         setMessages((prevMessages) => [...prevMessages, newMessage]);
                     }
@@ -199,9 +202,11 @@ const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => 
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
-                <img
+                <Image
                     src="https://via.placeholder.com/40"
                     alt="Profile"
+                    width={10}
+                    height={10}
                     className="w-10 h-10 rounded-full"
                 />
                 <h3 className="text-lg font-bold">{selectedContact.username}</h3>
@@ -263,10 +268,12 @@ const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, se
                 {/* Conditional rendering based on the type of media in the message */}
                 {isImage ? (
                     // Render an image if the message contains an image file
-                    <img
+                    <Image
                         src={mediaURL} // Use the mediaURL as the source of the image
                         alt="Media content"
-                        className="w-40 h-40 object-cover rounded-lg"
+                        width={40}
+                        height={40}
+                        className="object-cover rounded-lg"
                     />
                 ) : isAudio ? (
                     // Render an audio player if the message contains an audio file
@@ -375,62 +382,62 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     // Sends the message (text, file, or audio)
     const handleSend = async () => {
 
-        let fileName: string;
-        let contentToUpload: File | Blob;
+            let fileName: string;
+            let contentToUpload: File | Blob;
 
-        // Determine the type of content to upload
-        if (recordedAudio) {
-            // If there's recorded audio, prepare it for upload
-            fileName = `voice/${Date.now()}-voice-message.wav`;
-            contentToUpload = recordedAudio;
-        } else if (selectedFile) {
-            // If a file is selected, prepare it for upload
-            fileName = `images/${Date.now()}-${selectedFile.name}`;
-            contentToUpload = selectedFile;
-        } else if (textContent.trim()) {
-            // If text is entered, prepare it as a text file for upload
-            fileName = `texts/${Date.now()}-message.txt`;
-            contentToUpload = new Blob([textContent], { type: 'text/plain' });
-        } else {
-            // If no content is provided, show an alert
-            alert('Please enter a message, select a file, or record audio.');
-            return;
-        }
+            // Determine the type of content to upload
+            if (recordedAudio) {
+                // If there's recorded audio, prepare it for upload
+                fileName = `voice/${Date.now()}-voice-message.wav`;
+                contentToUpload = recordedAudio;
+            } else if (selectedFile) {
+                // If a file is selected, prepare it for upload
+                fileName = `images/${Date.now()}-${selectedFile.name}`;
+                contentToUpload = selectedFile;
+            } else if (textContent.trim()) {
+                // If text is entered, prepare it as a text file for upload
+                fileName = `texts/${Date.now()}-message.txt`;
+                contentToUpload = new Blob([textContent], { type: 'text/plain' });
+            } else {
+                // If no content is provided, show an alert
+                alert('Please enter a message, select a file, or record audio.');
+                return;
+            }
 
-        // Upload the content to the Supabase storage bucket
-        const { data: uploadData, error: uploadError } = await supabase
-            .storage
-            .from('Messages')
-            .upload(fileName, contentToUpload);
-
-
-        // Generate a public URL for the uploaded content
-        const { data: urlData } = supabase.storage.from('Messages').getPublicUrl(fileName);
-        const publicURL = urlData?.publicUrl;
-
-        if (!publicURL) {
-            alert('Failed to get public URL for the uploaded content.');
-            return;
-        }
-
-        // Insert the message into the database
-        const { error: insertError } = await supabase
-            .from('message')
-            .insert([
-                {
-                    sender: senderId, // Current user
-                    receiver: receiverId, // Recipient
-                    mediaURL: publicURL, // Uploaded content's URL
-                    time_stamp: new Date(), // Timestamp of the message
-                    is_read: false // Mark as unread
-                }
-            ]);
+            // Upload the content to the Supabase storage bucket
+            const { data: uploadData, error: uploadError } = await supabase
+                .storage
+                .from('Messages')
+                .upload(fileName, contentToUpload);
 
 
-        // Clear input fields after successful send
-        setTextContent('');
-        setSelectedFile(null);
-        setRecordedAudio(null);
+            // Generate a public URL for the uploaded content
+            const { data: urlData } = supabase.storage.from('Messages').getPublicUrl(fileName);
+            const publicURL = urlData?.publicUrl;
+
+            if (!publicURL) {
+                alert('Failed to get public URL for the uploaded content.');
+                return;
+            }
+
+            // Insert the message into the database
+            const { error: insertError } = await supabase
+                .from('message')
+                .insert([
+                    {
+                        sender: senderId, // Current user
+                        receiver: receiverId, // Recipient
+                        mediaURL: publicURL, // Uploaded content's URL
+                        time_stamp: new Date(), // Timestamp of the message
+                        is_read: false // Mark as unread
+                    }
+                ]);
+
+
+            // Clear input fields after successful send
+            setTextContent('');
+            setSelectedFile(null);
+            setRecordedAudio(null);
 
 
     };
