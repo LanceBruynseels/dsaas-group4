@@ -15,8 +15,17 @@ interface User {
     is_banned: boolean;
 }
 
+interface Report {
+    id: string;
+    title: string;
+    description: string | null;
+    groupchat_title: string; // Added groupchat_title
+}
+
+
 export default function CaretakerHome() {
     const [users, setUsers] = useState<User[]>([]);
+    const [reports, setReports] = useState<Report[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -40,22 +49,24 @@ export default function CaretakerHome() {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        if (selectedUser) {
+            fetchReports(selectedUser.id);
+        }
+    }, [selectedUser]);
+
+
     async function fetchUsers() {
         try {
             const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-            if (authError || !user) {
-                throw new Error('Not authenticated');
-            }
+            if (authError || !user) throw new Error('Not authenticated');
 
             const { data: userData, error: userError } = await supabase
                 .from('users')
                 .select('*')
                 .eq('caretaker_id', user.id);
 
-            if (userError) {
-                throw userError;
-            }
+            if (userError) throw userError;
 
             setUsers(userData || []);
         } catch (err) {
@@ -64,6 +75,49 @@ export default function CaretakerHome() {
             setLoading(false);
         }
     }
+    async function fetchReports(userId: string) {
+        try {
+            const { data: reportData, error: reportError } = await supabase
+                .from('reports')
+                .select('*')
+                .eq('user_id', userId);
+
+            if (reportError) throw reportError;
+
+            // Map reports to assign a title starting from 1 and add groupchat title
+            const enrichedReports = await Promise.all(
+                (reportData || []).map(async (report, index) => {
+                    // Fetch the group chat title based on the groupchat_id
+                    const { data: groupchatData, error: groupchatError } = await supabase
+                        .from('discover_chats')
+                        .select('title')
+                        .eq('id', report.groupchat_id)
+                        .single();  // Use .single() as we expect only one result
+
+                    if (groupchatError) {
+                        console.error('Error fetching group chat title:', groupchatError);
+                        return {
+                            ...report,
+                            title: `Report ${index + 1}`,  // Default title if groupchat fetch fails
+                            groupchat_title: 'Unknown',  // Default fallback value for the group chat title
+                        };
+                    }
+
+                    return {
+                        ...report,
+                        title: `Report ${index + 1}`,  // Start numbering from 1
+                        groupchat_title: groupchatData?.title || 'No Title',  // Use the fetched title
+                    };
+                })
+            );
+
+            setReports(enrichedReports);
+        } catch (err) {
+            console.error('Error fetching reports:', err);
+            setReports([]);
+        }
+    }
+
 
     const handleApprove = async (userId: string) => {
         try {
@@ -86,6 +140,7 @@ export default function CaretakerHome() {
             alert('Failed to approve user. Please try again.');
         }
     };
+
 
     const handleBan = async (userId: string) => {
         try {
@@ -148,7 +203,6 @@ export default function CaretakerHome() {
             alert('Failed to sign out. Please try again.');
         }
     };
-
     if (loading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     }
@@ -285,6 +339,20 @@ export default function CaretakerHome() {
                                     </span>
                                 </div>
                             </div>
+                            <h4 className="font-semibold text-l mb-4">Reports</h4>
+                            {reports.length > 0 ? (
+                                <ul className="space-y-3">
+                                    {reports.map(report => (
+                                        <li key={report.id} className="p-3 bg-white rounded-lg shadow">
+                                            <h5 className="font-bold">{report.title}</h5>
+                                            <p className="text-gray-600">{report.description || 'No description'}</p>
+                                            <h4 className="text-gray-500 font-bold">Group Chat: {report.groupchat_title}</h4>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-500">No reports available for this user.</p>
+                            )}
                         </div>
                     </>
                 ) : (
