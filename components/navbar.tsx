@@ -31,16 +31,16 @@ export default function NavBar() {
     }, []);
 
     const commonLinks = [
-        { href: "/", label: "Home" },
-        { href: "/about", label: "About" },
-        { href: "/contact", label: "Contact" },
+        { href: "/", label: "Log in" },
+        { href: "/team", label: "Over ons" },
+        { href: "/contact-us", label: "Contact" },
     ];
 
     const authenticatedLinks = [
-        { href: "/", label: "Home" },
-        { href: "/messages", label: "Berichten" },
+        { href: "/", label: "Zoek een match" },
+        { href: "/messaging", label: "Berichten" },
         { href: "/discover", label: "Ontdek" },
-        { href: "/settings", label: "Settings" },
+        { href: "/settings", label: "Mijn Profiel" },
     ];
 
     const links = path === "/" || path === "/sign-in" || path === "/registration"
