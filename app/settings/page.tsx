@@ -1,5 +1,4 @@
 // page.tsx (Server-side rendering)
-import Slider from "@components/settings/sliderSettings";
 import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
 import ProfileDOB from "@components/settings/profileDOB";
@@ -10,6 +9,7 @@ import {getServerSession} from "next-auth";
 import { authOptions } from "@/app/api/auth/auth.config";
 import {redirect} from "next/navigation";
 import AddPictures from "@components/settings/addPictures";
+import SliderSettings from "@components/settings/sliderSettings";
 
 const SettingsPage = async () => {
     const supabase = await createClient();
@@ -155,7 +155,7 @@ const SettingsPage = async () => {
                     {/* Sliders */}
                     <div className="flex flex-col w-full mt-4 mb-6">
                         <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
-                            <Slider
+                            <SliderSettings
                                 label="Afstand tot anderen"
                                 unit="km"
                                 min={5}
@@ -163,7 +163,7 @@ const SettingsPage = async () => {
                                 defaultValue={profile_data.distance || 15}
                                 userId={user_id}
                                 sliderColor="#771D1D"
-                            />
+                                table={"profile_distance"}/>
                         </div>
                     </div>
                 </div>
