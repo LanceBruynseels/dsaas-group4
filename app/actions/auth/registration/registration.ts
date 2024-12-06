@@ -20,6 +20,7 @@ export async function register(formData: FormData): Promise<RegistrationResponse
         const facility = formData.get("facility") as string;
         const supervisor = formData.get("supervisor") as string;
         const is_accepted = false;  // false by default
+        const is_banned = false;
 
         if (!username || !password || !facility || !supervisor) {
             return {
@@ -41,7 +42,8 @@ export async function register(formData: FormData): Promise<RegistrationResponse
                 password,
                 facility,
                 supervisor,
-                is_accepted
+                is_accepted,
+                is_banned
             }),
         });
 
