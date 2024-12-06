@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/20/solid";
-import UserDisplay from "./UserDisplay";
+// import UserDisplay from "./UserDisplay";
+import UserDisplay  from "./UserDisplay";
 
 export default function NavBar() {
     const path = usePathname();
