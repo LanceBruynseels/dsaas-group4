@@ -2,6 +2,8 @@
 import React from 'react';
 import CreateSubscription from "@components/CreateSubscription";
 
+console.log("paymentPageLoaded")
+
 const PricingPage: React.FC = () => {
     return (
         <div className="flex flex-col justify-start items-center w-screen h-screen gap-8 p-16">

@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 
-const PaymentForm = () => {
+
+const PaymentForm = ({productData}) => {
     const { productId } = useParams(); // Get productId from the URL
     const router = useRouter(); // Router for redirection
     const stripe = useStripe();
@@ -17,6 +18,8 @@ const PaymentForm = () => {
     const [password, setPassword] = useState(""); // Password field
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -61,14 +64,14 @@ const PaymentForm = () => {
                         phone,
                     },
                 },
-                setup_future_usage: "off_session", // Save the card for future subscriptions
+                setup_future_usage: "off_session", // Save card for future subscriptions
             });
 
             if (stripeError) {
                 throw new Error(stripeError.message);
             }
 
-            console.log("Payment successful:", paymentIntent);
+            console.log("Payment successful:");
 
             // Redirect to the subscription completed page
             router.push("/subscriptionComplete")
@@ -80,51 +83,86 @@ const PaymentForm = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
-            <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-            />
-            <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-            />
-            <input
-                type="text"
-                placeholder="Institution Name"
-                value={institution}
-                onChange={(e) => setInstitution(e.target.value)}
-                required
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
+        <div className="flex flex-row justify-center items-center w-full h-fit">
+            <div className="flex flex-col justify-between items-center w-1/3 h-screen p-12">
+                <div className="h-1/2 aspect-square">
+                    <img src="/vlinder.png" alt="Vlinder Logo"/>
+                </div>
+                <div className="flex flex-col w-full h-1/2 text-center">
+                    <h1 className="text-[5vw]">
+                        € {productData?.price/100}
+                </h1>
+                    <p className="text-[2vw]">
+                        {productData?.description}
+                    </p>
+                </div>
+            </div>
 
-            <CardElement options={{ hidePostalCode: true }} />
+            <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center p-8 gap-8 w-2/3 h-screen border-l-8 border-red-950">
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] "
+                       type="email"
+                       placeholder="Email"
+                       value={email}
+                       onChange={(e) => setEmail(e.target.value)}
+                       required
+                />
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw]  "
+                       type="text"
+                       placeholder="Name"
+                       value={name}
+                       onChange={(e) => setName(e.target.value)}
+                       required
+                />
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] "
+                       type="tel"
+                       placeholder="Phone Number"
+                       value={phone}
+                       onChange={(e) => setPhone(e.target.value)}
+                       required
+                />
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw]  "
+                       type="text"
+                       placeholder="Institution Name"
+                       value={institution}
+                       onChange={(e) => setInstitution(e.target.value)}
+                       required
+                />
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] "
+                       type="password"
+                       placeholder="Password"
+                       value={password}
+                       onChange={(e) => setPassword(e.target.value)}
+                       required
+                />
 
-            <button type="submit" disabled={loading}>
-                {loading ? "Processing..." : "Subscribe"}
-            </button>
+                <CardElement
+                    options={{
+                        hidePostalCode: true,
+                        style: {
+                            base: {
+                                fontSize: "5vw",
+                                color: "#32325d",
+                                "::placeholder": {
+                                    color: "#aab7c4",
+                                },
+                            },
+                        },
+                    }}
+                    className="w-1/2 aspect-[10/1] bg-white"
+                />
 
-            {error && <p style={{ color: "red" }}>{error}</p>}
-        </form>
+
+                <button type="submit" disabled={loading}
+                        className="bg-red-600 rounded-2xl hover:bg-red-300 text-white px-24 py-4">
+                    {loading ? "Processing..." : "Subscribe"}
+                </button>
+
+                {error && <p style={{color: "red"}}>{error}</p>}
+            </form>
+
+        </div>
+
+
     );
 };
 

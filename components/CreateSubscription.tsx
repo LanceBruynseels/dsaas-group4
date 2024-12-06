@@ -48,7 +48,7 @@ const ProductsPage = () => {
         );
     }
 
-    const handlePayment = (productId) => {
+    const handlePayment = (productId, ) => {
         router.push(`/payment/${productId}`);
     };
 

@@ -9,6 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2024-11-20.acacia",
 });
 
+
 let globalCodes: string[] = [];
 
 export async function POST(req: NextRequest) {
@@ -130,8 +131,9 @@ export async function POST(req: NextRequest) {
 
         await transporter.sendMail(mailOptions);
         console.log("Email sent successfully.");
+        console.log("prijs",price);
 
-        // Return client secret and customer ID
+        // Return client secret, customer ID and price
         return NextResponse.json({
             clientSecret,
             customerId: customer.id,
