@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Search } from "lucide-react";
 
 interface User {
@@ -11,6 +11,7 @@ interface User {
     first_name: string | null;
     last_name: string | null;
     is_accepted: boolean;
+    is_banned: boolean;
 }
 
 interface Report {
@@ -19,6 +20,7 @@ interface Report {
     description: string | null;
     groupchat_title: string; // Added groupchat_title
 }
+
 
 export default function CaretakerHome() {
     const [users, setUsers] = useState<User[]>([]);
@@ -29,6 +31,18 @@ export default function CaretakerHome() {
     const [searchQuery, setSearchQuery] = useState('');
     const supabase = createClient();
 
+    // use useMemo to improve filtering performance
+    const filteredUsers = useMemo(() => {
+        return users.filter(user => {
+            const query = searchQuery.toLowerCase();
+            return (
+                (user.first_name?.toLowerCase() || '').includes(query) ||
+                (user.last_name?.toLowerCase() || '').includes(query) ||
+                (user.username?.toLowerCase() || '').includes(query)
+            );
+        });
+    }, [users, searchQuery]);
+
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -38,6 +52,7 @@ export default function CaretakerHome() {
             fetchReports(selectedUser.id);
         }
     }, [selectedUser]);
+
 
     async function fetchUsers() {
         try {
@@ -58,7 +73,6 @@ export default function CaretakerHome() {
             setLoading(false);
         }
     }
-
     async function fetchReports(userId: string) {
         try {
             const { data: reportData, error: reportError } = await supabase
@@ -102,6 +116,7 @@ export default function CaretakerHome() {
         }
     }
 
+
     const handleApprove = async (userId: string) => {
         try {
             const { error } = await supabase
@@ -122,21 +137,62 @@ export default function CaretakerHome() {
         }
     };
 
-    const filteredUsers = users.filter(user => {
-        const query = searchQuery.toLowerCase();
-        return (
-            (user.first_name?.toLowerCase() || '').includes(query) ||
-            (user.last_name?.toLowerCase() || '').includes(query) ||
-            (user.username?.toLowerCase() || '').includes(query)
-        );
-    });
+    const handleBan = async (userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('users')
+                .update({ is_banned: true })
+                .eq('id', userId);
 
-    if (loading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-    if (error) return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
+            if (error) throw error;
+
+            const updatedUsers = users.map(user =>
+                user.id === userId ? { ...user, is_banned: true } : user
+            );
+            setUsers(updatedUsers);
+            setSelectedUser(prevUser =>
+                prevUser?.id === userId ? { ...prevUser, is_banned: true } : prevUser
+            );
+        } catch (err) {
+            console.error('Error banning user:', err);
+            alert('Failed to ban user. Please try again.');
+        }
+    };
+
+    const handleResume = async (userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('users')
+                .update({ is_banned: false })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            const updatedUsers = users.map(user =>
+                user.id === userId ? { ...user, is_banned: false } : user
+            );
+            setUsers(updatedUsers);
+            setSelectedUser(prevUser =>
+                prevUser?.id === userId ? { ...prevUser, is_banned: false } : prevUser
+            );
+        } catch (err) {
+            console.error('Error resuming user:', err);
+            alert('Failed to resume user. Please try again.');
+        }
+    };
+
+    if (loading) {
+        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
+    }
 
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-            <div className="w-1/3 p-6 border-r border-gray-200">
+            {/* Left Sidebar */}
+            <div className="w-1/3 p-6 border-r border-gray-200 flex flex-col">
                 <div className="mb-6 relative">
                     <input
                         type="text"
@@ -148,8 +204,8 @@ export default function CaretakerHome() {
                     <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
                 </div>
 
-                <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-100px)]">
-                    {filteredUsers.map(user => (
+                <div className="space-y-4 overflow-y-auto">
+                    {filteredUsers.map((user) => (
                         <div
                             key={user.id}
                             onClick={() => setSelectedUser(user)}
@@ -174,12 +230,18 @@ export default function CaretakerHome() {
                                         Pending
                                     </span>
                                 )}
+                                {user.is_banned && (
+                                    <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                                        Banned
+                                    </span>
+                                )}
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
+            {/* Right Content Area */}
             <div className="flex-1 flex flex-col p-6">
                 {selectedUser ? (
                     <>
@@ -197,22 +259,56 @@ export default function CaretakerHome() {
                                     <p className="text-sm text-gray-500">{selectedUser.facility || ''}</p>
                                 </div>
                             </div>
-                            {!selectedUser.is_accepted && (
-                                <button
-                                    onClick={() => handleApprove(selectedUser.id)}
-                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                                >
-                                    Approve User
-                                </button>
-                            )}
+                            <div className="space-x-2">
+                                {!selectedUser.is_accepted && !selectedUser.is_banned && (
+                                    <button
+                                        onClick={() => handleApprove(selectedUser.id)}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                                    >
+                                        Approve User
+                                    </button>
+                                )}
+                                {selectedUser.is_accepted && !selectedUser.is_banned && (
+                                    <button
+                                        onClick={() => handleBan(selectedUser.id)}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                                    >
+                                        Ban User
+                                    </button>
+                                )}
+                                {selectedUser.is_banned && (
+                                    <button
+                                        onClick={() => handleResume(selectedUser.id)}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                                    >
+                                        Resume User
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                        <div className="space-y-4 bg-[hsl(10,100%,95%)] rounded-lg p-4 mb-6">
-                            <p>
-                                <span className="font-semibold">Status:</span>{' '}
-                                <span className={selectedUser.is_accepted ? 'text-green-600' : 'text-yellow-600'}>
-                                    {selectedUser.is_accepted ? 'Accepted' : 'Pending Approval'}
-                                </span>
-                            </p>
+                        <div className="flex-1 bg-[hsl(10,100%,95%)] rounded-lg p-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <span className="font-semibold">Username:</span>
+                                    <span className="ml-2">{selectedUser.username || ''}</span>
+                                </div>
+                                <div>
+                                    <span className="font-semibold">Status:</span>
+                                    <span className={`ml-2 ${
+                                        selectedUser.is_banned
+                                            ? 'text-red-600'
+                                            : selectedUser.is_accepted
+                                                ? 'text-green-600'
+                                                : 'text-yellow-600'
+                                    }`}>
+                                        {selectedUser.is_banned
+                                            ? 'Banned'
+                                            : selectedUser.is_accepted
+                                                ? 'Active'
+                                                : 'Pending Approval'}
+                                    </span>
+                                </div>
+                            </div>
                             <h4 className="font-semibold text-l mb-4">Reports</h4>
                             {reports.length > 0 ? (
                                 <ul className="space-y-3">
