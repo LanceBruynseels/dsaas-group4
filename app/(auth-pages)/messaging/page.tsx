@@ -23,11 +23,11 @@ const ChatApp: React.FC = () => {
         </div>
 
     </div> : ( // laptop version ---------------------------------------------
-        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+        <div className="flex h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
             <div className="w-1/3 p-6">
                 <Sidebar onSelectContact={setSelectedContact}/>
             </div>
-            <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
+            <div className="w-6 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] "></div>
             <div className="flex-1 flex flex-col p-6">
                 {selectedContact ? (
                     <ChatSection selectedContact={selectedContact}/> // renders the chat section with the selected contact if its not null

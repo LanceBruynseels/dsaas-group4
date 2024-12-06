@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import {useIsMobile} from "@components/mediaQuery";
 
 const supabase = createClient();
 
@@ -9,7 +10,7 @@ const ChatApp: React.FC = () => {
     const [selectedGroupChat, setSelectedGroupChat] = useState<any | null>(null);
     const searchParams = useSearchParams();
     const chatID = searchParams.get('chatId');
-
+    const isMobile = useIsMobile();
     useEffect(() => {
         if (chatID) {
             const fetchChat = async () => {
@@ -32,106 +33,21 @@ const ChatApp: React.FC = () => {
 
 
     return (
-        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-            <div className="w-1/3 p-6">
-                <Sidebar onSelectGroupChat={setSelectedGroupChat} />
-            </div>
-            <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
-            <div className="flex-1 flex flex-col p-6">
+        <div className="flex flex-col h-screen bg-[hsl(10,100%,90%)] p-4 md:p-6">
+            <div className="flex-1 flex flex-col">
                 {selectedGroupChat ? (
                     <ChatSection selectedGroupChat={selectedGroupChat} />
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-lg text-gray-500">Select a group to start chatting</p>
+                        <p className="text-lg text-gray-500">Loading chat... </p>
                     </div>
                 )}
             </div>
         </div>
     );
+
 };
 
-const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelectGroupChat }) => {
-    const router = useRouter();  // Access the router
-    const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [selectedChat, setSelectedChat] = useState<{ id: number; title: string } | null>(null);  // Add selected chat state
-
-    useEffect(() => {
-        const fetchGroups = async () => {
-            try {
-                const {data, error} = await supabase
-                    .from("discover_chats")
-                    .select("id, title, image_url");
-
-                if (error) throw error;
-
-                setChats(data);
-            } catch (err) {
-                setError("Er is een fout opgetreden.");
-                console.error(err);
-            }
-        };
-
-        fetchGroups();
-    }, []);
-
-    // Filter chats based on the search term
-    const filteredChats = chats?.filter((chat) =>
-        chat.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const handleChatSelect = (chat: any) => {
-        setSelectedChat(chat);  // Update selected chat state
-        router.push(`/group-messaging?chatId=${chat.id}`);  // Change the URL with the selected chat ID
-        onSelectGroupChat(chat);  // Update the selected chat state
-    };
-
-    return (
-        <>
-            <div className="mb-6">
-                <input
-                    type="text"
-                    placeholder="Zoek een groepsgesprek"
-                    className="w-full p-3 rounded-lg border border-gray-300"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-                {filteredChats && filteredChats.length > 0 ? (
-                    filteredChats.map((chat) => (
-                        <div
-                            key={chat.id}
-                            onClick={() => handleChatSelect(chat)}
-                            className={`p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer ${
-                                selectedChat?.id === chat.id ? "bg-blue-100" : "bg-[hsl(10,100%,95%)]"
-                            }`}  // Conditional styling for the selected chat
-                        >
-                            <div className="flex items-center gap-4">
-                                <img
-                                    src={chat.image_url || "https://via.placeholder.com/40"}
-                                    alt={chat.title}
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
-                                <div className="flex-1 min-w-0">
-                                    <div className="font-bold truncate">{chat.title}</div>
-                                    <div className="text-gray-500 text-sm truncate">
-                                        Klik om te chatten...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                ) : error ? (
-                    <div className="text-red-500">{error}</div>
-                ) : (
-                    <div>{chats ? "Geen resultaten gevonden." : "Loading chats..."}</div>
-                )}
-            </div>
-        </>
-    );
-};
 
 const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }) => {
     const [messages, setMessages] = useState<any[]>([]);
@@ -183,7 +99,7 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
     return (
         <>
             <ChatHeader selectedGroupChat={selectedGroupChat} />
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="flex-1 overflow-y-auto min-h-0 p-2 md:p-4 bg-[hsl(10,100%,95%)] rounded-lg mb-4">
                 {messages.map((message, index) => (
                     <ChatMessage key={index} message={message} senderId={senderId} />
                 ))}
@@ -191,6 +107,7 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
             <MessageInput receiverId={receiverId} selectedGroupChat={selectedGroupChat} />
         </>
     );
+
 };
 
 const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; image_url: string } }> = ({ selectedGroupChat }) => {
@@ -305,7 +222,7 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
     };
     return (
         <div>
-            <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
+            <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg w-10/12">
                 <div className="flex items-center gap-3">
                     <img
                         src={selectedGroupChat.image_url || "https://via.placeholder.com/40"}
@@ -549,7 +466,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
     };
 
     return (
-        <div className="     flex items-center p-4 bg-white rounded-lg">
+        <div className="flex items-center p-4 bg-white rounded-lg w-10/12">
             <textarea
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
@@ -566,7 +483,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
             />
             <button
                 onClick={handleSend}
-                className="ml-2  text-2xl text-gray-500 hover:text-gray-700 transition-colors"
+                className="ml-2  text-2xl text-gray-500 hover:text-gray-700 transition-colors "
             >
                 &#128172;
             </button>
