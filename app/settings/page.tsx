@@ -162,7 +162,8 @@ const SettingsPage = async () => {
                                 max={30}
                                 defaultValue={profile_data.distance || 15}
                                 userId={user_id}
-                                sliderColor="#771D1D" table={""}                            />
+                                sliderColor="#771D1D"
+                                table={"profile_distance"}/>
                         </div>
                     </div>
                 </div>
