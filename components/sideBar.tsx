@@ -4,6 +4,7 @@ import React, { useContext, createContext, useState } from "react"
 import Image from "next/image";
 import NotificationItem, {Notification_user} from "@components/notification";
 import {ChevronFirst, ChevronLast} from "lucide-react";
+import {UserPopup} from "@components/userPopup";
 
 interface NotificationProps{
     notifications_data: any;
@@ -64,7 +65,7 @@ export default function Sidebar({notifications_data} : NotificationProps) {
                                     No Notifications
                                 </h2>
                                 <p className="text-red-700 text-center">
-                                    Start using the application to get your first notification!
+                                    You're all caught up! Check back later for new updates.
                                 </p>
                             </div>
                         </div>
@@ -82,6 +83,7 @@ export default function Sidebar({notifications_data} : NotificationProps) {
                 {expanded ? <ChevronFirst/> : <ChevronLast/>}
             </button>
             </div>
+
         </div>
 )
 }

@@ -13,6 +13,7 @@ import MatchingCard from "@components/matchingCard";
 import {MatchingUser} from "@components/matchingCard";
 import Sidebar from "@components/sideBar";
 import SearchSettings from "@components/searchSettings";
+import {UserPopup} from "@components/userPopup";
 
 
 export default async function HomePage() {
@@ -80,7 +81,7 @@ export default async function HomePage() {
 
             {/* middle section with matching and liking*/}
             <div
-                className="flex flex-col w-full bg-gradient-to-b shadow-md from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg ">
+                className="flex flex-col w-full bg-gradient-to-b shadow-md from-[#FFDFDB] to-[#FFAB9F] p-4 m-4 rounded-lg justify-center align-middle items-center">
                 {allMatchData ? (
                     <MatchingCard matchData={allMatchData} userId={userId}/>
                 ) : (

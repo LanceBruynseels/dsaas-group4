@@ -4,6 +4,7 @@ import React, {Suspense, useEffect, useState} from "react";
 import {FlowbiteCarousel} from "@components/flowbiteCarousel";
 import {NextResponse} from "next/server";
 import Loading from "@components/loading";
+import {UserPopup} from "@components/userPopup";
 
 interface ProfileData {
     genders: string[];         // or a specific type for gender values
@@ -44,6 +45,8 @@ interface MatchingUserProps {
 
 export default function MatchingCard({matchData, userId}: MatchingUserProps) {
     const [matchBuffer, setMatchBuffer] = useState<MatchingUser[]>(matchData);
+    const [isPopupOpen, setPopupOpen] = useState(true);
+
     //console.log("matchingCard:", userId);
     useEffect(() => {
         // Ensure the buffer is initially filled
@@ -106,21 +109,85 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
         <Suspense fallback={<Loading/>}>
             {currentMatch ? (
                 <>
-                <h2 className={"text-xl font-bold mb-4 p-4 text-red-950 text-center"}> Zoek hier je nieuwe match!</h2>
-                    <div className="flex flex-row p-4 w-full h-full">
+                <h2 className={"text-xl font-bold lg:mb-4 lg:p-4 text-red-950 text-center "}> Zoek hier je nieuwe match!</h2>
+                    <div className="flex flex-row lg:p-4 w-full h-full">
                         {currentMatch ? (
-                            <div className="flex flex-row basis-1/2 h-[500px] min-w-[300px]">
+                            <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px]">
                                         <FlowbiteCarousel
                                             pictures={currentMatch.publicUrls || []}
                                             infoSection={<div className="flex flex-col items-start">
                                                 <h2 className="text-2xl font-bold">
-                                                    {currentMatch.first_name},{" "}
-                                                    {new Date().getFullYear() -
-                                                        new Date(currentMatch.dob).getFullYear()}{" "}
-                                                    jaar
+                                                    {currentMatch.first_name}, {currentMatch.dob && new Date().getFullYear() - new Date(currentMatch.dob).getFullYear()} jaar
                                                 </h2>
-                                                {/* Render other profile data */}
-                                            </div>}/>
+                                                {currentMatch?.profile_data?.genders?.length > 0 && (
+
+                                                    <div className="mt-4">
+                                                        <strong>Gender</strong>
+                                                        <div className="flex flex-wrap gap-2 mt-1">
+                                                            {currentMatch.profile_data.genders.map((gender, idx) => (
+                                                                <span
+                                                                    key={idx}
+                                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                                                {gender}
+                                                            </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="mt-4">
+                                                    <strong>persoonlijkheid</strong>
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {currentMatch.profile_data.personalities.map((personalities, idx) => (
+                                                            <span
+                                                                key={idx}
+                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                                            {personalities}
+                                                        </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4">
+                                                    <strong>Intresses</strong>
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {currentMatch.profile_data.interests.map((interests, idx) => (
+                                                            <span
+                                                                key={idx}
+                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                                            {interests}
+                                                        </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4">
+                                                    <strong>Intresses</strong>
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {currentMatch.profile_data.interests.map((interests, idx) => (
+                                                            <span
+                                                                key={idx}
+                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                                            {interests}
+                                                        </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4">
+                                                    <strong></strong>
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {currentMatch.profile_data.interests.map((interests, idx) => (
+                                                            <span
+                                                                key={idx}
+                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
+                                                            {interests}
+                                                        </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>}
+                                        />
                             </div>
                         ) : (
                             <p>No matches found</p>
@@ -277,6 +344,7 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                 </div>
             )}
             </Suspense>
+            <UserPopup currentMatch={currentMatch} isOpen={isPopupOpen} onClose={() => setPopupOpen(false)}></UserPopup>
         </>
     );
 }
