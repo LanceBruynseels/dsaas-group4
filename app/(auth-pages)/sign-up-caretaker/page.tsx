@@ -78,6 +78,18 @@ export default async function Signup(props: {
                             />
                         </div>
 
+                        <div>
+                            <Label htmlFor="accessCode" className="block text-sm font-medium mb-1">
+                                Access code
+                            </Label>
+                            <Input
+                                name="accessCode"
+                                placeholder="Your access code"
+                                required
+                                className="w-full px-4 py-2 border rounded-lg bg-white text-gray-800 focus:outline-none focus:border-pink-300"
+                            />
+                        </div>
+
                         <SubmitButton
                             pendingText="Signing up..."
                             className="w-full bg-[#FCA5A5] hover:bg-pink-500 text-white font-semibold py-2 rounded-lg disabled:opacity-50"
@@ -85,11 +97,11 @@ export default async function Signup(props: {
                             Sign up
                         </SubmitButton>
 
-                        <FormMessage message={searchParams} />
+                        <FormMessage message={searchParams}/>
                     </form>
                 </div>
             </div>
-            <SmtpMessage />
+            <SmtpMessage/>
         </div>
     );
 }
