@@ -5,6 +5,7 @@ import {FlowbiteCarousel} from "@components/flowbiteCarousel";
 import {NextResponse} from "next/server";
 import Loading from "@components/loading";
 import {UserPopup} from "@components/userPopup";
+import RenderProfileTags from "@components/renderProfileTags";
 
 interface ProfileData {
     genders: string[];         // or a specific type for gender values
@@ -115,78 +116,7 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                             <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px]">
                                         <FlowbiteCarousel
                                             pictures={currentMatch.publicUrls || []}
-                                            infoSection={<div className="flex flex-col items-start">
-                                                <h2 className="text-2xl font-bold">
-                                                    {currentMatch.first_name}, {currentMatch.dob && new Date().getFullYear() - new Date(currentMatch.dob).getFullYear()} jaar
-                                                </h2>
-                                                {currentMatch?.profile_data?.genders?.length > 0 && (
-
-                                                    <div className="mt-4">
-                                                        <strong>Gender</strong>
-                                                        <div className="flex flex-wrap gap-2 mt-1">
-                                                            {currentMatch.profile_data.genders.map((gender, idx) => (
-                                                                <span
-                                                                    key={idx}
-                                                                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                                                {gender}
-                                                            </span>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                <div className="mt-4">
-                                                    <strong>persoonlijkheid</strong>
-                                                    <div className="flex flex-wrap gap-2 mt-1">
-                                                        {currentMatch.profile_data.personalities.map((personalities, idx) => (
-                                                            <span
-                                                                key={idx}
-                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                                            {personalities}
-                                                        </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    <strong>Intresses</strong>
-                                                    <div className="flex flex-wrap gap-2 mt-1">
-                                                        {currentMatch.profile_data.interests.map((interests, idx) => (
-                                                            <span
-                                                                key={idx}
-                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                                            {interests}
-                                                        </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    <strong>Intresses</strong>
-                                                    <div className="flex flex-wrap gap-2 mt-1">
-                                                        {currentMatch.profile_data.interests.map((interests, idx) => (
-                                                            <span
-                                                                key={idx}
-                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                                            {interests}
-                                                        </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    <strong></strong>
-                                                    <div className="flex flex-wrap gap-2 mt-1">
-                                                        {currentMatch.profile_data.interests.map((interests, idx) => (
-                                                            <span
-                                                                key={idx}
-                                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                                            {interests}
-                                                        </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>}
+                                            infoSection={<RenderProfileTags currentMatch={currentMatch}></RenderProfileTags>}
                                         />
                             </div>
                         ) : (
@@ -195,78 +125,7 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                         {/*Right Info Section for larger screens */}
                         <div
                             className="hidden lg:flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
-                            <h2 className="text-2xl font-bold">
-                                {currentMatch.first_name}, {currentMatch.dob && new Date().getFullYear() - new Date(currentMatch.dob).getFullYear()} jaar
-                            </h2>
-                            {currentMatch?.profile_data?.genders?.length > 0 && (
-
-                                <div className="mt-4">
-                                    <strong>Gender</strong>
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                        {currentMatch.profile_data.genders.map((gender, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                            {gender}
-                                        </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="mt-4">
-                                <strong>persoonlijkheid</strong>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {currentMatch.profile_data.personalities.map((personalities, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                            {personalities}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <strong>Intresses</strong>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {currentMatch.profile_data.interests.map((interests, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                            {interests}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <strong>Intresses</strong>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {currentMatch.profile_data.interests.map((interests, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                            {interests}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <strong></strong>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {currentMatch.profile_data.interests.map((interests, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-full shadow-sm">
-                                            {interests}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Additional details here as per the original layout */}
+                            <RenderProfileTags currentMatch={currentMatch}></RenderProfileTags>
                         </div>
                     </div>
                     <div className="flex justify-center align-middle items-center mt-6">
