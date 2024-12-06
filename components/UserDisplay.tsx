@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -80,8 +81,11 @@ const UserDisplay = () => {
                 height={32}
                 className="rounded-full border border-gray-500"
             />
+
         </div>
     );
 };
 
+
 export default UserDisplay;
+
