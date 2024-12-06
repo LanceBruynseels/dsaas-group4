@@ -1,5 +1,6 @@
 import { GeistSans } from "geist/font/sans";
 import NavBar from '@/components/navbar';
+// import UserDisplay from '@/components/UserDisplay'
 import "./globals.css";
 import UserDisplay from '@/components/UserDisplay';
 import Providers from '@/components/Providers';
@@ -27,6 +28,7 @@ export default function RootLayout({
             <Metrics />
           <nav className="w-full h-fit">
             <NavBar/>
+            {/*<UserDisplay/>*/}
           </nav>
           <div className="flex-1 w-full">{children}</div>
           <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
