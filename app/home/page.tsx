@@ -35,7 +35,7 @@ export default async function HomePage() {
     ]);
 
     // Handle errors more gracefully
-    if (profileData.error || initialMatchData.error || filterData.error || notifications_data.error) {
+    if (initialMatchData.error || filterData.error || notifications_data.error) {
         console.error("Error fetching data:", profileData.error || initialMatchData.error || filterData.error || notifications_data.error);
         return <p>Error loading data</p>;
     }
@@ -72,7 +72,7 @@ export default async function HomePage() {
         // Now `allMatchData` contains the original match data with publicUrls added.
     }
 
-    const showProfilePopup = !profileData; // Show popup if no profile found
+    const showProfilePopup = !profileData.data; // Show popup if no profile found
 
     return (
         <div className="flex flex-row w-full justify-center text-red-950">
