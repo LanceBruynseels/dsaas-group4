@@ -83,7 +83,7 @@ const PaymentForm = ({productData}) => {
     };
 
     return (
-        <div className="flex flex-row justify-center items-center w-full h-fit">
+        <div className="flex flex-row justify-center items-center w-full h-fit overflow-y-hidden">
             <div className="flex flex-col justify-between items-center w-1/3 h-screen p-12">
                 <div className="h-1/2 aspect-square">
                     <img src="/vlinder.png" alt="Vlinder Logo"/>
@@ -98,36 +98,36 @@ const PaymentForm = ({productData}) => {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center p-8 gap-8 w-2/3 h-screen border-l-8 border-red-950">
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] "
+            <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center p-8 gap-8 w-2/3 h-screen border-l-4 border-red-950 my-16">
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl "
                        type="email"
                        placeholder="Email"
                        value={email}
                        onChange={(e) => setEmail(e.target.value)}
                        required
                 />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw]  "
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl "
                        type="text"
                        placeholder="Name"
                        value={name}
                        onChange={(e) => setName(e.target.value)}
                        required
                 />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] "
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl"
                        type="tel"
                        placeholder="Phone Number"
                        value={phone}
                        onChange={(e) => setPhone(e.target.value)}
                        required
                 />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw]  "
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw]  rounded-xl"
                        type="text"
                        placeholder="Institution Name"
                        value={institution}
                        onChange={(e) => setInstitution(e.target.value)}
                        required
                 />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] "
+                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl"
                        type="password"
                        placeholder="Password"
                        value={password}
@@ -140,7 +140,7 @@ const PaymentForm = ({productData}) => {
                         hidePostalCode: true,
                         style: {
                             base: {
-                                fontSize: "5vw",
+                                fontSize: "6vw",
                                 color: "#32325d",
                                 "::placeholder": {
                                     color: "#aab7c4",
@@ -148,7 +148,7 @@ const PaymentForm = ({productData}) => {
                             },
                         },
                     }}
-                    className="w-1/2 aspect-[10/1] bg-white"
+                    className="w-1/2 aspect-[10/1] bg-white  "
                 />
 
 
