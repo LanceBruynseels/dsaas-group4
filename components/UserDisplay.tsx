@@ -58,7 +58,6 @@ const UserDisplay = () => {
     if (!user) {
         return (
             <Link href="/sign-in" className="flex items-center h-fit">
-                Sign in
             </Link>
         );
     }
@@ -71,7 +70,7 @@ const UserDisplay = () => {
                     href="/api/auth/signout"
                     className="text-xs text-gray-500 hover:text-gray-700"
                 >
-                    Sign out
+                    Log uit
                 </Link>
             </div>
             <Image
