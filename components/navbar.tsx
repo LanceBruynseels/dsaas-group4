@@ -34,21 +34,22 @@ export default function NavBar() {
         { href: "/", label: "Log in" },
         { href: "/team", label: "Over ons" },
         { href: "/contact-us", label: "Contact" },
+        { href: "/caretaker", label: "Caretaker"},
     ];
 
     const authenticatedLinks = [
-        { href: "/", label: "Zoek een match" },
+        { href: "/home", label: "Zoek een match" },
         { href: "/messaging", label: "Berichten" },
         { href: "/discover", label: "Ontdek" },
         { href: "/settings", label: "Mijn Profiel" },
     ];
 
-    const links = path === "/" || path === "/sign-in" || path === "/registration"
+    const links = path === "/" || path === "/sign-in" || path === "/registration" || path === "/caretaker" || path === "/caretaker/home"
         ? commonLinks
         : authenticatedLinks;
 
     return (
-        <nav className="flex flex-row w-screen h-fit text-white justify-between border-b border-red-950 text-[4vh] py-5">
+        <nav className="flex flex-row w-screen h-fit text-red-950 justify-between border-b border-red-950 py-5">
             <div className="hidden w-[60%] h-fit md:flex md:flex-row md:justify-between md:items-center mx-10 gap-2">
                 {/* Logo */}
                 <Link href="/">
@@ -83,7 +84,7 @@ export default function NavBar() {
                     ref={menuRef}
                     className="md:hidden flex flex-col my-2 items-start justify-center w-fit h-fit z-50"
                 >
-                    <div className="flex w-full flex-col justify-center items-center my-4 gap-4">
+                    <div className="flex w-full flex-col justify-center items-center my-4 gap-4 text-[4vh]">
                         {links.map((link) => (
                             <Link
                                 key={link.href}
@@ -97,7 +98,7 @@ export default function NavBar() {
                 </div>
             )}
 
-            <div className="w-fit text-[4vh] mx-10">
+            <div className="w-fit mx-10">
                 <UserDisplay />
             </div>
         </nav>
