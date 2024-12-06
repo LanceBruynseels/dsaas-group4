@@ -10,8 +10,9 @@ const ChatApp: React.FC = () => {
     const [selectedContact, setSelectedContact] = useState<any | null>(null); // holds the current selected contact from the side bar
     const isMobile = useIsMobile();
     const router = useRouter();
+
  // mobile version -------------------------------------
-    return isMobile ? <div className="flex h-screen bg-[hsl(10,100%,90%)]"> -
+    return isMobile ? <div className="flex h-screen bg-[hsl(10,100%,90%)]">
         <div className="max-w-fit p-10">
             <Sidebar
                 onSelectContact={(contact) =>
@@ -27,7 +28,7 @@ const ChatApp: React.FC = () => {
             <div className="w-1/3 p-6">
                 <Sidebar onSelectContact={setSelectedContact}/>
             </div>
-            <div className="w-6 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] "></div>
+            <div className="w-2 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] "></div>
             <div className="flex-1 flex flex-col p-6">
                 {selectedContact ? (
                     <ChatSection selectedContact={selectedContact}/> // renders the chat section with the selected contact if its not null
@@ -45,6 +46,8 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({onSelec
     // State to store the list of contacts fetched from the database
     const [matches, setMatches] = useState<any[]>([]);
     const isMobile = useIsMobile();
+
+
     // Hardcoded ID representing the current user
     const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
 
@@ -52,6 +55,7 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({onSelec
     useEffect(() => {
         // Asynchronous function to fetch matches and corresponding user details
         const fetchMatches = async () => {
+
             // Query the 'Matches' table to find rows where the current user is either user_1 or user_2
             const {data: matchData, error: matchError } = await supabase
                 .from('Matches')
@@ -80,6 +84,7 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({onSelec
                     // Update the state with the fetched user details
                     setMatches(userData); // userData will contain the username and id of the matched users
                 }
+
             }
         };
 
@@ -108,7 +113,7 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({onSelec
                     <div className="flex items-center gap-4">
                         {/* Placeholder profile image */}
                         <img
-                            src="https://via.placeholder.com/40"
+                            src= "https://via.placeholder.com/40"
                             alt="Profile" // Alternative text for the image
                             className="w-10 h-10 rounded-full" // Styling for a circular profile picture
                         />
@@ -181,6 +186,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
     // Extract the receiver's ID from the selected contact
     const receiverId = selectedContact.id;
 
+
     // useEffect to fetch messages and set up real-time updates
     useEffect(() => { // for managing external interactions
         // Function to fetch all messages between the sender and receiver from the database
@@ -191,7 +197,9 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                 .or(             // Fetch messages where:
                     // Sender is the current user and receiver is the selected contact, OR vice versa
                     `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
-                );
+
+                )
+                ;
 
             if (error) {
                 // Log any errors during the fetch
@@ -240,7 +248,9 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             <ChatHeader selectedContact={selectedContact} />
 
             {/* Message display area */}
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div
+
+                className="flex-1 overflow-y-auto min-h-3">
                 {messages.map((message, index) => (
                     // Render each message using the ChatMessage component
                     <ChatMessage key={index} message={message} senderId={senderId} />
@@ -256,15 +266,34 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
 const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
     const isMobile = useIsMobile();
-    return isMobile ? null:(
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+    const fetchProfilePicture = async () => {
+        const { data, error } = await supabase
+            .from('profile')
+            .select('profile_picture_url')
+            .eq('user_id', selectedContact.user_id)
+            .single();
+        setProfilePicture(data?.profile_picture_url || null);
+
+    };
+
+    useEffect(() => {
+        if (selectedContact?.user_id) {
+            fetchProfilePicture();
+        }
+    }, [selectedContact]);
+
+
+    return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
                 <img
-                    src="https://via.placeholder.com/40"
+                    src={profilePicture || "/profile-picture.jpeg"}
                     alt="Profile"
                     className="w-10 h-10 rounded-full"
                 />
-                <h3 className="text-lg font-bold">{selectedContact.username}</h3>
+                <h3 className="text-lg font-bold">{selectedContact?.username}</h3>
             </div>
         </div>
     );
@@ -553,5 +582,6 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
         </div>
     );
 };
+
 
 export default ChatApp;

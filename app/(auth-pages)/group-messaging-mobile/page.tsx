@@ -222,19 +222,19 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
     };
     return (
         <div>
-            <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg w-10/12">
+            <div className="flex items-center justify-between bg-[hsl(10,100%,95%)] rounded-lg w-auto my-5">
                 <div className="flex items-center gap-3">
                     <img
                         src={selectedGroupChat.image_url || "https://via.placeholder.com/40"}
                         alt={selectedGroupChat.title}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="pl-1 w-10 h-10 rounded-full object-cover"
                     />
                     <h3 className="text-lg font-bold">{selectedGroupChat.title}</h3>
                 </div>
 
                 <button
                     onClick={handleButtonClick}
-                    className="ml-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
+                    className="ml-4 px-6 py-2 bg-[hsl(10,100%,95%)] hover:bg-blue-600 border-gray-300 rounded-lg"
                 >
                     🚩 Probleem melden
                 </button>
@@ -466,28 +466,31 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
     };
 
     return (
-        <div className="flex items-center p-4 bg-white rounded-lg w-10/12">
-            <textarea
-                value={textContent}
-                onChange={(e) => setTextContent(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-5 w-1/2 p-2 rounded-lg border border-gray-300 outline-none"
-                disabled={!!selectedFile}
-            />
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="ml-4"
-                disabled={!!textContent.trim()}
-            />
-            <button
-                onClick={handleSend}
-                className="ml-2  text-2xl text-gray-500 hover:text-gray-700 transition-colors "
-            >
-                &#128172;
-            </button>
+        <div className="flex flex-col items-center p-2 bg-white rounded-lg w-full gap-2">
+    <textarea
+        value={textContent}
+        onChange={(e) => setTextContent(e.target.value)}
+        placeholder="Type your message..."
+        className="w-full p-2 rounded-lg border border-gray-300 outline-none resize-none"
+        disabled={!!selectedFile}
+    />
+            <div className="flex items-center justify-between w-full gap-2">
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-1/2"
+                    disabled={!!textContent.trim()}
+                />
+                <button
+                    onClick={handleSend}
+                    className="w-1/3 text-lg text-white bg-blue-500 hover:bg-blue-600 rounded-lg py-2 text-center"
+                >
+                    Send
+                </button>
+            </div>
         </div>
+
     );
 };
 
