@@ -21,14 +21,21 @@ const FilterSection: React.FC<FilterSectionProps> = ({ title, table, data, keyFi
     useEffect(() => {
         const fetchSelectedItems = async () => {
             try {
-                const response = await fetch(`/api/search_${table}?user_id=${user_id}&table=${table}`);
+                const response = await fetch('/api/settings/selected-items', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_id, table }),
+                });
 
                 if (!response.ok) {
                     throw new Error('Failed to fetch selected items');
                 }
 
                 const result = await response.json();
-                const ids : Set<number> = new Set(result.map((item: any) => item[`${table}_id`]));
+                const reponseIds = result.data;
+                const ids: Set<number> = new Set(reponseIds.map((item: any) => item[`${table}_id`]));
                 setSelectedIds(ids);
             } catch (err: any) {
                 setError(err.message || 'An unexpected error occurred');
@@ -39,39 +46,6 @@ const FilterSection: React.FC<FilterSectionProps> = ({ title, table, data, keyFi
 
         fetchSelectedItems();
     }, [table, user_id]);
-
-    // Handle toggling the selected state
-    const handleToggle = async (id: number) => {
-        const updatedSelectedIds = new Set(selectedIds);
-        if (updatedSelectedIds.has(id)) {
-            updatedSelectedIds.delete(id);
-        } else {
-            updatedSelectedIds.add(id);
-        }
-
-        setSelectedIds(updatedSelectedIds);
-
-        // Update the API
-        try {
-            const response = await fetch(`/api/search_${table}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id,
-                    table,
-                    selectedItems: Array.from(updatedSelectedIds),
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update selected items');
-            }
-        } catch (err: any) {
-            setError(err.message || 'An error occurred while updating items');
-        }
-    };
 
     if (loading) {
         return (
