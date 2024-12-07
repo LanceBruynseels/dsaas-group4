@@ -63,7 +63,7 @@ const Discover: React.FC = () => {
 
     return (
         <div className="flex flex-1 container mx-auto py-2 px-2 bg-white">
-            <div className="bg-[#771D1D] text-xl text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
+            <div className=" bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] text-xl text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
                 <h1 className=" font-bold text-3xl mb-4">Discover 🔍</h1>
                 <p className="text-sm mb-4 ">Group chats</p>
 

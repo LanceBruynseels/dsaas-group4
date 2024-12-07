@@ -6,12 +6,13 @@ import UserDisplay from '@/components/UserDisplay';
 import Providers from '@/components/Providers';
 import { Metadata } from 'next';
 import Metrics from "@/app/metrics";
+import Link from "next/link";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
     metadataBase: new URL(baseUrl),
-    title: 'Your Site Title',
+    title: 'V(l)inder',
     description: 'Your site description',
 };
 
@@ -31,8 +32,15 @@ export default function RootLayout({
             {/*<UserDisplay/>*/}
           </nav>
           <div className="flex-1 w-full">{children}</div>
-          <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-          </footer>
+            <footer className="flex flex-row w-screen h-fit text-red-950 justify-between border-t border-red-950 py-5">
+                <div className="hidden w-full h-fit gap-2 md:flex md:justify-center md:items-center">
+                    <Link href={"/share"} className="text-red-950 w-[60%] text-center hover:text-red-950">
+                        Deel met vrienden!
+                    </Link>
+                </div>
+            </footer>
+
+
         </main>
       </Providers>
       </body>
