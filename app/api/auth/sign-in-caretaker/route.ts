@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
             message: "Inloggen succesvol!",
             session: data.session,
             redirect: {
-                destination: '/home'
+                destination: '/caretaker/home'
             }
         });
 

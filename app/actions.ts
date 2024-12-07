@@ -95,7 +95,7 @@ export const signInAction = async (formData: FormData) => {
     }
 
     // return redirect("/protected");
-    return redirect("/caretaker");
+    return redirect("/caretaker/home");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {

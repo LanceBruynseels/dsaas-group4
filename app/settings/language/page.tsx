@@ -2,7 +2,7 @@ import React from "react";
 import { SubmitButton } from "@components/submit-button";
 import LanguageSettingsAction from "@/app/actions/settings/language/action";
 import Link from "next/link";
-import GoogleTranslate from "@components/settings/googleTranslate.tsx";
+import GoogleTranslate from "@components/settings/googleTranslate";
 
 const LanguageSettingsPage = () => {
     return (
