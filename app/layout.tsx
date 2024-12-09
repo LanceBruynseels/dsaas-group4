@@ -11,8 +11,8 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
     metadataBase: new URL(baseUrl),
-    title: 'Your Site Title',
-    description: 'Your site description',
+    title: 'Vlinder',
+    description: 'Vlinder speciaal voor jouw',
 };
 
 export default function RootLayout({
