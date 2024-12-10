@@ -5,6 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
 
+export const getUserId = () => {
+    const { data: session } = useSession();
+    return session?.user?.id;
+};
+
 const UserDisplay = () => {
     const { data: session, status } = useSession();
 

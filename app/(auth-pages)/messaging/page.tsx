@@ -6,10 +6,13 @@ import { useIsMobile } from "@/components/mediaQuery";
 import Link from 'next/link';
 const supabase = createClient();
 import {useRouter} from 'next/navigation';
+import {getUserId} from "@components/UserDisplay";
+
 const ChatApp: React.FC = () => {
     const [selectedContact, setSelectedContact] = useState<any | null>(null); // holds the current selected contact from the side bar
     const isMobile = useIsMobile();
     const router = useRouter();
+    const userId = getUserId();
 
  // mobile version -------------------------------------
     return isMobile ? <div className="flex h-screen bg-[hsl(10,100%,90%)]">
@@ -34,7 +37,7 @@ const ChatApp: React.FC = () => {
                     <ChatSection selectedContact={selectedContact}/> // renders the chat section with the selected contact if its not null
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-lg text-gray-500">Select a contact to start chatting</p>
+                        <p className="text-lg text-gray-500">{userId}</p>
                     </div>
                 )}
             </div>
@@ -46,10 +49,10 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({onSelec
     // State to store the list of contacts fetched from the database
     const [matches, setMatches] = useState<any[]>([]);
     const isMobile = useIsMobile();
+    const senderId = getUserId();
 
 
     // Hardcoded ID representing the current user
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
 
     // Effect to fetch matched contacts when the component mounts or when senderId changes
     useEffect(() => {
@@ -181,7 +184,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
     const [messages, setMessages] = useState<any[]>([]);
     const isMobile = useIsMobile();
     // Hardcoded ID for the sender (current user)
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const senderId = getUserId();
 
     // Extract the receiver's ID from the selected contact
     const receiverId = selectedContact.id;
@@ -398,7 +401,7 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     const streamRef = useRef<MediaStream | null>(null); // React reference to the audio
 
     // Hardcoded sender ID (current user)
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const senderId = getUserId();
 
     // Starts audio recording
     const startRecording = async () => {
