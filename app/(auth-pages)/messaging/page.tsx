@@ -198,6 +198,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
     // Extract the receiver's ID from the selected contact
     const receiverId = selectedContact.id;
+    const chatContainerRef = useRef<HTMLDivElement>(null);
 
 
     // useEffect to fetch messages and set up real-time updates
@@ -231,9 +232,9 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT',       // Only listen for new message inserts
-                    schema: 'public',      // Schema name
-                    table: 'message',      // Table name
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'message',
                 },
                 (payload) => {
                     // Handle the new message payload
@@ -241,7 +242,8 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
                     {
                         // Add the new message to the existing state
-                        setMessages((prevMessages) => [...prevMessages, newMessage]);
+                        // if(selectedContact.id == senderId)
+                            setMessages((prevMessages) => [...prevMessages, newMessage]);
                     }
                 }
             )
@@ -253,6 +255,12 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
         };
     }, [senderId, receiverId]); // run this effect when senderId or receiverId changes
 
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
 
     return isMobile ? null:(
         <>
@@ -262,7 +270,8 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             {/* Message display area */}
             <div
 
-                className="flex-1 overflow-y-auto min-h-3">
+                ref={chatContainerRef}
+                className="flex-1 overflow-y-auto min-h-3 shadow-sm">
                 {messages.map((message, index) => (
                     // Render each message using the ChatMessage component
                     <ChatMessage key={index} message={message} senderId={senderId} />
@@ -277,30 +286,45 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
 
 const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
-
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
-
     useEffect(() => {
+        // Reset the profile picture when the selected contact changes
+        setProfilePicture(null);
+
         const getProfilePicture = async () => {
-            const {data} = await supabase
-                .from('profile')
-                .select("user_id, profile_picture_url")
-                .or(
-                    `and(user_id.eq.${selectedContact.id})`
-                );
-            setProfilePicture(data[0].profile_picture_url || null);
-        }
+            try {
+                const { data, error } = await supabase
+                    .from('profile')
+                    .select('profile_picture_url')
+                    .eq('user_id', selectedContact.id)
+                    .single(); // Fetch a single row
+
+                if (error) {
+                    console.error('Error fetching profile picture:', error);
+                    return;
+                }
+
+                if (data?.profile_picture_url) {
+                    setProfilePicture(data.profile_picture_url); // Set the profile picture URL
+                } else {
+                    setProfilePicture(null); // Set to null if no picture found
+                }
+            } catch (err) {
+                console.error('Unexpected error fetching profile picture:', err);
+                setProfilePicture(null); // Reset on error
+            }
+        };
+
         getProfilePicture();
     }, [selectedContact]);
-
 
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
                 <img
-                    src={profilePicture || '/profile-picture.png'} // Use a default image if `profilePicture` is null
-                    alt="Profile"
+                    src={profilePicture || '/profile-picture.png'} // Use default if no profile picture
+                    alt={`${selectedContact?.username || 'Unknown'}'s Profile`}
                     className="w-10 h-10 rounded-full"
                 />
                 <h3 className="text-lg font-bold">{selectedContact?.username || 'Unknown'}</h3>
@@ -308,6 +332,7 @@ const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => 
         </div>
     );
 };
+
 
 const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, senderId }) => {
     // Destructure the message object to extract relevant fields

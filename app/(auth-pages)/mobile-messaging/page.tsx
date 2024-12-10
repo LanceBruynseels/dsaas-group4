@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mic, Send } from 'lucide-react';
 import TextContent from "@components/TextContent";
+import {getUserId} from "@components/UserDisplay";
 
 const supabase = createClient();
 
@@ -12,7 +13,7 @@ const MobileMessaging: React.FC = () => {
     const contactId = searchParams.get('id'); // Selected contact ID from query params
     const [contact, setContact] = useState<any | null>(null); // Contact details
     const [messages, setMessages] = useState<any[]>([]); // Chat messages
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b'; // Hardcoded sender ID
+    const senderId = getUserId();
     const router = useRouter();
 
     // Fetch contact details using the contactId
@@ -105,46 +106,57 @@ const ChatHeader: React.FC<{ contact: any; onBack: () => void }> = ({contact, on
     </div>
 );
 
-const ChatSection: React.FC<{ messages: any[]; senderId: string }> = ({ messages, senderId }) => (
-    <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((message, index) => {
-            const isAudio = message.mediaURL.match(/\.(wav|mp3|ogg)$/i);
-            const isSentByCurrentUser = message.sender === senderId;
+const ChatSection: React.FC<{ messages: any[]; senderId: string }> = ({ messages, senderId }) => {
+    const chatContainerRef = useRef<HTMLDivElement>(null);
 
-            return (
-                <div
-                    key={index}
-                    className={`p-3 rounded-lg w-fit max-w-[75%] ${isSentByCurrentUser ? 'ml-auto' : 'mr-auto'}`}
-                    style={{
-                        backgroundColor: isSentByCurrentUser ? '#DCEEFF' : '#FFF5F5',
-                        textAlign: isSentByCurrentUser ? 'right' : 'left',
-                        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                    }}
-                >
-                    {isAudio ? (
-                        // Render an audio player if the message contains an audio file
-                        <div className={`p-3 rounded-lg ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}>
-                            <audio controls src={message.mediaURL} className = "w-48 h-8"/> {/* Audio player */}
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
-                        </div>
-                    ) : message.mediaURL.match(/\.(jpeg|jpg|gif|png)$/i) ? (
-                        <img
-                            src={message.mediaURL}
-                            alt="Media"
-                            className="w-full max-w-xs h-auto object-cover rounded-lg"
-                        />
-                    ) : message.mediaURL.match(/\.(txt)$/i) ? (
-                        <TextContent url={message.mediaURL} />
-                    ) : (
-                        <a href={message.mediaURL} target="_blank" rel="noopener noreferrer">
-                            Download File
-                        </a>
-                    )}
-                </div>
-            );
-        })}
-    </div>
-);
+    return (
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map((message, index) => {
+                const isAudio = message.mediaURL.match(/\.(wav|mp3|ogg)$/i);
+                const isSentByCurrentUser = message.sender === senderId;
+
+                return (
+                    <div
+                        key={index}
+                        className={`p-3 rounded-lg w-fit max-w-[75%] ${isSentByCurrentUser ? 'ml-auto' : 'mr-auto'}`}
+                        style={{
+                            backgroundColor: isSentByCurrentUser ? '#DCEEFF' : '#FFF5F5',
+                            textAlign: isSentByCurrentUser ? 'right' : 'left',
+                            boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
+                        }}
+                    >
+                        {isAudio ? (
+                            // Render an audio player if the message contains an audio file
+                            <div className={`p-3 rounded-lg ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}>
+                                <audio controls src={message.mediaURL} className="w-48 h-8" /> {/* Audio player */}
+                            </div>
+                        ) : message.mediaURL.match(/\.(jpeg|jpg|gif|png)$/i) ? (
+                            <img
+                                src={message.mediaURL}
+                                alt="Media"
+                                className="w-full max-w-xs h-auto object-cover rounded-lg"
+                            />
+                        ) : message.mediaURL.match(/\.(txt)$/i) ? (
+                            <TextContent url={message.mediaURL} />
+                        ) : (
+                            <a href={message.mediaURL} target="_blank" rel="noopener noreferrer">
+                                Download File
+                            </a>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+
 
 
 
@@ -154,7 +166,7 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isRecording, setIsRecording] = useState(false);
     const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const senderId = getUserId();
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
     const streamRef = useRef<MediaStream | null>(null);
