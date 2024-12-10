@@ -12,7 +12,6 @@ const ChatApp: React.FC = () => {
     const [selectedContact, setSelectedContact] = useState<any | null>(null); // holds the current selected contact from the side bar
     const isMobile = useIsMobile();
     const router = useRouter();
-    const userId = getUserId();
 
  // mobile version -------------------------------------
     return isMobile ? <div className="flex h-screen bg-[hsl(10,100%,90%)]">
@@ -37,7 +36,7 @@ const ChatApp: React.FC = () => {
                     <ChatSection selectedContact={selectedContact}/> // renders the chat section with the selected contact if its not null
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-lg text-gray-500">{userId}</p>
+                        <p className="text-lg text-gray-500">Select a contact for chatting</p>
                     </div>
                 )}
             </div>
@@ -45,138 +44,149 @@ const ChatApp: React.FC = () => {
     );
 };
 
-const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({onSelectContact}) => {
-    // State to store the list of contacts fetched from the database
-    const [matches, setMatches] = useState<any[]>([]);
+const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
+    const [matches, setMatches] = useState<any[]>([]); // Matched contacts
+    const [profilePictures, setProfilePictures] = useState<{ [key: string]: string }>({}); // Profile pictures by user ID
     const isMobile = useIsMobile();
-    const senderId = getUserId();
+    const senderId = getUserId(); // Get current user ID
 
-
-    // Hardcoded ID representing the current user
-
-    // Effect to fetch matched contacts when the component mounts or when senderId changes
+    // Fetch matched contacts
     useEffect(() => {
-        // Asynchronous function to fetch matches and corresponding user details
         const fetchMatches = async () => {
-
-            // Query the 'Matches' table to find rows where the current user is either user_1 or user_2
-            const {data: matchData, error: matchError } = await supabase
+            const { data: matchData, error: matchError } = await supabase
                 .from('Matches')
                 .select('*')
                 .or(`user_1.eq.${senderId},user_2.eq.${senderId}`);
 
             if (matchError) {
-                // Log any error that occurs during the fetch
                 console.error('Error fetching matches:', matchError);
-            } else if (matchData) {
-                // Extract the IDs of the contacts matched with the current user
-                const matchedContacts = matchData.map((match: any) => {
-                    return match.user_1 === senderId ? match.user_2 : match.user_1; // Identify the contact based on user_1 or user_2
+                return;
+            }
+
+            if (matchData) {
+                const matchedContacts = matchData.map((match) => {
+                    return match.user_1 === senderId ? match.user_2 : match.user_1;
                 });
 
-                // Fetch details (id and username) of the matched contacts from the 'users' table
+                // Fetch user details for matched contacts
                 const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('id, username')
-                    .in('id', matchedContacts); // Filter users by IDs in matchedContacts
+                    .in('id', matchedContacts);
 
                 if (userError) {
-                    // Log any error that occurs while fetching user details
                     console.error('Error fetching user details:', userError);
-                } else if (userData) {
-                    // Update the state with the fetched user details
-                    setMatches(userData); // userData will contain the username and id of the matched users
+                    return;
                 }
 
+                if (userData) {
+                    setMatches(userData); // Save matched user data
+                }
             }
         };
 
-        // Call the asynchronous fetch function
         fetchMatches();
-    }, [senderId]); // Runs again if the senderID changes
+    }, [senderId]);
 
-    return isMobile ? (     // mobile version----------------------------------------------------------------------------------
-        <>
-        {/* Search bar for filtering conversations */}
-        <div className="mb-6">
-            <input
-                type="text"
-                placeholder="zoek een gesprek"
-                className="w-full p-3 rounded-lg border border-gray-300"
-            />
-        </div>
-        {/* List of matched contacts */}
-        <div className="space-y-5">
-            {matches.map((contact, index) => (
-                <div
-                    key={index} // Unique key for each contact
-                    onClick={() => onSelectContact(contact)} // Callback to select the contact when clicked
-                    className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                    <div className="flex items-center gap-4">
-                        {/* Placeholder profile image */}
-                        <img
-                            src= "https://via.placeholder.com/40"
-                            alt="Profile" // Alternative text for the image
-                            className="w-10 h-10 rounded-full" // Styling for a circular profile picture
-                        />
+    // Fetch profile pictures
+    useEffect(() => {
+        const fetchProfilePictures = async () => {
+            const userIds = matches.map((match) => match.id); // Extract user IDs
 
-                        <div className="flex-1 min-w-0">
-                            {/* Display the username of the contact */}
-                            <Link href="/mobile-messaging">
-                                <div className="font-bold truncate">{contact.username}</div>
-                                <div className="text-gray-500 text-sm truncate">
-                                    een gesprek beginnen ...
-                                </div>
-                            </Link>
+            if (userIds.length > 0) {
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profile') // Query the profile table
+                    .select('user_id, profile_picture_url')
+                    .in('user_id', userIds); // Filter by matched user IDs
 
-                            {/* Subtext under the username */}
+                if (profileError) {
+                    console.error('Error fetching profile pictures:', profileError);
+                    return;
+                }
 
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    </>) :( // laptop version----------------------------------------------------------------------------------
-        <>
-            {/* Search bar for filtering conversations */}
+                if (profileData) {
+                    // Build a dictionary of user_id to profile_picture_url
+                    const pictures = profileData.reduce((acc, profile) => {
+                        acc[profile.user_id] = profile.profile_picture_url;
+                        return acc;
+                    }, {});
+                    setProfilePictures(pictures); // Save profile pictures
+                }
+            }
+        };
+
+        fetchProfilePictures();
+    }, [matches]);
+
+    return isMobile ? (
+        <div>
             <div className="mb-6">
                 <input
                     type="text"
-                    placeholder="zoek een gesprek"
-                    className="w-full p-3 rounded-lg border border-gray-300" // Styling for the input field
+                    placeholder="Search conversations"
+                    className="w-full p-3 rounded-lg border border-gray-300"
                 />
             </div>
-            {/* List of matched contacts */}
             <div className="space-y-5">
-                {matches.map((contact, index) => (
+                {matches.map((contact) => (
                     <div
-                        key={index} // Unique key for each contact
-                        onClick={() => onSelectContact(contact)} // Callback to select the contact when clicked
+                        key={contact.id}
+                        onClick={() => onSelectContact(contact)}
                         className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <div className="flex items-center gap-4">
-                            {/* Placeholder profile image */}
                             <img
-                                src="https://via.placeholder.com/40"
-                                alt="Profile" // Alternative text for the image
-                                className="w-10 h-10 rounded-full" // Styling for a circular profile picture
+                                src={profilePictures[contact.id] || 'https://via.placeholder.com/40'}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
                             />
                             <div className="flex-1 min-w-0">
-                                {/* Display the username of the contact */}
                                 <div className="font-bold truncate">{contact.username}</div>
-                                {/* Subtext under the username */}
                                 <div className="text-gray-500 text-sm truncate">
-                                    een gesprek beginnen ...
+                                    Start a conversation...
                                 </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-        </>
+        </div>
+    ) : (
+        <div>
+            <div className="mb-6">
+                <input
+                    type="text"
+                    placeholder="Search conversations"
+                    className="w-full p-3 rounded-lg border border-gray-300"
+                />
+            </div>
+            <div className="space-y-5">
+                {matches.map((contact) => (
+                    <div
+                        key={contact.id}
+                        onClick={() => onSelectContact(contact)}
+                        className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                        <div className="flex items-center gap-4">
+                            <img
+                                src={profilePictures[contact.id] || 'https://via.placeholder.com/40'}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <div className="font-bold truncate">{contact.username}</div>
+                                <div className="text-gray-500 text-sm truncate">
+                                    Start a conversation...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
+
 
 
 const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
@@ -201,8 +211,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     // Sender is the current user and receiver is the selected contact, OR vice versa
                     `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
 
-                )
-                ;
+                );
 
             if (error) {
                 // Log any errors during the fetch
@@ -268,23 +277,21 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
 
 const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
-    const isMobile = useIsMobile();
+
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
-    const fetchProfilePicture = async () => {
-        const { data, error } = await supabase
-            .from('profile')
-            .select('profile_picture_url')
-            .eq('user_id', selectedContact.user_id)
-            .single();
-        setProfilePicture(data?.profile_picture_url || null);
-
-    };
 
     useEffect(() => {
-        if (selectedContact?.user_id) {
-            fetchProfilePicture();
+        const getProfilePicture = async () => {
+            const {data} = await supabase
+                .from('profile')
+                .select("user_id, profile_picture_url")
+                .or(
+                    `and(user_id.eq.${selectedContact.id})`
+                );
+            setProfilePicture(data[0].profile_picture_url || null);
         }
+        getProfilePicture();
     }, [selectedContact]);
 
 
@@ -292,11 +299,11 @@ const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => 
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
                 <img
-                    src={profilePicture || "/profile-picture.jpeg"}
+                    src={profilePicture || '/profile-picture.png'} // Use a default image if `profilePicture` is null
                     alt="Profile"
                     className="w-10 h-10 rounded-full"
                 />
-                <h3 className="text-lg font-bold">{selectedContact?.username}</h3>
+                <h3 className="text-lg font-bold">{selectedContact?.username || 'Unknown'}</h3>
             </div>
         </div>
     );
