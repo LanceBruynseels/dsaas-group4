@@ -206,4 +206,3 @@ function getCodes(): string {
     }
     return globalCodes.join('\n'); // Returns the codes as a string joined by newline
 }
-
