@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {useSession} from "next-auth/react";
 
 interface User {
     id: string;
@@ -15,7 +16,10 @@ interface UserData {
     user: User;
     picture: { profile_picture_url: string[] };  // Updated to reflect the correct structure
 }
-
+export const getUserId = () => {
+    const { data: session } = useSession();
+    return session?.user?.id;
+};
 const UserDisplay = () => {
     const [user, setUser] = useState<User | null>(null);
     const [picture, setPicture] = useState<string | null>(null); // Explicitly typed as string | null

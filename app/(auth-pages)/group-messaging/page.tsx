@@ -3,6 +3,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import { Mic, Send } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import {getUserId} from "@components/UserDisplay";
 
 const supabase = createClient();
 
@@ -178,10 +179,8 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
 
 const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }) => {
     const [messages, setMessages] = useState<any[]>([]);
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
-    //const receiverId = selectedContact.id;
+    const senderId = getUserId();
     const receiverId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
-
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -197,47 +196,54 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
             }
         };
 
-
         fetchMessages();
 
         const channel = supabase
             .channel('realtime:group_message')
-            .on('postgres_changes', {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'group_message',
-            }, (payload) => {
-                const newMessage = payload.new;
-                if (
-                    (newMessage.sender === senderId && newMessage.group_id === selectedGroupChat.id) ||
-                    (newMessage.sender === selectedGroupChat.id && newMessage.group_id === senderId)
-                ) {
-                    setMessages((prevMessages) => [...prevMessages, newMessage]);
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'group_message',
+                },
+                (payload) => {
+                    const newMessage = payload.new;
+                    if (
+                        (newMessage.sender === senderId && newMessage.group_id === selectedGroupChat.id) ||
+                        (newMessage.sender === selectedGroupChat.id && newMessage.group_id === senderId)
+                    ) {
+                        setMessages((prevMessages) => [...prevMessages, newMessage]);
+                    }
                 }
-            })
+            )
             .subscribe();
-
 
         return () => {
             supabase.removeChannel(channel);
         };
     }, [senderId, selectedGroupChat.id]);
 
-    return (
-        <div className="flex flex-col h-screen">
-            <ChatHeader selectedGroupChat={selectedGroupChat} />
-            <div className="flex-1 overflow-y-auto min-h-0 max-h-[50vh]">
-                {messages.map((message, index) => (
-                    <ChatMessage key={index} message={message} senderId={senderId} />
-                ))}
+    // Chat component inside ChatSection
+    const Chat = ({ selectedGroupChat, messages, senderId, receiverId }) => {
+        return (
+            <div className="flex flex-col h-screen">
+                <ChatHeader selectedGroupChat={selectedGroupChat} />
+                <div className="flex-1 overflow-y-auto min-h-0 max-h-[50vh]">
+                    {messages.map((message, index) => (
+                        <ChatMessage key={index} message={message} senderId={senderId} />
+                    ))}
+                </div>
+                <div className="bg-white rounded-lg">
+                    <MessageInput receiverId={receiverId} selectedGroupChat={selectedGroupChat} />
+                </div>
             </div>
-            <div className="bg-white rounded-lg">
-                <MessageInput receiverId={receiverId} selectedGroupChat={selectedGroupChat} />
-            </div>
-        </div>
-    );
+        );
+    };
 
+    return <Chat selectedGroupChat={selectedGroupChat} messages={messages} senderId={senderId} receiverId={receiverId} />;
 };
+
 
 const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; image_url: string } }> = ({ selectedGroupChat }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -428,82 +434,99 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
 };
 
 
-const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, senderId }) => {
+const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, senderId }) => {
     const { mediaURL, time_stamp, sender } = message;
+    const [username, setUsername] = useState<string | null>(null);
     const [textContent, setTextContent] = useState<string | null>(null);
-    const isSentByCurrentUser = sender === senderId;
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [loadedText, setLoadedText] = useState<string | null>(null);
-    const isImage = mediaURL && ['.jpeg', '.jpg', '.gif', '.png'].some(ext => mediaURL.toLowerCase().endsWith(ext));
 
-    // Check if the message contains an audio file by matching the file extension
-    const isAudio = mediaURL && ['.wav', '.mp3', '.ogg'].some(ext => mediaURL.toLowerCase().endsWith(ext));
-
-    // Check if the message contains a text file by matching the file extension
+    const isSentByCurrentUser = sender === senderId;
+    const isImage = mediaURL && ['.jpeg', '.jpg', '.gif', '.png'].some((ext) => mediaURL.toLowerCase().endsWith(ext));
+    const isAudio = mediaURL && ['.wav', '.mp3', '.ogg'].some((ext) => mediaURL.toLowerCase().endsWith(ext));
     const isText = mediaURL && mediaURL.endsWith('.txt');
 
-    // useEffect to fetch the text content if the message contains a text file
+    // Fetch username using sender ID
+    useEffect(() => {
+        const fetchUsername = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('username')
+                    .eq('id', sender)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching username:', error);
+                    setUsername('Unknown'); // Fallback in case of error
+                } else if (data) {
+                    setUsername(data.username);
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                setUsername('Unknown');
+            }
+        };
+
+        fetchUsername();
+    }, [sender]);
+
+    // Fetch text content if the message contains a text file
     useEffect(() => {
         const fetchTextContent = async () => {
             if (isText && mediaURL) {
                 try {
-                    // Fetch the content of the text file from the mediaURL
                     const response = await fetch(mediaURL);
                     if (response.ok) {
                         const text = await response.text();
-                        setLoadedText(text); // Update the state with the text content
+                        setLoadedText(text);
                     } else {
-                        setLoadedText('Failed to fetch content.'); // Handle fetch failure
+                        setLoadedText('Failed to fetch content.');
                     }
                 } catch (error) {
-                    // Log any errors that occur during the fetch
                     console.error('Error fetching text content:', error);
                     setLoadedText('Error loading content.');
                 }
             }
         };
 
-        fetchTextContent(); // Call the function to fetch the text content
-    }, [mediaURL, isText]); // Dependencies: re-run if mediaURL or isText changes
-
+        fetchTextContent();
+    }, [mediaURL, isText]);
 
     const handleImageClick = (image: string) => {
-        setSelectedImage(image);  // Set the selected image to show in modal
-        setIsImageModalOpen(true);  // Open the modal
+        setSelectedImage(image);
+        setIsImageModalOpen(true);
     };
 
     const closeImageModal = () => {
-        setIsImageModalOpen(false);  // Close the modal
-        setSelectedImage(null);  // Clear selected image
+        setIsImageModalOpen(false);
+        setSelectedImage(null);
     };
 
     return (
         <div className={`flex items-start ${isSentByCurrentUser ? 'justify-end' : 'justify-start'} gap-3 mb-3`}>
             <div className="flex flex-col">
-                <div className="text-xs text-gray-400">Rohan</div>
+                {/* Display the dynamically fetched username */}
+                <div className="text-xs text-gray-400">{username || 'Loading...'}</div>
                 {isImage ? (
                     <img
                         src={textContent || mediaURL}
                         alt="Media content"
                         className="w-40 h-40 object-cover rounded-lg cursor-pointer"
-                        onClick={() => handleImageClick(textContent || mediaURL)}  // Add click handler
+                        onClick={() => handleImageClick(textContent || mediaURL)}
                     />
                 ) : isAudio ? (
-                    // Render an audio player if the message contains an audio file
                     <div className={`p-3 rounded-lg ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}>
-                        <audio controls src={mediaURL} /> {/* Audio player */}
+                        <audio controls src={mediaURL} />
                     </div>
                 ) : isText ? (
-                    // Render the text content if the message contains a text file
                     <div className={`p-3 rounded-lg max-w-xs ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}>
-                        <p>{loadedText}</p> {/* Display the fetched text content */}
+                        <p>{loadedText}</p>
                     </div>
-                ): (
-                    <div
-                        className={`p-3 rounded-lg max-w-xs ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}
-                    >
-                        <p>{textContent || 'Sending...'}</p>
+                ) : (
+                    <div className={`p-3 rounded-lg max-w-xs ${isSentByCurrentUser ? 'bg-blue-100' : 'bg-gray-200'}`}>
+                        <p>{textContent || 'loading...'}</p>
                     </div>
                 )}
             </div>
@@ -523,7 +546,6 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
                         >
                             &times;
                         </button>
-
                     </div>
                 </div>
             )}
@@ -532,10 +554,11 @@ const ChatMessage: React.FC<{ message: any, senderId: string }> = ({ message, se
 };
 
 
+
 const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = ({ receiverId, selectedGroupChat }) =>  {
     const [textContent, setTextContent] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const senderId = getUserId();
     const [isRecording, setIsRecording] = useState(false);
     const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
 
@@ -649,7 +672,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                 .from('group_message')
                 .insert([
                     {
-                        sender: senderId,
+                        sender: senderId,//senderId
                         group_id: selectedGroupChat.id,
                         mediaURL: publicURL,
                         timestamp: new Date(),
