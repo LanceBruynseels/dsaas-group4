@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
                 phone,
                 institution,
                 password: hashedPassword,
+                subscriptionID: null,
             },
         ]);
 
@@ -85,6 +86,18 @@ export async function POST(req: NextRequest) {
             throw new Error("Client secret could not be retrieved from the payment intent.");
         }
         console.log("Payment Intend created")
+
+        const { data: updatedUser, error: updateError } = await supabase
+            .from('Buyers')
+            .update({ subscriptionID: subscription.id })
+            .eq('email', email);  // Match the email to update the correct record
+
+        if (updateError) {
+            console.error("Error updating subscription_id in Supabase:", updateError.message);
+            throw new Error("Failed to update subscription ID");
+        }
+
+        console.log("User's subscription ID updated in Supabase:", updatedUser);
 
         // Generate unique codes for different subscription tiers
         const BasicSubscription = 20;

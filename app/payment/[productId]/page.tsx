@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Elements, useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PaymentForm from "@components/paymentRegistrationForm";
+import { Spinner } from "flowbite-react";
 
 // Load Stripe with your publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
@@ -37,11 +38,15 @@ const PaymentPage = () => {
     }, [productId]);
 
     if (loading) {
-        return <div>Loading...</div>; // Display loading message while data is being fetched
+        return (
+            <div className="flex justify-center items-center w-full h-screen">
+                <Spinner color="pink" size="xl" aria-label="Pink spinner example" />
+            </div>
+        );
     }
 
     return (
-       <div className="flex flex-col w-screen h-screen">
+       <div className="flex flex-col justify-center items-center w-screen h-screen">
             <Elements stripe={stripePromise}>
                 <PaymentForm productData={productData} />
             </Elements>

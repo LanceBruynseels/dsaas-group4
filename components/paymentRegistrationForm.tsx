@@ -4,7 +4,6 @@ import React, {useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 
-
 const PaymentForm = ({productData}) => {
     const { productId } = useParams(); // Get productId from the URL
     const router = useRouter(); // Router for redirection
@@ -18,8 +17,6 @@ const PaymentForm = ({productData}) => {
     const [password, setPassword] = useState(""); // Password field
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -83,85 +80,88 @@ const PaymentForm = ({productData}) => {
     };
 
     return (
-        <div className="flex flex-row justify-center items-center w-full h-fit overflow-y-hidden">
-            <div className="flex flex-col justify-between items-center w-1/3 h-screen p-12">
-                <div className="h-1/2 aspect-square">
-                    <img src="/vlinder.png" alt="Vlinder Logo"/>
-                </div>
-                <div className="flex flex-col w-full h-1/2 text-center">
-                    <h1 className="text-[5vw]">
-                        € {productData?.price/100}
-                </h1>
-                    <p className="text-[2vw]">
-                        {productData?.description}
-                    </p>
+        <div className="flex flex-row w-[90%] h-[90%] bg-red-700 ">
+            <div className="flex flex-row justify-center w-[50%] h-full ">
+                <form onSubmit={handleSubmit}
+                      className="flex flex-col justify-center items-center gap-8 w-full h-screen ">
+                    <input className="flex w-10/12 aspect-[10/1] text-[2vw] "
+                           type="email"
+                           placeholder="Email"
+                           value={email}
+                           onChange={(e) => setEmail(e.target.value)}
+                           required
+                    />
+                    <input className="flex w-10/12 aspect-[10/1] text-[2vw]"
+                           type="text"
+                           placeholder="Name"
+                           value={name}
+                           onChange={(e) => setName(e.target.value)}
+                           required
+                    />
+                    <input className="flex w-10/12 aspect-[10/1] text-[2vw]"
+                           type="tel"
+                           placeholder="Phone Number"
+                           value={phone}
+                           onChange={(e) => setPhone(e.target.value)}
+                           required
+                    />
+                    <input className="flex w-10/12 aspect-[10/1] text-[2vw]"
+                           type="text"
+                           placeholder="Institution Name"
+                           value={institution}
+                           onChange={(e) => setInstitution(e.target.value)}
+                           required
+                    />
+                    <input className="flex w-10/12 aspect-[10/1] text-[2vw] "
+                           type="password"
+                           placeholder="Password"
+                           value={password}
+                           onChange={(e) => setPassword(e.target.value)}
+                           required
+                    />
+
+                    <CardElement
+                        options={{
+                            hidePostalCode: true,
+                            style: {
+                                base: {
+                                    fontSize: "6vw",
+                                    color: "#32325d",
+                                    "::placeholder": {
+                                        color: "#aab7c4",
+                                    },
+                                },
+                            },
+                        }}
+                        className="w-10/12 aspect-[10/1] bg-white  "
+                    />
+
+                    <button type="submit" disabled={loading}
+                            className="bg-red-600 rounded-2xl hover:bg-red-300 text-white px-24 py-4">
+                        {loading ? "Processing..." : "Subscribe"}
+                    </button>
+
+                    {error && <p style={{color: "red"}}>{error}</p>}
+                </form>
+            </div>
+
+            <div className="flex flex-col justify-between items-center w-[50%] h-full">
+                <div  className="flex flex-col justify-between items-center w-[80%] h-[80%]l bg-white rounded-8xl shadow-black">
+                    <div className="h-[40%] aspect-square">
+                        <img src="/vlinder.png" alt="Vlinder Logo"/>
+                    </div>
+                    <div className="flex flex-col h-[60%] w-[90%] text-center">
+                        <h1 className="text-[5vw]">
+                            € {productData?.price / 100}
+                        </h1>
+                        <p className="text-[2vw]">
+                            {productData?.description}
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center p-8 gap-8 w-2/3 h-screen border-l-4 border-red-950 my-16">
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl "
-                       type="email"
-                       placeholder="Email"
-                       value={email}
-                       onChange={(e) => setEmail(e.target.value)}
-                       required
-                />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl "
-                       type="text"
-                       placeholder="Name"
-                       value={name}
-                       onChange={(e) => setName(e.target.value)}
-                       required
-                />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl"
-                       type="tel"
-                       placeholder="Phone Number"
-                       value={phone}
-                       onChange={(e) => setPhone(e.target.value)}
-                       required
-                />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw]  rounded-xl"
-                       type="text"
-                       placeholder="Institution Name"
-                       value={institution}
-                       onChange={(e) => setInstitution(e.target.value)}
-                       required
-                />
-                <input className="flex w-1/2 aspect-[10/1] text-[2vw] rounded-xl"
-                       type="password"
-                       placeholder="Password"
-                       value={password}
-                       onChange={(e) => setPassword(e.target.value)}
-                       required
-                />
-
-                <CardElement
-                    options={{
-                        hidePostalCode: true,
-                        style: {
-                            base: {
-                                fontSize: "6vw",
-                                color: "#32325d",
-                                "::placeholder": {
-                                    color: "#aab7c4",
-                                },
-                            },
-                        },
-                    }}
-                    className="w-1/2 aspect-[10/1] bg-white  "
-                />
-
-
-                <button type="submit" disabled={loading}
-                        className="bg-red-600 rounded-2xl hover:bg-red-300 text-white px-24 py-4">
-                    {loading ? "Processing..." : "Subscribe"}
-                </button>
-
-                {error && <p style={{color: "red"}}>{error}</p>}
-            </form>
-
         </div>
-
 
     );
 };

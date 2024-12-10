@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Spinner } from "flowbite-react";
+
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
@@ -35,13 +37,17 @@ const ProductsPage = () => {
 
     // Show loading state
     if (loading) {
-        return <div>Loading products...</div>;
+        return (
+            <div className="flex justify-center items-center w-full h-screen">
+                <Spinner color="pink" size="xl" aria-label="Spinner" />
+            </div>
+        );
     }
 
     // Show error if it occurs
     if (error) {
         return (
-            <div style={{ color: 'red' }}>
+            <div style={{color: 'red' }}>
                 <h3>Error:</h3>
                 <p>{error}</p>
             </div>
