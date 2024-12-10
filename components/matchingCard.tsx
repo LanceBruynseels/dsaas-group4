@@ -40,23 +40,44 @@ export interface MatchingUser {
 }
 
 interface MatchingUserProps {
-    matchData: MatchingUser[],
     userId: string
 }
 
-export default function MatchingCard({matchData, userId}: MatchingUserProps) {
-    const [matchBuffer, setMatchBuffer] = useState<MatchingUser[]>(matchData);
+export default function MatchingCard({ userId}: MatchingUserProps) {
+    const [matchBuffer, setMatchBuffer] = useState<MatchingUser[]>([]);
     const [isPopupOpen, setPopupOpen] = useState(true);
+
+    useEffect(() => {
+        const refreshMatches = async () => {
+            try {
+                const response = await fetch("/api/home/fetchMatches", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId }),
+                });
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    const matchData : MatchingUser[] = jsonResponse.allMatchData;
+                    console.log("matchData", matchData);
+                    //console.log("jsonResponse",jsonResponse);
+                    setMatchBuffer(matchData);
+                }
+            } catch (error) {
+                console.error("Error fetching initial matches:", error);
+            }
+        };
+        refreshMatches();
+    }, []);
+
+
 
     //console.log("matchingCard:", userId);
     useEffect(() => {
         // Ensure the buffer is initially filled
-        if (matchBuffer.length < 5) {
+        if (matchBuffer && matchBuffer.length < 2) {
             fetchAdditionalUsers();
         }
     }, [matchBuffer]);
-
-    let currentMatch : MatchingUser;
 
     const fetchAdditionalUsers = async () => {
         try {
@@ -66,11 +87,10 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
                 body: JSON.stringify({ userId }),
             });
             const jsonResponse: MatchingUser = await response.json();
-            console.log(response);
 
             if (response.status == 200) {
                 setMatchBuffer((prevBuffer) => [...prevBuffer, jsonResponse].slice(0, 5)); // Keep buffer size at 5
-
+                console.log(matchBuffer);
             }
 
         } catch (error) {
@@ -101,9 +121,8 @@ export default function MatchingCard({matchData, userId}: MatchingUserProps) {
         }
     };
 
-    if(matchBuffer.length > 0){
-        currentMatch = matchBuffer[0];
-    }
+    let currentMatch: MatchingUser | null = matchBuffer.length > 0 ? matchBuffer[0] : null;
+
 
     return (
         <>
