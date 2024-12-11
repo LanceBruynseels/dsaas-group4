@@ -249,7 +249,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                 )
             )}
             </Suspense>
-            {/*<UserPopup currentMatch={currentMatch} isOpen={isPopupOpen} onClose={() => setPopupOpen(false)}></UserPopup>*/}
+            <UserPopup currentMatch={currentMatch} isOpen={isPopupOpen} onClose={() => setPopupOpen(false)}></UserPopup>
         </>
     );
 }
