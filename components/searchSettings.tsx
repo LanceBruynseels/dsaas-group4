@@ -127,7 +127,7 @@ export default function SearchSettings({filterData, userId, sliderAgeRange} : Se
                                 label="Zoek leeftijd"
                                 minValue={18}
                                 maxValue={99}
-                                defaultValue={18, 20}
+                                defaultValue={[sliderAgeRange.min_age, sliderAgeRange.max_age]}
                                 user_id={userId}
                             />
 
