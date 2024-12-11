@@ -84,88 +84,89 @@ const SettingsPage = async () => {
                         Dit moet je ook weten over mij...
                     </h2>
                     <div className={`flex flex-col items-center justify-end transition-all w-full`}>
-                    {/* Personality Options */}
-                    <ProfileFiltersSection
-                        title="Ik ben ..."
-                        table="personality"
-                        data={filter_data.personalities}
-                        keyField="personality_id"
-                        labelField="personality"
-                        user_id={user_id}
-                    />
+                        {/* Personality Options */}
+                        <ProfileFiltersSection
+                            title="Ik ben ..."
+                            table="personality"
+                            data={filter_data.personalities}
+                            keyField="personality_id"
+                            labelField="personality"
+                            user_id={user_id}
+                        />
 
-                    {/* Relationship goals Options */}
-                    <ProfileFiltersSection
-                        title="Ik ben op zoek naar ..."
-                        table="relationship_goals"
-                        data={filter_data.relationship_goals}
-                        keyField="relationship_goals_id"
-                        labelField="relationship_goals"
-                        user_id={user_id}
-                    />
+                        {/* Relationship goals Options */}
+                        <ProfileFiltersSection
+                            title="Ik ben op zoek naar ..."
+                            table="relationship_goals"
+                            data={filter_data.relationship_goals}
+                            keyField="relationship_goals_id"
+                            labelField="relationship_goals"
+                            user_id={user_id}
+                        />
 
-                    {/* Gender Options */}
-                    <SingleSelectFilter
-                        title="Mijn gender is ..."
-                        table="gender"
-                        data={filter_data.genders}
-                        keyField="gender_id"
-                        labelField="gender"
-                        user_id={user_id}
-                    />
+                        {/* Gender Options */}
+                        <SingleSelectFilter
+                            title="Mijn gender is ..."
+                            table="gender"
+                            data={filter_data.genders}
+                            keyField="gender_id"
+                            labelField="gender"
+                            user_id={user_id}
+                        />
 
-                    {/* Interests Options */}
-                    <ProfileFiltersSection
-                        title="Mijn Interesses zijn ..."
-                        table="interest"
-                        data={filter_data.interests}
-                        keyField="id"
-                        labelField="interest"
-                        user_id={user_id}
-                    />
+                        {/* Interests Options */}
+                        <ProfileFiltersSection
+                            title="Mijn Interesses zijn ..."
+                            table="interests"
+                            data={filter_data.interests}
+                            keyField="id"
+                            labelField="interest"
+                            user_id={user_id}
+                        />
 
-                    {/* Disability Options */}
-                    <ProfileFiltersSection
-                        title="Mijn bijzondere kenmerken zijn ..."
-                        table="disability"
-                        data={filter_data.disabilities}
-                        keyField="disability_id"
-                        labelField="disability"
-                        user_id={user_id}
-                    />
+                        {/* Disability Options */}
+                        <ProfileFiltersSection
+                            title="Mijn bijzondere kenmerken zijn ..."
+                            table="disability"
+                            data={filter_data.disabilities}
+                            keyField="disability_id"
+                            labelField="disability"
+                            user_id={user_id}
+                        />
 
-                    {/* Home status Options */}
-                    <ProfileFiltersSection
-                        title="Ik woon ..."
-                        table="home_status"
-                        data={filter_data.home_statuses}
-                        keyField="home_status_id"
-                        labelField="home_status"
-                        user_id={user_id}
-                    />
+                        {/* Home status Options */}
+                        <ProfileFiltersSection
+                            title="Ik woon ..."
+                            table="home_status"
+                            data={filter_data.home_statuses}
+                            keyField="home_status_id"
+                            labelField="home_status"
+                            user_id={user_id}
+                        />
 
-                    {/* Religion Options */}
-                    <SingleSelectFilter
-                        title="Mijn Religie is ..."
-                        table="religion"
-                        data={filter_data.religions}
-                        keyField="religion_id"
-                        labelField="religion"
-                        user_id={user_id}
-                    />
+                        {/* Religion Options */}
+                        <SingleSelectFilter
+                            title="Mijn Religie is ..."
+                            table="religion"
+                            data={filter_data.religions}
+                            keyField="religion_id"
+                            labelField="religion"
+                            user_id={user_id}
+                        />
 
-                    {/* Sliders */}
-                    <div className="flex flex-col w-full mt-4 mb-6">
-                        <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
-                            <SliderSettings
-                                label="Afstand tot anderen"
-                                unit="km"
-                                min={5}
-                                max={30}
-                                defaultValue={profile_data.distance || 15}
-                                userId={user_id}
-                                sliderColor="#771D1D" table={""}
-                            />
+                        {/* Sliders */}
+                        <div className="flex flex-col w-full mt-4 mb-6">
+                            <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
+                                <SliderSettings
+                                    label="Afstand tot anderen"
+                                    unit="km"
+                                    min={5}
+                                    max={30}
+                                    defaultValue={profile_data.distance || 15}
+                                    userId={user_id}
+                                    sliderColor="#771D1D" table={""}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
