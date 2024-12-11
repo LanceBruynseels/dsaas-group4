@@ -34,16 +34,37 @@ const Discover: React.FC = () => {
         fetchChats();
     }, []);
 
-    const handleSearch = () => {
-        if (searchQuery) {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        if (query) {
+            // Filter chats based on search query
             const filtered = chats.filter((chat) =>
-                chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+                chat.title.toLowerCase().includes(query.toLowerCase())
             );
             setFilteredChats(filtered); // Update filtered chats when search query exists
             setCurrentPage(1); // Reset to the first page after search
         } else {
-            setFilteredChats(chats); // Show all chats if search is cleared
-            setCurrentPage(1); // Reset to the first page
+            // Re-fetch chats from the database when search is cleared
+            const fetchChats = async () => {
+                try {
+                    const { data, error } = await supabase
+                        .from("discover_chats")
+                        .select("id, title, image_url");
+
+                    if (error) throw error;
+
+                    setChats(data); // Store all chats
+                    setFilteredChats(data); // Initialize filtered chats with all chats
+                    setCurrentPage(1); // Reset to the first page
+                } catch (err) {
+                    setError("Er is een fout opgetreden.");
+                    console.error(err);
+                }
+            };
+
+            fetchChats(); // Fetch the full list again
         }
     };
 
@@ -101,10 +122,7 @@ const Discover: React.FC = () => {
                     <input
                         type="text"
                         value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            handleSearch();  // Trigger search immediately as the user types
-                        }}
+                        onChange={handleSearch} // Trigger search immediately as the user types
                         className="p-2 rounded-l-lg w-1/3 border border-gray-300 text-black"
                         placeholder="Search chats"
                     />
