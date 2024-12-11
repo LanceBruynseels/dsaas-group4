@@ -1,14 +1,29 @@
 'use client';
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Mic, Send } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import {getUserId} from "@components/UserDisplay";
+import { getUserId } from "@components/UserDisplay";
 
 const supabase = createClient();
 
 const ChatApp: React.FC = () => {
     const [selectedGroupChat, setSelectedGroupChat] = useState<any | null>(null);
+
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ChatContent
+                selectedGroupChat={selectedGroupChat}
+                setSelectedGroupChat={setSelectedGroupChat}
+            />
+        </Suspense>
+    );
+};
+
+const ChatContent: React.FC<{
+    selectedGroupChat: any | null;
+    setSelectedGroupChat: (chat: any | null) => void;
+}> = ({ selectedGroupChat, setSelectedGroupChat }) => {
     const searchParams = useSearchParams();
     const chatID = searchParams.get('chatId');
 
@@ -24,17 +39,16 @@ const ChatApp: React.FC = () => {
                 if (error) {
                     console.error('Failed to fetch chat:', error);
                 } else {
-                    setSelectedGroupChat(data);  // Set the selected chat from the database
+                    setSelectedGroupChat(data);
                 }
             };
 
             fetchChat();
         }
-    }, [chatID]);
-
+    }, [chatID, setSelectedGroupChat]);
 
     return (
-        <div className="bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+        <div className="bg-white">
             <div className="flex h-[90vh] bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB]">
                 <div className="w-1/3 p-6 rounded-tl-lg">
                     <Sidebar onSelectGroupChat={setSelectedGroupChat} />
@@ -52,7 +66,6 @@ const ChatApp: React.FC = () => {
             </div>
         </div>
     );
-
 };
 
 const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelectGroupChat }) => {
