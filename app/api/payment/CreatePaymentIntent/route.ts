@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
-import { signUpAction } from "@/app/actions";
+import { signBuyerUpAction } from "@/app/actions";
 
 
 
@@ -38,20 +38,21 @@ export async function POST(req: NextRequest) {
 
 
         //pogint got registreren
-        const hashedPassword = await bcrypt.hash(password, 14);
+        console.log("poging tot reg")
         const formData = new FormData();
         formData.append("email", email);
-        formData.append("password", hashedPassword);
-        formData.append("displayName", "Test User");
-        formData.append("accessCode", "");
+        formData.append("password", password);
+        formData.append("displayName", name);
+        await signBuyerUpAction(formData);
+
 
 
 
 
         // Create a user in Supabase
-
+        const hashedPassword = await bcrypt.hash(password, 14);
         const supabase = await createClient(); // Await the promise here
-        const { data: supabaseData, error: supabaseError } = await supabase.from('').insert([
+        const { data: supabaseData, error: supabaseError } = await supabase.from('Buyers').insert([
             {
                 name,
                 email,
@@ -65,7 +66,26 @@ export async function POST(req: NextRequest) {
         if (supabaseError) {
             console.error("Error inserting user into Supabase:", supabaseError.message);
             throw new Error("Supabase user creation failed");
+
         }
+
+        //creates institude in supabase
+        const supabase2 = await createClient(); // Await the promise here
+        const { data: supabaseData2, error: supabaseError2 } = await supabase2.from('institutions').insert([
+            {
+                institution: institution
+            },
+        ]);
+
+        if (supabaseError2) {
+            console.error("Error inserting user into Supabase:", supabaseError2.message);
+            throw new Error("Supabase user creation failed");
+
+        }
+
+
+
+
 
         console.log("User created in Supabase:");
 
