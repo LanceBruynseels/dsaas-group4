@@ -9,7 +9,7 @@ import {getServerSession} from "next-auth";
 import { authOptions } from "@/app/api/auth/auth.config";
 import {redirect} from "next/navigation";
 import AddPictures from "@components/settings/addPictures";
-import SliderSettings from "@components/settings/sliderSettings";
+import SingleSelectFilter from "@components/settings/singleSelectFilter";
 
 const SettingsPage = async () => {
     const supabase = await createClient();
@@ -52,7 +52,7 @@ const SettingsPage = async () => {
                 {/* Profile Section */}
                 <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
                     <div className="flex flex-col justify-center items-center mb-6">
-                        <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                        <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D]">
                             {profile_data.first_name} {profile_data.last_name}
                         </h2>
                         <ProfilePicture imageUrl={picture.profile_picture_url || "/mock-picture.webp"} userId={user_id} />
@@ -62,7 +62,7 @@ const SettingsPage = async () => {
 
                 {/* Add More Pictures Section */}
                 <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D]">
                         Voeg meer foto's toe
                     </h2>
                     <div className="flex flex-wrap justify-center gap-4">
@@ -78,13 +78,13 @@ const SettingsPage = async () => {
 
                 {/* Personality and Filters Section */}
                 <div className="rounded-lg p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] ">
                         Dit moet je ook weten over mij...
                     </h2>
-
+                    <div className={`flex flex-col items-center justify-end transition-all w-full`}>
                     {/* Personality Options */}
                     <ProfileFiltersSection
-                        title="Persoonlijkheid"
+                        title="Ik ben ..."
                         table="personality"
                         data={filter_data.personalities}
                         keyField="personality_id"
@@ -94,7 +94,7 @@ const SettingsPage = async () => {
 
                     {/* Relationship goals Options */}
                     <ProfileFiltersSection
-                        title="Relatiedoel"
+                        title="Ik ben op zoek naar ..."
                         table="relationship_goals"
                         data={filter_data.relationship_goals}
                         keyField="relationship_goals_id"
@@ -103,8 +103,8 @@ const SettingsPage = async () => {
                     />
 
                     {/* Gender Options */}
-                    <ProfileFiltersSection
-                        title="Gender"
+                    <SingleSelectFilter
+                        title="Mijn gender is ..."
                         table="gender"
                         data={filter_data.genders}
                         keyField="gender_id"
@@ -114,7 +114,7 @@ const SettingsPage = async () => {
 
                     {/* Interests Options */}
                     <ProfileFiltersSection
-                        title="Interesses"
+                        title="Mijn Interesses zijn ..."
                         table="interest"
                         data={filter_data.interests}
                         keyField="id"
@@ -124,7 +124,7 @@ const SettingsPage = async () => {
 
                     {/* Disability Options */}
                     <ProfileFiltersSection
-                        title="Beperking"
+                        title="Mijn bijzondere kenmerken zijn ..."
                         table="disability"
                         data={filter_data.disabilities}
                         keyField="disability_id"
@@ -134,7 +134,7 @@ const SettingsPage = async () => {
 
                     {/* Home status Options */}
                     <ProfileFiltersSection
-                        title="Thuis status"
+                        title="Ik woon ..."
                         table="home_status"
                         data={filter_data.home_statuses}
                         keyField="home_status_id"
@@ -143,28 +143,14 @@ const SettingsPage = async () => {
                     />
 
                     {/* Religion Options */}
-                    <ProfileFiltersSection
-                        title="Religie"
+                    <SingleSelectFilter
+                        title="Mijn Religie is ..."
                         table="religion"
                         data={filter_data.religions}
                         keyField="religion_id"
                         labelField="religion"
                         user_id={user_id}
                     />
-
-                    {/* Sliders */}
-                    <div className="flex flex-col w-full mt-4 mb-6">
-                        <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
-                            <SliderSettings
-                                label="Afstand tot anderen"
-                                unit="km"
-                                min={5}
-                                max={30}
-                                defaultValue={profile_data.distance || 15}
-                                userId={user_id}
-                                sliderColor="#771D1D"
-                                table={"profile_distance"}/>
-                        </div>
                     </div>
                 </div>
             </div>
