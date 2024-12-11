@@ -52,7 +52,7 @@ const SettingsPage = async () => {
                 {/* Profile Section */}
                 <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
                     <div className="flex flex-col justify-center items-center mb-6">
-                        <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                        <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D]">
                             {profile_data.first_name} {profile_data.last_name}
                         </h2>
                         <ProfilePicture imageUrl={picture.profile_picture_url || "/mock-picture.webp"} userId={user_id} />
@@ -62,7 +62,7 @@ const SettingsPage = async () => {
 
                 {/* Add More Pictures Section */}
                 <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D]">
                         Voeg meer foto's toe
                     </h2>
                     <div className="flex flex-wrap justify-center gap-4">
@@ -78,7 +78,7 @@ const SettingsPage = async () => {
 
                 {/* Personality and Filters Section */}
                 <div className="rounded-lg p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] font-serif">
+                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] ">
                         Dit moet je ook weten over mij...
                     </h2>
                     <div className={`flex flex-col items-center justify-end transition-all w-full`}>
