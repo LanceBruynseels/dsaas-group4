@@ -22,7 +22,7 @@ export function FlowbiteCarousel({ pictures = [], infoSection }) { // Accept inf
     }, []);
 
     return (
-        <div className="flex flex-col w-full m-2 h-full bg-gradient-to-b from-gray-50 to-gray-200 rounded-lg shadow-md">
+        <div className="flex flex-col w-full h-full bg-gradient-to-b from-gray-50 to-gray-200 rounded-lg shadow-md">
             {isSmallScreen ? (
                 <Carousel className={"w-full"}>
                 {/* Render pictures */}

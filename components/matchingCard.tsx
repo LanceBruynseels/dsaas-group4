@@ -157,7 +157,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                     </button>
                         <div className="flex flex-row lg:p-4 w-full h-full">
                             {currentMatch ? (
-                                <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px]">
+                                <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px] m-2">
                                     <FlowbiteCarousel
                                         pictures={currentMatch.publicUrls || []}
                                         infoSection={<RenderProfileTags
@@ -169,7 +169,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                             )}
                             {/*Right Info Section for larger screens */}
                             <div
-                                className="hidden lg:flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
+                                className="hidden lg:flex m-2 basis-1/2 flex-col h-full max-h-[500px] overflow-y-auto p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
                                 <RenderProfileTags currentMatch={currentMatch}></RenderProfileTags>
                             </div>
                         </div>
