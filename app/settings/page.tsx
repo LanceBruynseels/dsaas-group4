@@ -171,6 +171,7 @@ const SettingsPage = async () => {
                 </div>
             </div>
         </div>
+    </div>
     );
 };
 
