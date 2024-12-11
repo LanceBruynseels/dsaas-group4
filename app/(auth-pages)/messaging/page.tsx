@@ -93,7 +93,7 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSele
                         <div className="flex items-center gap-4">
                             {/* Placeholder profile image */}
                             <Image
-                                src="https://via.placeholder.com/40"
+                                src="/profile-picture.jpeg"
                                 alt="Profile" // Alternative text for the image
                                 width={10}
                                 height={10}
@@ -203,7 +203,7 @@ const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => 
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
                 <Image
-                    src="https://via.placeholder.com/40"
+                    src="/profile-picture.jpeg"
                     alt="Profile"
                     width={10}
                     height={10}

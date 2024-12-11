@@ -71,7 +71,7 @@ export default async function HomePage() {
     //     );
     // }
 
-    const showProfilePopup = !profileData; // Show popup if no profile found
+    const showProfilePopup = !profileData.data; // Show popup if no profile found
 
     return (
         <div className="flex flex-row w-full justify-center text-red-950">

@@ -9,14 +9,46 @@ export const signUpAction = async (formData: FormData) => {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
     const displayName = formData.get("displayName")?.toString();
+    const accessCode = formData.get("accessCode")?.toString();
     const supabase = await createClient();
     const origin = (await headers()).get("origin");
 
-    if (!email || !password) {
+    if (!email || !password || !accessCode) {
         return encodedRedirect(
             "error",
             "/sign-up-caretaker",
-            "Email and password are required",
+            "Email, password and access code are required",
+        );
+    }
+
+    // verify access code
+    const { data: accessCodeData, error: accessCodeError } = await supabase
+        .from('access_codes')
+        .select('*')
+        .eq('code', accessCode)
+        .is('is_used', null)
+        .single();
+
+    if (accessCodeError || !accessCodeData) {
+        return encodedRedirect(
+            "error",
+            "/sign-up-caretaker",
+            "Invalid or already used access code",
+        );
+    }
+
+    // update access code status to used
+    const { error: updateError } = await supabase
+        .from('access_codes')
+        .update({ is_used: true })
+        .eq('id', accessCodeData.id);
+
+    if (updateError) {
+        console.error(updateError);
+        return encodedRedirect(
+            "error",
+            "/sign-up-caretaker",
+            "Error updating access code",
         );
     }
 
@@ -26,14 +58,19 @@ export const signUpAction = async (formData: FormData) => {
         options: {
             emailRedirectTo: `${origin}/auth/callback`,
             data: {
-                display_name: displayName
+                display_name: displayName,
+                // institution: accessCodeData.institution  // institution msg
             }
         },
     });
 
     if (error) {
         console.error(error.code + " " + error.message);
-        return encodedRedirect("error", "/sign-up", error.message);
+        return encodedRedirect(
+            "error",
+            "/sign-up-caretaker",
+            error.message
+        );
     } else {
         return encodedRedirect(
             "success",
@@ -58,7 +95,7 @@ export const signInAction = async (formData: FormData) => {
     }
 
     // return redirect("/protected");
-    return redirect("/caretaker");
+    return redirect("/caretaker/home");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
