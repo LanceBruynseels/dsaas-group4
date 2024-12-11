@@ -36,7 +36,7 @@ export function FlowbiteCarousel({ pictures = [], infoSection }) { // Accept inf
 
                 {/* Render info section as a carousel item */}
                 <div
-                    className="flex flex-col h-full p-6 bg-gradient-to-b from-gray-50 to-gray-200text-red-950 rounded-lg">
+                    className="flex flex-col h-full overflow-y-auto p-6 bg-gradient-to-b from-gray-50 to-gray-200text-red-950 rounded-lg">
                     {infoSection || (
                         <p>No additional info available</p> // Fallback for infoSection
                     )}
