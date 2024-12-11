@@ -49,13 +49,19 @@ const SubscriptionOverview = () => {
     };
 
     return (
-        <div>
-            <h1>Subscription Overview</h1>
-            {subscriptionId ? (
-                <p>Your Subscription ID: {subscriptionId}</p>
-            ) : (
-                <p>Loading subscription information...</p>
-            )}
+        <div className="w-screen h-screen flex flex-col justify-center items-center bg-purple-600">
+            <h1 className="text-[400%] bg-red-950 text-white py-[1%] px-[5%]">Subscription Overview</h1>
+
+            <div className="flex flex-row w-[90%] h-full">
+                <div className="flex flex-col w-[50%] h-full bg-green-300">
+
+                </div>
+                <div className="flex flex-col w-[50%] h-full bg-orange-600">
+
+                </div>
+
+            </div>
+
 
             <h2>Cancel Your Subscription</h2>
             <form onSubmit={handleCancel}>

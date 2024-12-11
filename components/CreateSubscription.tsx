@@ -124,7 +124,7 @@ const ProductsPage = () => {
                         className="flex flex-col justify-between items-center gap-2 p-8 border-white rounded-2xl border-8 w-2/3 group-hover:bg-red-200 group-hover:w-10/12  h-[66%] ">
                         <h3 className="text-[2vw]">{product1.name}</h3>
                         <img src="/vlinder.png" alt="Vlinder Logo" className="aspect-square group-hover:hidden"/>
-                        <p className=" z-50 bg-green-300 text-center text-white rounded-2xl p-2 y- "> Best value </p>
+                        <p className=" z-50 bg-green-500 text-center text-white rounded-2xl p-2 y- "> Best value </p>
                         <p className="hidden group-hover:flex text-[1.5vw]">{product1.description}</p>
                         {product1.price && (
                             <p className="text-[2vw]">

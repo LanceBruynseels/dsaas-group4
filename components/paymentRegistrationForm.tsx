@@ -192,7 +192,7 @@ const PaymentForm = ({ productData }) => {
                         <div className="flex flex-row justify-center w-[60%] aspect-square">
                             <img src="/vlinder.png" alt="Vlinder Logo" className="w-full h-full" />
                         </div>
-                        <div className="flex flex-col justify-center h-fit w-[90%] text-center">
+                        <div className="flex flex-col justify-center h-fit w-[90%] text-center text-black">
                             <h1 className="text-[400%]">€ {productData?.price / 100}</h1>
                             <p className="text-[120%]">{productData?.description}</p>
                         </div>

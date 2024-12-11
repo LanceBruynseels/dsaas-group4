@@ -3,6 +3,9 @@ import Stripe from "stripe";
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
+import { signUpAction } from "@/app/actions";
+
+
 
 // Initialize Stripe for payments
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -21,6 +24,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+
         // Create a customer in Stripe
         const customer = await stripe.customers.create({
             email,
@@ -31,10 +35,23 @@ export async function POST(req: NextRequest) {
 
         console.log("Customer created:");
 
+
+
+        //pogint got registreren
+        const hashedPassword = await bcrypt.hash(password, 14);
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", hashedPassword);
+        formData.append("displayName", "Test User");
+        formData.append("accessCode", "");
+
+
+
+
         // Create a user in Supabase
-        const hashedPassword = await bcrypt.hash(password, 10);
+
         const supabase = await createClient(); // Await the promise here
-        const { data: supabaseData, error: supabaseError } = await supabase.from('Buyers').insert([
+        const { data: supabaseData, error: supabaseError } = await supabase.from('').insert([
             {
                 name,
                 email,
