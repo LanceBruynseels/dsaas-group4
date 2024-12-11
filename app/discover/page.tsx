@@ -1,8 +1,8 @@
-// Import necessary dependencies
 "use client";
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client"; // Adjust the import path
 import { getUserId } from "@components/UserDisplay";
+
 const Discover: React.FC = () => {
     const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -16,7 +16,6 @@ const Discover: React.FC = () => {
 
     useEffect(() => {
         const fetchChats = async () => {
-            const supabase = createClient();
             try {
                 const { data, error } = await supabase
                     .from("discover_chats")
@@ -24,8 +23,8 @@ const Discover: React.FC = () => {
 
                 if (error) throw error;
 
-                setChats(data);
-                setFilteredChats(data);
+                setChats(data); // Store all chats
+                setFilteredChats(data); // Initialize filtered chats with all chats
             } catch (err) {
                 setError("Er is een fout opgetreden.");
                 console.error(err);
@@ -37,15 +36,15 @@ const Discover: React.FC = () => {
 
     const handleSearch = () => {
         if (searchQuery) {
-            const filtered = chats?.filter((chat) =>
+            const filtered = chats.filter((chat) =>
                 chat.title.toLowerCase().includes(searchQuery.toLowerCase())
             );
-            setFilteredChats(filtered); // Update the filtered chats
+            setFilteredChats(filtered); // Update filtered chats when search query exists
             setCurrentPage(1); // Reset to the first page after search
         } else {
-            setFilteredChats(chats); // If no search query, show all chats
+            setFilteredChats(chats); // Show all chats if search is cleared
+            setCurrentPage(1); // Reset to the first page
         }
-        setSearchQuery(""); // Clear the search input after searching
     };
 
     const handleNextPage = () => {
@@ -62,7 +61,6 @@ const Discover: React.FC = () => {
 
     const handleChatClick = async (chatId: number) => {
         try {
-            // Check if the user is already in the group
             const { data, error } = await supabase
                 .from("groupchat_users")
                 .select("id")
@@ -71,7 +69,6 @@ const Discover: React.FC = () => {
 
             if (error) throw error;
 
-            // If the user is not in the group, add them
             if (data.length === 0) {
                 const { error: insertError } = await supabase
                     .from("groupchat_users")
@@ -83,41 +80,34 @@ const Discover: React.FC = () => {
                 if (insertError) throw insertError;
             }
 
-            // Navigate to the group messaging page
             window.location.href = `/group-messaging?chatId=${chatId}`;
         } catch (err) {
             console.error("Error adding user to group:", err);
         }
     };
 
-
     // Calculate the chats to display for the current page
     const indexOfLastChat = currentPage * chatsPerPage;
     const indexOfFirstChat = indexOfLastChat - chatsPerPage;
-    const currentChats = filteredChats?.slice(indexOfFirstChat, indexOfLastChat);
+    const currentChats = filteredChats.slice(indexOfFirstChat, indexOfLastChat);
 
     return (
         <div className="flex flex-1 container mx-auto py-2 px-2 bg-white">
-            <div className=" bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] text-xl text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
-                <h1 className=" font-bold text-3xl mb-4">Join a new group chat 🔍</h1>
+            <div className="bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] text-xl text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
+                <h1 className="font-bold text-3xl mb-4">Nieuwe groep toevoegen? 🔍</h1>
+
                 {/* Search bar */}
                 <div className="flex justify-center items-center mb-4">
                     <input
                         type="text"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") handleSearch();
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            handleSearch();  // Trigger search immediately as the user types
                         }}
                         className="p-2 rounded-l-lg w-1/3 border border-gray-300 text-black"
                         placeholder="Search chats"
                     />
-                    <button
-                        onClick={handleSearch}
-                        className="bg-rose-400 text-white p-2 rounded-r-lg ml-2 hover:bg-blue-400 "
-                    >
-                        Search
-                    </button>
                 </div>
 
                 {/* Navigation buttons and chat display */}

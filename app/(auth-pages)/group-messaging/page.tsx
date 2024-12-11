@@ -181,17 +181,18 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
     useEffect(() => {
         const fetchMessages = async () => {
             const { data, error } = await supabase
-                .from('group_message') // Assuming the table is named 'group_message'
+                .from('group_message')
                 .select('*')
-                .eq('group_id', selectedGroupChat.id); // Filter by the selected group ID
+                .eq('group_id', selectedGroupChat.id);  // Fetch messages for the selected group chat
 
             if (error) {
                 console.error('Error fetching messages:', error);
             } else if (data) {
-                setMessages(data);
+                setMessages(data);  // Update the state with fetched messages
             }
         };
 
+        // Initial fetch of messages
         fetchMessages();
 
         const channel = supabase
@@ -205,20 +206,20 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
                 },
                 (payload) => {
                     const newMessage = payload.new;
-                    if (
-                        (newMessage.sender === senderId && newMessage.group_id === selectedGroupChat.id) ||
-                        (newMessage.sender === selectedGroupChat.id && newMessage.group_id === senderId)
-                    ) {
-                        setMessages((prevMessages) => [...prevMessages, newMessage]);
+                    // Check if the new message belongs to the selected group chat
+                    if (newMessage.group_id === selectedGroupChat.id) {
+                        // Refetch the messages after a new message is inserted
+                        fetchMessages();
                     }
                 }
             )
             .subscribe();
 
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeChannel(channel);  // Cleanup the subscription on component unmount
         };
-    }, [senderId, selectedGroupChat.id]);
+    }, [selectedGroupChat.id]);  // Re-run effect when the selected group changes
+
 
     // Chat component inside ChatSection
     const Chat = ({ selectedGroupChat, messages, senderId, receiverId }) => {
@@ -481,7 +482,7 @@ const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, se
                         const text = await response.text();
                         setLoadedText(text);
                     } else {
-                        setLoadedText('Failed to fetch content.');
+
                     }
                 } catch (error) {
                     console.error('Error fetching text content:', error);
@@ -722,7 +723,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                     className={`cursor-pointer px-4 py-2 rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300 
                     transition-colors ${!!textContent.trim() || isRecording || !!recordedAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Upload
+                    Upload 📷
                 </label>
             </div>
 
@@ -740,7 +741,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         onClick={() => setSelectedFile(null)}
                         className="mt-2 px-4 py-2 text-sm text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
                     >
-                        Remove
+                        Verwijderen
                     </button>
                 </div>
             )}
@@ -758,7 +759,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         onClick={() => setRecordedAudio(null)}
                         className="mt-2 px-4 py-2 text-sm text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
                     >
-                        Remove
+                        Verwijderen
                     </button>
                 </div>
             )}
@@ -772,7 +773,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         ${isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={isRecording}
                     >
-                        Start
+                        🎙️ Start
                     </button>
                     <button
                         onClick={stopRecording}
@@ -780,7 +781,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         ${!isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={!isRecording}
                     >
-                        Stop
+                        🎙️ Stop
                     </button>
                 </div>
             ) : (
