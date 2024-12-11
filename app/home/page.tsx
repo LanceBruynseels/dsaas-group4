@@ -11,7 +11,7 @@ import CustomSlider from "@components/customSlider";
 import Loading from "@components/loading";
 import MatchingCard from "@components/matchingCard";
 import {MatchingUser} from "@components/matchingCard";
-import Sidebar from "@components/sideBar";
+import NotificationsPanel from "@components/notificationsPanel";
 import SearchSettings from "@components/searchSettings";
 import {UserPopup} from "@components/userPopup";
 
@@ -33,6 +33,8 @@ export default async function HomePage() {
         supabase.rpc('get_user_notifications', { notifications_user_id: userId }),
         supabase.from("search_age_range").select("min_age, max_age").eq("user_id", userId).single()
     ]);
+
+    console.log(notifications_data);
 
     // // Handle errors more gracefully
     // if (profileData.error || initialMatchData.error || filterData.error || notifications_data.error) {
@@ -74,7 +76,7 @@ export default async function HomePage() {
     return (
         <div className="flex flex-row w-full justify-center text-red-950">
             {/* Notifications Side Panel */}
-            <Sidebar notifications_data={notifications_data}></Sidebar>
+            <NotificationsPanel notifications_data={notifications_data}></NotificationsPanel>
 
             {/* middle section with matching and liking*/}
             <div

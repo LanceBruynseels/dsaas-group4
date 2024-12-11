@@ -3,11 +3,9 @@ import Image from "next/image";
 
 const Loading: React.FC = () => {
     return (
-        <div className="flex items-center justify-center h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-            <div className="flex flex-col items-center">
-                <Image src="/loading-spinner.gif" unoptimized={true} alt="Loading" width={50} height={50} />
-                <h2 className="mt-4 text-lg font-bold text-red-700">Even geduld...</h2>
-            </div>
+        <div className="flex flex-col justify-center items-center w-full h-full">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-950"></div>
+            <p className="text-red-950 mt-4 text-lg">Loading...</p>
         </div>
     );
 };

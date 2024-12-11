@@ -10,7 +10,7 @@ interface NotificationProps{
     notifications_data: any;
 }
 
-export default function Sidebar({notifications_data} : NotificationProps) {
+export default function NotificationsPanel({notifications_data} : NotificationProps) {
     const [expanded, setExpanded] = useState(true)
 
     return (

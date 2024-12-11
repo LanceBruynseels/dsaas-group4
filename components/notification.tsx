@@ -1,10 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
-import React from "react";
+import React, {useState} from "react";
 import Image from "next/image";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import {redirect} from "next/navigation";
+import {UserPopup} from "@components/userPopup";
 
 // Define the type for a single notification
 export type Notification_user = {
@@ -17,6 +18,7 @@ export type Notification_user = {
     first_name_sender: string | null;
     last_name_sender: string | null;
     sender_profile_image: string | null;
+    sender_id: string;
 };
 
 interface NotificationItemProps {
@@ -27,6 +29,8 @@ interface NotificationItemProps {
 const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expanded }) => {
     const router = useRouter();
     const supabase = createClientComponentClient(); // Initialize Supabase client
+    const [openMatchPopup, setOpenMatchPopup] = useState(false); // State for managing the popup
+    const [currentMatch, setCurrentMatch] = useState(null); // Store current match details
 
     // Get sender's full name
     const senderName = `${notification.first_name_sender || "Someone"} ${notification.last_name_sender || ""}`.trim();
@@ -42,9 +46,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expan
         if (!notification.is_read) {
             try {
                 const { error } = await supabase
-                    .from("notifications") // Replace with your actual table name
+                    .from("notifications")
                     .update({ is_read: true })
                     .eq("notification_id", notification.notification_id);
+
+
 
                 if (error) {
                     console.error("Error marking notification as read:", error.message);
@@ -60,29 +66,53 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expan
             router.push('/messaging');
             router.refresh();
         }
+        // else if (notification.type === "match") {
+        //     // Fetch match details from Supabase or other source
+        //     try {
+        //         const { data, error } = await supabase
+        //             .from("Matches")
+        //             .select("*")
+        //             .eq("user_1", notification.user_id)
+        //             .eq("user_2", notification.sender_id)
+        //             .single();
+        //
+        //         console.log(data);
+        //
+        //         if (error) {
+        //             console.error("Error fetching match data:", error.message);
+        //         } else {
+        //             setCurrentMatch(data); // Set match data
+        //             setOpenMatchPopup(true); // Open the popup
+        //         }
+        //     } catch (err) {
+        //         console.error("Unexpected error:", err);
+        //     }
+        // }
     };
 
     return (
-        <div
-            className={`flex flex-row items-center p-2 cursor-pointer ${bgColor}`}
-            onClick={handleNotificationClick} // Add click handler
-        >
-            {/* Profile Image */}
-            <Image
-                src={senderImage}
-                alt={`${senderName}'s Profile Picture`}
-                width={50}
-                height={50}
-                className="rounded-full border border-gray-500"
-            />
-            {/* Notification Content */}
-            <div className={`text-sm mx-2 overflow-hidden  ${
-                expanded ? "" : "hidden"
-            }`}>
-                <span className="font-semibold">{senderName}</span>
-                <p>{notification.content}</p>
+        <>
+            <div
+                className={`flex flex-row items-center p-2 cursor-pointer ${bgColor}`}
+                onClick={handleNotificationClick} // Add click handler
+            >
+                {/* Profile Image */}
+                <Image
+                    src={senderImage}
+                    alt={`${senderName}'s Profile Picture`}
+                    width={50}
+                    height={50}
+                    className="rounded-full border border-gray-500"
+                />
+                {/* Notification Content */}
+                <div className={`text-sm mx-2 overflow-hidden  ${
+                    expanded ? "" : "hidden"
+                }`}>
+                    <span className="font-semibold">{senderName}</span>
+                    <p>{notification.content}</p>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
