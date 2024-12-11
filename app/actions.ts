@@ -96,12 +96,12 @@ export const signInAction = async (formData: FormData) => {
         password,
     });
 
-    console.log("=== Login User Info ===");
-    console.log("Full user object:", user);
-    console.log("User metadata:", user?.user_metadata);
-    console.log("User role:", user?.user_metadata?.role);
-    console.log("User email:", user?.email);
-    console.log("=====================");
+    // console.log("=== Login User Info ===");
+    // console.log("Full user object:", user);
+    // console.log("User metadata:", user?.user_metadata);
+    // console.log("User role:", user?.user_metadata?.role);
+    // console.log("User email:", user?.email);
+    // console.log("=====================");
 
     if (error) {
         return encodedRedirect("error", "/sign-in-caretaker", error.message);
