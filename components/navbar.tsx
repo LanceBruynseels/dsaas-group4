@@ -41,7 +41,7 @@ export default function NavBar() {
     const authenticatedLinks = [
         { href: "/home", label: "Zoek een match" },
         { href: "/messaging", label: "Berichten" },
-        { href: "/discover", label: "Ontdek" },
+        { href: "/group-messaging", label: "Groepen" },
         { href: "/settings", label: "Mijn Profiel" },
     ];
 

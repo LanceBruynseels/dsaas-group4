@@ -1,7 +1,8 @@
+// Import necessary dependencies
 "use client";
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client"; // Adjust the import path
-
+import { getUserId } from "@components/UserDisplay";
 const Discover: React.FC = () => {
     const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -9,6 +10,9 @@ const Discover: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const chatsPerPage = 6; // Number of chats per page
+
+    const supabase = createClient();
+    const userId = getUserId();
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -56,6 +60,37 @@ const Discover: React.FC = () => {
         }
     };
 
+    const handleChatClick = async (chatId: number) => {
+        try {
+            // Check if the user is already in the group
+            const { data, error } = await supabase
+                .from("groupchat_users")
+                .select("id")
+                .eq("group_id", chatId)
+                .eq("user_id", userId);
+
+            if (error) throw error;
+
+            // If the user is not in the group, add them
+            if (data.length === 0) {
+                const { error: insertError } = await supabase
+                    .from("groupchat_users")
+                    .insert({
+                        group_id: chatId,
+                        user_id: userId,
+                    });
+
+                if (insertError) throw insertError;
+            }
+
+            // Navigate to the group messaging page
+            window.location.href = `/group-messaging?chatId=${chatId}`;
+        } catch (err) {
+            console.error("Error adding user to group:", err);
+        }
+    };
+
+
     // Calculate the chats to display for the current page
     const indexOfLastChat = currentPage * chatsPerPage;
     const indexOfFirstChat = indexOfLastChat - chatsPerPage;
@@ -64,9 +99,7 @@ const Discover: React.FC = () => {
     return (
         <div className="flex flex-1 container mx-auto py-2 px-2 bg-white">
             <div className=" bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] text-xl text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
-                <h1 className=" font-bold text-3xl mb-4">Discover 🔍</h1>
-                <p className="text-sm mb-4 ">Group chats</p>
-
+                <h1 className=" font-bold text-3xl mb-4">Join a new group chat 🔍</h1>
                 {/* Search bar */}
                 <div className="flex justify-center items-center mb-4">
                     <input
@@ -103,7 +136,8 @@ const Discover: React.FC = () => {
                                 <button
                                     key={chat.id}
                                     className="bg-white p-4 rounded-lg text-center hover:bg-rose-400 hover:scale-105 focus:outline-none"
-                                    onClick={() => (window.location.href = `/group-messaging?chatId=${chat.id}`)}                                >
+                                    onClick={() => handleChatClick(chat.id)}
+                                >
                                     {chat.image_url ? (
                                         <img
                                             src={chat.image_url}
@@ -120,7 +154,6 @@ const Discover: React.FC = () => {
                             <div>Loading chats...</div>
                         )}
                     </div>
-
 
                     <button
                         onClick={handleNextPage}
