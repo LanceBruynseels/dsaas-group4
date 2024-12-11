@@ -55,14 +55,8 @@ function ToggleLabel({
 }) {
     const [selected, setSelected] = useState(initialSelected);
     const [loading, setLoading] = useState(false); // Track if API call is in progress
-    const isMounted = useRef(true); // Track component mount state
 
-    useEffect(() => {
-        // Cleanup on unmount
-        return () => {
-            isMounted.current = false;
-        };
-    }, []);
+
 
     // Toggle the label selection state
     const handleToggle = async () => {
@@ -78,16 +72,15 @@ function ToggleLabel({
             await removeLabelToUser(table, labelKey, user_id);
         }
 
-        // Only update state if component is still mounted
-        if (isMounted.current) {
-            setSelected(newSelected);
-            setLoading(false);
-        }
+        setSelected(newSelected);
+        setLoading(false);
     };
 
     useEffect(() => {
         setSelected(initialSelected);
     }, [initialSelected]);
+
+
 
     return (
         <button

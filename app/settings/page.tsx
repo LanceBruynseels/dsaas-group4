@@ -1,4 +1,5 @@
 // page.tsx (Server-side rendering)
+import Slider from "@components/settings/sliderSettings";
 import ProfilePicture from "@components/settings/profilePicture";
 import ProfileFiltersSection from "@components/settings/profileFiltersSection";
 import ProfileDOB from "@components/settings/profileDOB";
@@ -9,6 +10,7 @@ import {getServerSession} from "next-auth";
 import { authOptions } from "@/app/api/auth/auth.config";
 import {redirect} from "next/navigation";
 import AddPictures from "@components/settings/addPictures";
+import SliderSettings from "@components/settings/sliderSettings";
 import SingleSelectFilter from "@components/settings/singleSelectFilter";
 
 const SettingsPage = async () => {
@@ -151,6 +153,20 @@ const SettingsPage = async () => {
                         labelField="religion"
                         user_id={user_id}
                     />
+
+                    {/* Sliders */}
+                    <div className="flex flex-col w-full mt-4 mb-6">
+                        <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
+                            <SliderSettings
+                                label="Afstand tot anderen"
+                                unit="km"
+                                min={5}
+                                max={30}
+                                defaultValue={profile_data.distance || 15}
+                                userId={user_id}
+                                sliderColor="#771D1D" table={""}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
