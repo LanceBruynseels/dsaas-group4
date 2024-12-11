@@ -52,6 +52,14 @@ export const signBuyerUpAction = async (formData: FormData) => {
     );
   }
 
+  if (!password || password.length < 8) {
+    return encodedRedirect(
+        "error",
+        "/SubscriptionOverview",
+        "Het wachtwoord moet minstens 8 tekens bevatten.",
+    );
+  }
+
   const { error } = await supabase.auth.signUp({
     email,
     password,

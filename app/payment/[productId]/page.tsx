@@ -46,7 +46,7 @@ const PaymentPage = () => {
     }
 
     return (
-       <div className="flex flex-col justify-center items-center w-screen h-screen">
+       <div className="flex flex-col justify-center items-center w-screen  h-screen p-4">
             <Elements stripe={stripePromise}>
                 <PaymentForm productData={productData} />
             </Elements>

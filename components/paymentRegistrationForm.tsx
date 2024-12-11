@@ -27,8 +27,68 @@ const PaymentForm = ({ productData }) => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [institutionError, setInstitutionError] = useState<string | null>(null);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [status, setStatus] = useState();
 
-    const handleSubmit = async (e) => {
+    const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
+        const email = event.target.value;
+
+        if (!email) return;
+
+        try {
+            const response = await fetch('/api/payment/checkEmail', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const result = await response.json();
+
+            if (!result.available) {
+                setEmailError("Dit e-mailadres is al in gebruik.");
+            } else {
+                setEmailError(null);
+            }
+        } catch (error) {
+            setEmailError("Fout bij het controleren van e-mailadres beschikbaarheid.");
+        }
+    };
+
+    const handleInstitutionBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
+        const institution = event.target.value;
+
+        if (!institution) return;
+
+        try {
+            const response = await fetch('/api/payment/checkInstitution', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ institution }),
+            });
+
+            const result = await response.json();
+
+            if (!result.available) {
+                setInstitutionError("Dit instituut bestaat al! Zet de locatie achter de naam!.");
+            } else {
+                setInstitutionError(null);
+            }
+        } catch (error) {
+            setInstitutionError("Fout bij het controleren de instituut beschikbaarheid.");
+        }
+    };
+
+    const handlepPasswordBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
+        const institution = event.target.value;
+        if (institution.length < 8) {
+            setPasswordError("wachtwoord moet langer zijn dan 8 tekens!");
+            return;
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
@@ -92,17 +152,22 @@ const PaymentForm = ({ productData }) => {
 
 
     return (
-            <div className="flex lg:flex-row flex-col-reverse  w-[70%] h-[90%]">
-                <div className="flex flex-row justify-center w-[50%] h-full p-[5%] rounded-l-3xl border-red-950 lg:border-t-4 border-l-4 lg:border-b-4 border-r-4 lg:border-r-0 ">
-                    <form onSubmit={handleSubmit} className="flex w-full flex-col justify-between items-center gap-[5%]">
+            <div className="flex lg:flex-row flex-col-reverse justify-center items-center  w-[70%] lg:h-[90%] h-full">
+                <div className="flex flex-row justify-center items-center w-[50%] h-full p-[5%]  border-red-950
+                border-l-4  border-b-4  border-r-4 rounded-b-3xl
+                lg:border-t-4  lg:border-b-4  lg:border-r-0 lg:rounded-l-3xl lg:rounded-r-none">
+                    <form onSubmit={handleSubmit}
+                          className="flex w-full h-fit min-h-full flex-col justify-between items-center">
                         <input
                             className="flex w-full h-full bg-white rounded-xl p-2"
                             type="email"
                             placeholder="Email"
                             value={email}
+                            onBlur={handleEmailBlur}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
+                        {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
 
                         <input
                             className="flex w-full h-full bg-white rounded-xl p-2"
@@ -125,29 +190,34 @@ const PaymentForm = ({ productData }) => {
                         <input
                             className="flex w-full h-full bg-white rounded-xl p-2"
                             type="text"
-                            placeholder="Institution Name"
+                            placeholder="Institution Name + Location (e.g vlinder Leuven)"
                             value={institution}
+                            onBlur={handleInstitutionBlur}
                             onChange={(e) => setInstitution(e.target.value)}
                             required
                         />
+                        {institutionError && <p className="text-red-500 text-sm">{institutionError}</p>}
 
                         <input
                             className="flex w-full h-full bg-white rounded-xl p-2"
                             type="password"
                             placeholder="Password"
                             value={password}
+                            onBlur={handlepPasswordBlur}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
 
+                        {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+
                         {/* Stripe Card Elements */}
-                        <div className="w-full h-fit bg-white p-2 rounded-xl ">
+                        <div className="w-full h-full bg-white p-2 rounded-xl  ">
                             <CardElement
                                 options={{
                                     hidePostalCode: true,
                                     style: {
                                         base: {
-                                            fontSize: "4vw",
+                                            fontSize: "5hw",
                                             color: "#32325d",
                                             "::placeholder": {
                                                 color: "#aab7c4",
@@ -160,7 +230,7 @@ const PaymentForm = ({ productData }) => {
                         </div>
 
                         {/* Checkbox for terms and conditions */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex h-full w-full items-center gap-2">
                             <Checkbox id="agree"/>
                             <Label htmlFor="agree" className="flex">
                                 I agree with the&nbsp;
@@ -187,14 +257,16 @@ const PaymentForm = ({ productData }) => {
                     </form>
                 </div>
 
-                <div className="flex flex-col justify-center items-end w-[50%] h-full ">
-                    <div className="flex flex-col justify-center items-center w-full h-full bg-white border-red-950 border-t-4 border-r-4 border-b-4 gap-8 rounded-r-3xl shadow-black p-4">
-                        <div className="flex flex-row justify-center w-[60%] aspect-square">
-                            <img src="/vlinder.png" alt="Vlinder Logo" className="w-full h-full" />
+                <div className="flex flex-col lg:justify-center justify-center items-center w-[50%] lg:h-full h-[30%] ">
+                    <div className="flex flex-col justify-center items-center w-full h-full bg-white border-red-950
+                        border-l-4  border-t-4  border-r-4 rounded-t-3xl
+                        lg:border-t-4  lg:border-b-4  lg:border-l-0 lg:rounded-r-3xl lg:rounded-l-none ">
+                        <div className="lg:flex hidden flex-row justify-center w-[60%] aspect-square">
+                            <img src="/vlinder.png" alt="Vlinder Logo" className="  w-full h-full" />
                         </div>
-                        <div className="flex flex-col justify-center h-fit w-[90%] text-center text-black">
-                            <h1 className="text-[400%]">€ {productData?.price / 100}</h1>
-                            <p className="text-[120%]">{productData?.description}</p>
+                        <div className="flex flex-col justify-center items-center h-fit w-[90%] text-center text-black">
+                            <h1 className="lg:text-[400%] text-[6vw] ">€ {productData?.price / 100}</h1>
+                            <p className="lg:text-[120%] text-[2vh]">{productData?.description}</p>
                         </div>
                     </div>
                 </div>
