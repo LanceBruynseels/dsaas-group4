@@ -35,7 +35,7 @@ const ProfileFilterSection: ({title, table, data, keyField, labelField, user_id}
 
     return (
         <div className="mb-4">
-            <h3 className="text-lg font-semibold">{title}</h3>
+            <h3 className="text-lg text-center font-semibold">{title}</h3>
             <div className="flex flex-wrap gap-2 mt-2">
                 {data && data.length > 0 ? (
                     data.map((item) => (
