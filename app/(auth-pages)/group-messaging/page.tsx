@@ -69,45 +69,58 @@ const ChatContent: React.FC<{
 };
 
 const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelectGroupChat }) => {
-    const router = useRouter();  // Access the router
+    const router = useRouter();
     const [chats, setChats] = useState<{ id: number; title: string; image_url: string }[] | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [selectedChat, setSelectedChat] = useState<{ id: number; title: string } | null>(null);  // Add selected chat state
+    const [selectedChat, setSelectedChat] = useState<{ id: number; title: string } | null>(null);
+    const userId = getUserId();
 
     useEffect(() => {
-        const fetchGroups = async () => {
+        const fetchUserGroups = async () => {
             try {
-                const {data, error} = await supabase
-                    .from("discover_chats")
-                    .select("id, title, image_url");
+                const { data, error } = await supabase
+                    .from("groupchat_users")
+                    .select("group_id")
+                    .eq("user_id", userId);
 
                 if (error) throw error;
 
-                setChats(data);
+                const groupIds = data.map((group) => group.group_id);
+
+                if (groupIds.length > 0) {
+                    const { data: chatsData, error: chatsError } = await supabase
+                        .from("discover_chats")
+                        .select("id, title, image_url")
+                        .in("id", groupIds);
+
+                    if (chatsError) throw chatsError;
+
+                    setChats(chatsData);
+                } else {
+                    setChats([]);
+                }
             } catch (err) {
-                setError("Er is een fout opgetreden.");
-                console.error(err);
+                setError("Failed to fetch chats");
             }
         };
 
-        fetchGroups();
-    }, []);
+        fetchUserGroups();
+    }, [userId]);
 
-    // Filter chats based on the search term
     const filteredChats = chats?.filter((chat) =>
         chat.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleChatSelect = (chat: any) => {
-        setSelectedChat(chat);  // Update selected chat state
-        router.push(`/group-messaging?chatId=${chat.id}`);  // Change the URL with the selected chat ID
-        onSelectGroupChat(chat);  // Update the selected chat state
+        setSelectedChat(chat);
+        router.push(`/group-messaging?chatId=${chat.id}`);
+        onSelectGroupChat(chat);
     };
 
     return (
         <>
-            <div className="mb-6">
+            <div className="mb-4">
                 <input
                     type="text"
                     placeholder="Zoek een groepsgesprek"
@@ -115,6 +128,14 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+            </div>
+            <div className="mb-6">
+                <button
+                    className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    onClick={() => router.push("/discover")}
+                >
+                    Nieuwe groepschat
+                </button>
             </div>
             <div className="space-y-3 max-h-96 overflow-y-auto">
                 {filteredChats && filteredChats.length > 0 ? (
@@ -124,7 +145,7 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                             onClick={() => handleChatSelect(chat)}
                             className={`p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer ${
                                 selectedChat?.id === chat.id ? "bg-blue-100" : "bg-[hsl(10,100%,95%)]"
-                            }`}  // Conditional styling for the selected chat
+                            }`}
                         >
                             <div className="flex items-center gap-4">
                                 <img
@@ -144,51 +165,13 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                 ) : error ? (
                     <div className="text-red-500">{error}</div>
                 ) : (
-                    <div>{chats ? "Geen resultaten gevonden." :
-                        <div role="status" className="max-w-md p-4 space-y-4 border border-gray-200 divide-y divide-gray-200 rounded shadow animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                                <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                            </div>
-                            <div className="flex items-center justify-between pt-4">
-                                <div>
-                                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                                <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                            </div>
-                            <div className="flex items-center justify-between pt-4">
-                                <div>
-                                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                                <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                            </div>
-                            <div className="flex items-center justify-between pt-4">
-                                <div>
-                                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                                <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                            </div>
-                            <div className="flex items-center justify-between pt-4">
-                                <div>
-                                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                                <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                            </div>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                    }</div>
+                    <div>{chats ? "Geen resultaten gevonden." : "Laden..."}</div>
                 )}
             </div>
         </>
     );
 };
+
 
 const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }) => {
     const [messages, setMessages] = useState<any[]>([]);
@@ -198,17 +181,18 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
     useEffect(() => {
         const fetchMessages = async () => {
             const { data, error } = await supabase
-                .from('group_message') // Assuming the table is named 'group_message'
+                .from('group_message')
                 .select('*')
-                .eq('group_id', selectedGroupChat.id); // Filter by the selected group ID
+                .eq('group_id', selectedGroupChat.id);  // Fetch messages for the selected group chat
 
             if (error) {
                 console.error('Error fetching messages:', error);
             } else if (data) {
-                setMessages(data);
+                setMessages(data);  // Update the state with fetched messages
             }
         };
 
+        // Initial fetch of messages
         fetchMessages();
 
         const channel = supabase
@@ -222,20 +206,20 @@ const ChatSection: React.FC<{ selectedGroupChat: any }> = ({ selectedGroupChat }
                 },
                 (payload) => {
                     const newMessage = payload.new;
-                    if (
-                        (newMessage.sender === senderId && newMessage.group_id === selectedGroupChat.id) ||
-                        (newMessage.sender === selectedGroupChat.id && newMessage.group_id === senderId)
-                    ) {
-                        setMessages((prevMessages) => [...prevMessages, newMessage]);
+                    // Check if the new message belongs to the selected group chat
+                    if (newMessage.group_id === selectedGroupChat.id) {
+                        // Refetch the messages after a new message is inserted
+                        fetchMessages();
                     }
                 }
             )
             .subscribe();
 
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeChannel(channel);  // Cleanup the subscription on component unmount
         };
-    }, [senderId, selectedGroupChat.id]);
+    }, [selectedGroupChat.id]);  // Re-run effect when the selected group changes
+
 
     // Chat component inside ChatSection
     const Chat = ({ selectedGroupChat, messages, senderId, receiverId }) => {
@@ -262,6 +246,7 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [problemDescription, setProblemDescription] = useState('');
     const [people, setPeople] = useState<{ username: string; user_id: number; isSelected: boolean }[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const fetchGroupUsers = async () => {
@@ -313,12 +298,11 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
         setProblemDescription(event.target.value);
     };
 
-    const handleButtonClick = () => {
-        setIsModalOpen(true);
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
 
     const handleReportSubmit = async () => {
-        // Filter selected users (including the reporter)
         const selectedUsers = people.filter(user => user.isSelected);
 
         if (selectedUsers.length === 0) {
@@ -326,49 +310,42 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
             return;
         }
 
-        // Assuming the first selected user is the reporter
-        const reporter = selectedUsers[0];  // This is the reporter
-
         try {
-            // Insert one row for each selected user (reporter + selected users) in the reports table
             const insertPromises = selectedUsers.map(user =>
                 supabase
                     .from('reports')
                     .insert({
-                        description: problemDescription, // The problem description
-                        user_id: user.user_id,            // The user ID for each selected user (reporter + targets)
+                        description: problemDescription,
+                        user_id: user.user_id,
                         groupchat_id: selectedGroupChat.id,
                     })
             );
 
-            // Wait for all insertions to finish
             await Promise.all(insertPromises);
 
             console.log("Report submitted successfully");
-            // Reset the checkboxes and problem description after submission
-            setPeople(prevPeople =>
-                prevPeople.map(user => ({
-                    ...user,
-                    isSelected: false,  // Reset selected state
-                }))
-            );
-            setProblemDescription(''); // Clear the problem description text field
-            closeModal();  // Close the modal
+            closeModal();
         } catch (error) {
             console.error("Error submitting report:", error);
         }
     };
 
     const closeModal = () => {
-        setIsModalOpen(false);  // Close the modal
+        setIsModalOpen(false);
         setPeople(prevPeople =>
             prevPeople.map(user => ({
                 ...user,
-                isSelected: false,  // Uncheck all checkboxes
+                isSelected: false,
             }))
         );
-        setProblemDescription(''); // Clear the problem description
+        setProblemDescription('');
+        setSearchTerm('');
     };
+
+    const filteredPeople = people.filter(user =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div>
             <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
@@ -382,14 +359,13 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                 </div>
 
                 <button
-                    onClick={handleButtonClick}
+                    onClick={() => setIsModalOpen(true)}
                     className="ml-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
                 >
                     🚩 Probleem melden
                 </button>
             </div>
 
-            {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg w-96">
@@ -404,23 +380,34 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                             placeholder="Beschrijf hier het probleem..."
                         />
 
+                        <div className="mt-4">
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                placeholder="Zoek naar personen..."
+                                className="w-full p-2 border rounded-md"
+                            />
+                        </div>
+
                         <div className="mt-4 max-h-40 overflow-y-auto">
                             <h3 className="font-semibold">Is er iemand betrokken?</h3>
-                            <ul className="list-disc pl-5">
-                                {people.length === 0 ? (
-                                    <li className="text-gray-500">Geen personen om te selecteren...</li>
-                                ) : (
-                                    people.map((user, index) => (
-                                        <li key={index} className="flex items-center gap-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={user.isSelected}
-                                                onChange={() => handleCheckboxChange(user.user_id)}
-                                                className="form-checkbox"
-                                            />
-                                            <span>{user.username}</span>
-                                        </li>
-                                    ))
+                            <ul className="list-disc pl-5 space-y-2 max-h-40 overflow-y-auto">
+                                {filteredPeople.slice(0, 5).map((user, index) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={user.isSelected}
+                                            onChange={() => handleCheckboxChange(user.user_id)}
+                                            className="form-checkbox"
+                                        />
+                                        <span>{user.username}</span>
+                                    </li>
+                                ))}
+                                {filteredPeople.length > 5 && (
+                                    <li className="text-gray-500 text-sm">
+                                        Blader omhoog of omlaag voor meer gebruikers...
+                                    </li>
                                 )}
                             </ul>
                         </div>
@@ -495,7 +482,7 @@ const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, se
                         const text = await response.text();
                         setLoadedText(text);
                     } else {
-                        setLoadedText('Failed to fetch content.');
+
                     }
                 } catch (error) {
                     console.error('Error fetching text content:', error);
@@ -736,7 +723,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                     className={`cursor-pointer px-4 py-2 rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300 
                     transition-colors ${!!textContent.trim() || isRecording || !!recordedAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Upload
+                    Upload 📷
                 </label>
             </div>
 
@@ -754,7 +741,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         onClick={() => setSelectedFile(null)}
                         className="mt-2 px-4 py-2 text-sm text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
                     >
-                        Remove
+                        Verwijderen
                     </button>
                 </div>
             )}
@@ -772,7 +759,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         onClick={() => setRecordedAudio(null)}
                         className="mt-2 px-4 py-2 text-sm text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
                     >
-                        Remove
+                        Verwijderen
                     </button>
                 </div>
             )}
@@ -786,7 +773,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         ${isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={isRecording}
                     >
-                        Start
+                        🎙️ Start
                     </button>
                     <button
                         onClick={stopRecording}
@@ -794,7 +781,7 @@ const MessageInput: React.FC<{ receiverId: string; selectedGroupChat: any }> = (
                         ${!isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={!isRecording}
                     >
-                        Stop
+                        🎙️ Stop
                     </button>
                 </div>
             ) : (
