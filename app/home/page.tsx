@@ -90,7 +90,7 @@ export default async function HomePage() {
             {showProfilePopup && (
                 <ProfilePopup
                     userId={userId}
-                    initialImageUrl={"mock-picture.webp"}
+                    initialImageUrl={"/mock-picture.webp"}
                     initialShowPopup={showProfilePopup}
                 />
             )}
