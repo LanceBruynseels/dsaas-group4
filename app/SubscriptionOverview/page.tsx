@@ -36,8 +36,18 @@ const SubscriptionOverview = () => {
 
             const data = await response.json();
 
+            if(data.items[0].price === 'price_1QSzgWFAdne61edZzyAVKxmL'){
+                setPrice(1250);
+                console.log("i get here");
+            }
+
             if(data.items[0].price === 'price_1QSzh3FAdne61edZ2PH2A12E'){
                 setPrice(2000);
+                console.log("i get here");
+            }
+
+            if(data.items[0].price === 'price_1QSzZhFAdne61edZ3dAkq4b'){
+                setPrice(3000);
                 console.log("i get here");
             }
 
