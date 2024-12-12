@@ -6,11 +6,11 @@ import NotificationItem, {Notification_user} from "@components/notification";
 import {ChevronFirst, ChevronLast} from "lucide-react";
 import {UserPopup} from "@components/userPopup";
 
-interface NotificationProps{
-    notifications_data: any;
+interface NotificationProps {
+    notifications_data: any,
 }
 
-export default function NotificationsPanel({notifications_data} : NotificationProps) {
+export default function NotificationsPanel({notifications_data}: NotificationProps) {
     const [expanded, setExpanded] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -57,8 +57,8 @@ export default function NotificationsPanel({notifications_data} : NotificationPr
                                         <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                                              xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                              viewBox="0 0 24 24">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                  stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+                                                  strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6"/>
                                         </svg>
                                     </button>
                                 </div>
@@ -111,7 +111,6 @@ export default function NotificationsPanel({notifications_data} : NotificationPr
                         className={`flex shadow-md flex-col rounded-lg bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] transition-all ${
                             expanded ? "w-full m-4 p-4" : "w-10 m-4 cursor-pointer"
                         }`}
-                        onClick={() => setExpanded((curr) => !curr)}
                     >
                         <div
                             className={`flex flex-row justify-between items-center ${
@@ -126,7 +125,7 @@ export default function NotificationsPanel({notifications_data} : NotificationPr
                                 Meldingen
                             </h2>
                             <div>
-                                <Image src="/bell.png" alt="Bell Icon" height={25} width={25} />
+                                <Image src="/bell.png" alt="Bell Icon" height={25} width={25}/>
                             </div>
                         </div>
                         <div
@@ -186,7 +185,7 @@ export default function NotificationsPanel({notifications_data} : NotificationPr
                             onClick={() => setExpanded((curr) => !curr)}
                             className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
                         >
-                            {expanded ? <ChevronFirst /> : <ChevronLast />}
+                            {expanded ? <ChevronFirst/> : <ChevronLast/>}
                         </button>
                     </div>
                 </div>

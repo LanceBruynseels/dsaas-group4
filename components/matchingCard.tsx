@@ -75,8 +75,6 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
         refreshMatches();
     }, []);
 
-
-
     //console.log("matchingCard:", userId);
     useEffect(() => {
         // Ensure the buffer is initially filled
@@ -249,7 +247,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                 )
             )}
             </Suspense>
-            <UserPopup currentMatch={currentMatch} isOpen={isPopupOpen} onClose={() => setPopupOpen(false)}></UserPopup>
+
         </>
     );
 }

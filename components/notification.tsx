@@ -1,11 +1,32 @@
 'use client'
 
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import React, {useState} from "react";
 import Image from "next/image";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import {createClientComponentClient} from "@supabase/auth-helpers-nextjs";
 import {redirect} from "next/navigation";
 import {UserPopup} from "@components/userPopup";
+
+export interface UserPopUp {
+    id: number;
+    profile_picture_url: string;
+    location: string | null;
+    user_id: string;
+    dob: string;
+    first_name: string;
+    last_name: string;
+    profile_data: {
+        disabilities: string[];
+        distance: string | null;
+        genders: string[];
+        home_status: string[];
+        interests: string[];
+        personalities: string[];
+        relationship_goals: string[];
+        religions: string[];
+    };
+    publicUrls: string[];
+}
 
 // Define the type for a single notification
 export type Notification_user = {
@@ -22,11 +43,11 @@ export type Notification_user = {
 };
 
 interface NotificationItemProps {
-    notification: Notification_user;
-    expanded: boolean;
+    notification: Notification_user,
+    expanded: boolean,
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expanded }) => {
+const NotificationItem: React.FC<NotificationItemProps> = ({notification, expanded}: NotificationItemProps) => {
     const router = useRouter();
     const supabase = createClientComponentClient(); // Initialize Supabase client
     const [openMatchPopup, setOpenMatchPopup] = useState(false); // State for managing the popup
@@ -45,11 +66,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expan
     const handleNotificationClick = async () => {
         if (!notification.is_read) {
             try {
-                const { error } = await supabase
+                const {error} = await supabase
                     .from("notifications")
-                    .update({ is_read: true })
+                    .update({is_read: true})
                     .eq("notification_id", notification.notification_id);
-
 
 
                 if (error) {
@@ -62,32 +82,39 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expan
             }
         }
 
-        if(notification.type === "message"){
+        if (notification.type === "message") {
             router.push('/messaging');
             router.refresh();
+        } else if (notification.type === "match") {
+            try {
+                const {data: matchInfoData, error: matchInfoError} = await supabase.rpc('get_match_info', {match_user_id: notification.sender_id})
+
+                const match  = matchInfoData[0];
+
+                if(match){
+                    const { data: fileList, error: listError } = await supabase
+                                    .storage
+                                    .from('picturesExtra') // The storage bucket name
+                                    .list(notification.sender_id);
+
+                    const publicUrls : string[] = fileList.map((file) =>
+                                    supabase.storage.from('picturesExtra').getPublicUrl(`${notification.sender_id}/${file.name}`).data.publicUrl
+                                );
+
+                    const matchInfo : UserPopUp = {...match, publicUrls};
+                    setCurrentMatch(matchInfo);
+                    setOpenMatchPopup(true);
+                }
+
+                if (matchInfoError) {
+                    console.error("Error marking notification as read:", matchInfoError.message);
+                } else {
+                    console.log("Notification marked as read");
+                }
+            } catch (err) {
+                console.error("Unexpected error:", err);
+            }
         }
-        // else if (notification.type === "match") {
-        //     // Fetch match details from Supabase or other source
-        //     try {
-        //         const { data, error } = await supabase
-        //             .from("Matches")
-        //             .select("*")
-        //             .eq("user_1", notification.user_id)
-        //             .eq("user_2", notification.sender_id)
-        //             .single();
-        //
-        //         console.log(data);
-        //
-        //         if (error) {
-        //             console.error("Error fetching match data:", error.message);
-        //         } else {
-        //             setCurrentMatch(data); // Set match data
-        //             setOpenMatchPopup(true); // Open the popup
-        //         }
-        //     } catch (err) {
-        //         console.error("Unexpected error:", err);
-        //     }
-        // }
     };
 
     return (
@@ -111,7 +138,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, expan
                     <span className="font-semibold">{senderName}</span>
                     <p>{notification.content}</p>
                 </div>
+
             </div>
+            <UserPopup currentMatch={currentMatch} isOpen={openMatchPopup}
+                       onClose={() => setOpenMatchPopup(false)}></UserPopup>
         </>
     );
 };
