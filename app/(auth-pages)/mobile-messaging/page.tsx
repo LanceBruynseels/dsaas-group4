@@ -101,7 +101,7 @@ const ChatHeader: React.FC<{ contact: any; onBack: () => void }> = ({contact, on
             <button onClick={onBack} className="text-sm text-gray-700 p-2 rounded-lg bg-white shadow-md">
                 Back
             </button>
-            <h2 className="text-lg font-semibold text-gray-800">{contact.username}</h2>
+            <h2 className="text-lg font-semibold text-gray-800 pr-4">{contact.username}</h2>
         </div>
     </div>
 );
@@ -116,7 +116,7 @@ const ChatSection: React.FC<{ messages: any[]; senderId: string }> = ({ messages
     }, [messages]);
 
     return (
-        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[65vh]">
             {messages.map((message, index) => {
                 const isAudio = message.mediaURL.match(/\.(wav|mp3|ogg)$/i);
                 const isSentByCurrentUser = message.sender === senderId;
