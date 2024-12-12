@@ -1,10 +1,11 @@
-'use client';
-
+"use client";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState, useMemo } from "react";
 import { Search, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ChatApp from "@/app/(auth-pages)/group-messaging/page";
 
+// Define the interface for User and Reports
 interface User {
     id: string;
     username: string | null;
@@ -15,32 +16,42 @@ interface User {
     is_banned: boolean;
 }
 
-interface Report {
+interface GroupReport {
     id: string;
     title: string;
     description: string | null;
-    groupchat_title: string; // Added groupchat_title
+    groupchat_id: string;
+    groupchat_title?: string;
 }
 
+interface RegularReport {
+    id: string;
+    description: string | null;
+    sender_id: string;
+    receiver_id: string;
+    type: "sent" | "received";
+}
 
+// CaretakerHome component
 export default function CaretakerHome() {
     const [users, setUsers] = useState<User[]>([]);
-    const [reports, setReports] = useState<Report[]>([]);
+    const [groupReports, setGroupReports] = useState<GroupReport[]>([]);
+    const [sentReports, setSentReports] = useState<RegularReport[]>([]);
+    const [receivedReports, setReceivedReports] = useState<RegularReport[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
     const supabase = createClient();
-    const router = useRouter(); // for sign out
+    const router = useRouter();
 
-    // use useMemo to improve filtering performance
     const filteredUsers = useMemo(() => {
-        return users.filter(user => {
+        return users.filter((user) => {
             const query = searchQuery.toLowerCase();
             return (
-                (user.first_name?.toLowerCase() || '').includes(query) ||
-                (user.last_name?.toLowerCase() || '').includes(query) ||
-                (user.username?.toLowerCase() || '').includes(query)
+                (user.first_name?.toLowerCase() || "").includes(query) ||
+                (user.last_name?.toLowerCase() || "").includes(query) ||
+                (user.username?.toLowerCase() || "").includes(query)
             );
         });
     }, [users, searchQuery]);
@@ -55,154 +66,157 @@ export default function CaretakerHome() {
         }
     }, [selectedUser]);
 
-
-    async function fetchUsers() {
-        try {
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
-            if (authError || !user) throw new Error('Not authenticated');
-
-            const { data: userData, error: userError } = await supabase
-                .from('users')
-                .select('*')
-                .eq('caretaker_id', user.id);
-
-            if (userError) throw userError;
-
-            setUsers(userData || []);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
-        } finally {
-            setLoading(false);
-        }
-    }
-    async function fetchReports(userId: string) {
-        try {
-            const { data: reportData, error: reportError } = await supabase
-                .from('reports')
-                .select('*')
-                .eq('user_id', userId);
-
-            if (reportError) throw reportError;
-
-            // Map reports to assign a title starting from 1 and add groupchat title
-            const enrichedReports = await Promise.all(
-                (reportData || []).map(async (report, index) => {
-                    // Fetch the group chat title based on the groupchat_id
-                    const { data: groupchatData, error: groupchatError } = await supabase
-                        .from('discover_chats')
-                        .select('title')
-                        .eq('id', report.groupchat_id)
-                        .single();  // Use .single() as we expect only one result
-
-                    if (groupchatError) {
-                        console.error('Error fetching group chat title:', groupchatError);
-                        return {
-                            ...report,
-                            title: `Report ${index + 1}`,  // Default title if groupchat fetch fails
-                            groupchat_title: 'Unknown',  // Default fallback value for the group chat title
-                        };
-                    }
-
-                    return {
-                        ...report,
-                        title: `Report ${index + 1}`,  // Start numbering from 1
-                        groupchat_title: groupchatData?.title || 'No Title',  // Use the fetched title
-                    };
-                })
-            );
-
-            setReports(enrichedReports);
-        } catch (err) {
-            console.error('Error fetching reports:', err);
-            setReports([]);
-        }
-    }
-
-
     const handleApprove = async (userId: string) => {
         try {
             const { error } = await supabase
-                .from('users')
+                .from("users")
                 .update({ is_accepted: true })
-                .eq('id', userId);
+                .eq("id", userId);
 
             if (error) throw error;
 
-            const updatedUsers = users.map(user =>
+            const updatedUsers = users.map((user) =>
                 user.id === userId ? { ...user, is_accepted: true } : user
             );
             setUsers(updatedUsers);
-            setSelectedUser(prevUser =>
+            setSelectedUser((prevUser) =>
                 prevUser?.id === userId ? { ...prevUser, is_accepted: true } : prevUser
             );
         } catch (err) {
-            console.error('Error approving user:', err);
-            alert('Failed to approve user. Please try again.');
+            console.error("Error approving user:", err);
+            alert("Failed to approve user. Please try again.");
         }
     };
-
 
     const handleBan = async (userId: string) => {
         try {
             const { error } = await supabase
-                .from('users')
+                .from("users")
                 .update({ is_banned: true })
-                .eq('id', userId);
+                .eq("id", userId);
 
             if (error) throw error;
 
-            const updatedUsers = users.map(user =>
+            const updatedUsers = users.map((user) =>
                 user.id === userId ? { ...user, is_banned: true } : user
             );
             setUsers(updatedUsers);
-            setSelectedUser(prevUser =>
+            setSelectedUser((prevUser) =>
                 prevUser?.id === userId ? { ...prevUser, is_banned: true } : prevUser
             );
         } catch (err) {
-            console.error('Error banning user:', err);
-            alert('Failed to ban user. Please try again.');
+            console.error("Error banning user:", err);
+            alert("Failed to ban user. Please try again.");
         }
     };
 
     const handleResume = async (userId: string) => {
         try {
             const { error } = await supabase
-                .from('users')
+                .from("users")
                 .update({ is_banned: false })
-                .eq('id', userId);
+                .eq("id", userId);
 
             if (error) throw error;
 
-            const updatedUsers = users.map(user =>
+            const updatedUsers = users.map((user) =>
                 user.id === userId ? { ...user, is_banned: false } : user
             );
             setUsers(updatedUsers);
-            setSelectedUser(prevUser =>
+            setSelectedUser((prevUser) =>
                 prevUser?.id === userId ? { ...prevUser, is_banned: false } : prevUser
             );
         } catch (err) {
-            console.error('Error resuming user:', err);
-            alert('Failed to resume user. Please try again.');
+            console.error("Error resuming user:", err);
+            alert("Failed to resume user. Please try again.");
         }
     };
 
-    if (loading) {
-        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    async function fetchUsers() {
+        try {
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            if (authError || !user) throw new Error("Not authenticated");
+
+            const { data: userData, error: userError } = await supabase
+                .from("users")
+                .select("*")
+                .eq("caretaker_id", user.id);
+
+            if (userError) throw userError;
+
+            setUsers(userData || []);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "An error occurred");
+        } finally {
+            setLoading(false);
+        }
     }
 
-    if (error) {
-        return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
+    async function fetchReports(userId: string) {
+        try {
+            const { data: groupReportData, error: groupReportError } = await supabase
+                .from("groupreports")
+                .select("*")
+                .eq("user_id", userId);
+
+            if (groupReportError) throw groupReportError;
+
+            const groupChats = await Promise.all(
+                groupReportData?.map(async (report) => {
+                    const { data: groupChatData, error: groupChatError } = await supabase
+                        .from("discover_chats")
+                        .select("title")
+                        .eq("id", report.groupchat_id)
+                        .single();
+
+                    if (groupChatError) {
+                        console.error("Error fetching group chat title:", groupChatError);
+                        return null;
+                    }
+                    return groupChatData?.title || "Unknown Group";
+                }) || []
+            );
+
+            const updatedGroupReports = groupReportData?.map((report, index) => ({
+                ...report,
+                groupchat_title: groupChats[index] || "Unknown Group",
+            }));
+
+            const { data: sentReportData, error: sentReportError } = await supabase
+                .from("reports")
+                .select("*")
+                .eq("sender_id", userId);
+
+            if (sentReportError) throw sentReportError;
+
+            const { data: receivedReportData, error: receivedReportError } = await supabase
+                .from("reports")
+                .select("*")
+                .eq("receiver_id", userId);
+
+            if (receivedReportError) throw receivedReportError;
+
+            setGroupReports(updatedGroupReports || []);
+            setSentReports(sentReportData || []);
+            setReceivedReports(receivedReportData || []);
+        } catch (err) {
+            console.error("Error fetching reports:", err);
+            setGroupReports([]);
+            setSentReports([]);
+            setReceivedReports([]);
+        }
     }
 
     const handleSignOut = async () => {
         try {
             await supabase.auth.signOut();
-            router.push('/sign-in-caretaker');
+            router.push("/sign-in-caretaker");
         } catch (err) {
-            console.error('Error signing out:', err);
-            alert('Failed to sign out. Please try again.');
+            console.error("Error signing out:", err);
+            alert("Failed to sign out. Please try again.");
         }
     };
+
     if (loading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     }
@@ -213,7 +227,6 @@ export default function CaretakerHome() {
 
     return (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-            {/* Left Sidebar */}
             <div className="w-1/3 p-6 border-r border-gray-200 flex flex-col">
                 <div className="mb-6 relative">
                     <input
@@ -223,7 +236,7 @@ export default function CaretakerHome() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Search className="absolute left-3 top-3.5 text-gray-400" size={20}/>
+                    <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
                 </div>
 
                 <button
@@ -231,7 +244,7 @@ export default function CaretakerHome() {
                     className="p-2 flex items-center gap-2 hover:bg-red-100 rounded-lg transition-colors"
                     title="Sign out"
                 >
-                    <LogOut className="text-red-600" size={24}/>
+                    <LogOut className="text-red-600" size={24} />
                     <span className="text-red-600">Sign out</span>
                 </button>
 
@@ -250,21 +263,19 @@ export default function CaretakerHome() {
                                 />
                                 <div className="flex-1 min-w-0">
                                     <div className="font-bold truncate">
-                                        {user.first_name || ''} {user.last_name || ''}
+                                        {user.first_name || ""} {user.last_name || ""}
                                     </div>
-                                    <div className="text-gray-500 text-sm truncate">
-                                        {user.facility || ''}
-                                    </div>
+                                    <div className="text-gray-500 text-sm truncate">{user.facility || ""}</div>
                                 </div>
                                 {!user.is_accepted && (
                                     <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
-                                        Pending
-                                    </span>
+                    Pending
+                  </span>
                                 )}
                                 {user.is_banned && (
                                     <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
-                                        Banned
-                                    </span>
+                    Banned
+                  </span>
                                 )}
                             </div>
                         </div>
@@ -272,7 +283,6 @@ export default function CaretakerHome() {
                 </div>
             </div>
 
-            {/* Right Content Area */}
             <div className="flex-1 flex flex-col p-6">
                 {selectedUser ? (
                     <>
@@ -285,9 +295,9 @@ export default function CaretakerHome() {
                                 />
                                 <div>
                                     <h3 className="text-lg font-bold">
-                                        {selectedUser.first_name || ''} {selectedUser.last_name || ''}
+                                        {selectedUser.first_name || ""} {selectedUser.last_name || ""}
                                     </h3>
-                                    <p className="text-sm text-gray-500">{selectedUser.facility || ''}</p>
+                                    <p className="text-sm text-gray-500">{selectedUser.facility || ""}</p>
                                 </div>
                             </div>
                             <div className="space-x-2">
@@ -317,49 +327,91 @@ export default function CaretakerHome() {
                                 )}
                             </div>
                         </div>
-                        <div className="flex-1 bg-[hsl(10,100%,95%)] rounded-lg p-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <span className="font-semibold">Username:</span>
-                                    <span className="ml-2">{selectedUser.username || ''}</span>
-                                </div>
-                                <div>
-                                    <span className="font-semibold">Status:</span>
-                                    <span className={`ml-2 ${
-                                        selectedUser.is_banned
-                                            ? 'text-red-600'
-                                            : selectedUser.is_accepted
-                                                ? 'text-green-600'
-                                                : 'text-yellow-600'
-                                    }`}>
-                                        {selectedUser.is_banned
-                                            ? 'Banned'
-                                            : selectedUser.is_accepted
-                                                ? 'Active'
-                                                : 'Pending Approval'}
-                                    </span>
-                                </div>
+
+                        <div className="space-y-4 mb-6">
+                            <div>
+                                <span className="font-semibold">Username:</span>
+                                <span className="ml-2">{selectedUser.username || ""}</span>
                             </div>
-                            <h4 className="font-semibold text-l mb-4">Reports</h4>
-                            {reports.length > 0 ? (
-                                <ul className="space-y-3">
-                                    {reports.map(report => (
-                                        <li key={report.id} className="p-3 bg-white rounded-lg shadow">
-                                            <h5 className="font-bold">{report.title}</h5>
-                                            <p className="text-gray-600">{report.description || 'No description'}</p>
-                                            <h4 className="text-gray-500 font-bold">Group Chat: {report.groupchat_title}</h4>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-gray-500">No reports available for this user.</p>
-                            )}
+                            <div>
+                                <span className="font-semibold">Status:</span>
+                                <span
+                                    className={`ml-2 ${
+                                        selectedUser.is_banned
+                                            ? "text-red-600"
+                                            : selectedUser.is_accepted
+                                                ? "text-green-600"
+                                                : "text-yellow-600"
+                                    }`}
+                                >
+                  {selectedUser.is_banned
+                      ? "Banned"
+                      : selectedUser.is_accepted
+                          ? "Active"
+                          : "Pending Approval"}
+                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            {/* Group Reports */}
+                            <div className="max-h-96 overflow-y-auto bg-white p-4 rounded-lg shadow-lg">
+                                <h4 className="font-semibold text-l mb-4 text-center">Groep meldingen 🚨</h4>
+                                {groupReports.length > 0 ? (
+                                    <ul className="space-y-4">
+                                        {groupReports.map((report) => (
+                                            <li key={report.id} className="bg-gray-50 p-3 rounded-lg shadow-md">
+                                                <p className="text-gray-700 font-medium">Beschrijving:</p>
+                                                <h5 className="font-bold">{report.title}</h5>
+                                                <p className="text-gray-600">{report.description || "No description"}</p>
+                                                <h4 className="text-gray-500 font-bold">Group Chat: {report.groupchat_title}</h4>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-500">No group reports available for this user.</p>
+                                )}
+                            </div>
+
+                            {/* Sent Reports */}
+                            <div className="max-h-96 overflow-y-auto bg-white p-4 rounded-lg shadow-lg">
+                                <h4 className="font-semibold text-l mb-4 text-center">Verzonden meldingen 🚨</h4>
+                                <h5 className="text-l mb-4 text-center">1 op 1 gesprekken</h5>
+                                {sentReports.length > 0 ? (
+                                    <ul className="space-y-4">
+                                        {sentReports.map((report) => (
+                                            <li key={report.id} className="bg-gray-50 p-3 rounded-lg shadow-md">
+                                                <p className="text-gray-700 font-medium">Beschrijving:</p>
+                                                <p className="text-gray-600">{report.description || "No description"}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-500">No sent reports available for this user.</p>
+                                )}
+                            </div>
+
+                            {/* Received Reports */}
+                            <div className="max-h-96 overflow-y-auto bg-white p-4 rounded-lg shadow-lg">
+                                <h4 className="font-semibold text-l mb-4 text-center">Ontvangen meldingen 🚨</h4>
+                                <h5 className="text-l mb-4 text-center">1 op 1 gesprekken</h5>
+                                {receivedReports.length > 0 ? (
+                                    <ul className="space-y-4">
+                                        {receivedReports.map((report) => (
+                                            <li key={report.id} className="bg-gray-50 p-3 rounded-lg shadow-md">
+                                                <p className="text-gray-700 font-medium">Beschrijving:</p>
+                                                <p className="text-gray-600">{report.description || "No description"}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-500">No received reports available for this user.</p>
+                                )}
+                            </div>
                         </div>
                     </>
                 ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                        Select a user to view details
-                    </div>
+                    <p className="text-gray-500 text-center">Select a user to see more details.</p>
                 )}
             </div>
         </div>
