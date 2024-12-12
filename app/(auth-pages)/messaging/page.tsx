@@ -5,35 +5,58 @@ import { Mic, Send } from 'lucide-react';
 import { useIsMobile } from "@/components/mediaQuery";
 import Link from 'next/link';
 const supabase = createClient();
-import {useRouter} from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
 import {getUserId} from "@components/UserDisplay";
 
 const ChatApp: React.FC = () => {
-    const [selectedContact, setSelectedContact] = useState<any | null>(null); // holds the current selected contact from the side bar
+    const [selectedContact, setSelectedContact] = useState<any | null>(null); // Holds the current selected contact
     const isMobile = useIsMobile();
+    const searchParams = useSearchParams();
     const router = useRouter();
 
-    // mobile version -------------------------------------
-    return isMobile ? <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-        <div className="max-w-fit p-10">
-            <Sidebar
-                onSelectContact={(contact) =>
-                    router.push(`/mobile-messaging?id=${contact.id}`) // Pass contact ID via query params
+    useEffect(() => {
+        // Check for matchId in the query parameters
+        const matchedId = searchParams.get('matchedId');
+        if (matchedId) {
+            // Fetch contact details for the given matchId
+            const fetchContact = async () => {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', matchedId)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching contact:', error);
+                } else {
+                    setSelectedContact(data);
                 }
-            />
+            };
 
+            fetchContact();
+        }
+    }, [searchParams]); // Re-run if query parameters change
 
+    return isMobile ? (
+        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+            <div className="max-w-fit p-10">
+                <Sidebar
+                    onSelectContact={(contact) =>
+                        router.push(`/mobile-messaging?id=${contact.id}`) // Pass contact ID via query params
+                    }
+                />
+            </div>
         </div>
-
-    </div> : ( // laptop version ---------------------------------------------
+    ) : (
+        // Laptop version
         <div className="flex h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
             <div className="w-1/3 p-6">
-                <Sidebar onSelectContact={setSelectedContact}/>
+                <Sidebar onSelectContact={setSelectedContact} />
             </div>
-            <div className="w-2 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] "></div>
+            <div className="w-2 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB]"></div>
             <div className="flex-1 flex flex-col p-6">
                 {selectedContact ? (
-                    <ChatSection selectedContact={selectedContact}/> // renders the chat section with the selected contact if its not null
+                    <ChatSection selectedContact={selectedContact} /> // Render the chat section with the selected contact
                 ) : (
                     <div className="flex items-center justify-center h-full">
                         <p className="text-lg text-gray-500">Select a contact for chatting</p>
@@ -43,7 +66,6 @@ const ChatApp: React.FC = () => {
         </div>
     );
 };
-
 const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
     const [matches, setMatches] = useState<any[]>([]); // Matched contacts
     const [profilePictures, setProfilePictures] = useState<{ [key: string]: string }>({}); // Profile pictures by user ID
