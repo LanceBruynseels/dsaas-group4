@@ -119,7 +119,7 @@ export default function SearchSettings({ filterData, userId, sliderAgeRange }: S
     // Mobile Layout
     const mobileLayout = (
         <div className={`absolute ${
-                expanded ? 'top-[100px] w-auto p-4 rounded-lg z-20 left-4 right-4 mb-4' : 'right-5 top-[100px] w-12 h-12 cursor-pointer rounded-lg z-10'
+                expanded ? 'top-[100px] w-auto p-4 rounded-lg z-20 left-4 right-4 mb-4 overflow-y-scroll' : 'right-5 top-[100px] w-12 h-12 cursor-pointer rounded-lg z-10'
             } bg-red-50 transition-all`}
         >
             {expanded ? (

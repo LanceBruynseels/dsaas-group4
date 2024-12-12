@@ -19,7 +19,6 @@ export default function NotificationsPanel({notifications_data}: NotificationPro
         const mediaQuery = window.matchMedia("(max-width: 768px)"); // Adjust based on your breakpoint
         const handleMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
             setIsMobile(e.matches);
-            setExpanded(e.matches);
         };
 
         // Initial check

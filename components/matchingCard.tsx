@@ -152,8 +152,8 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                                   stroke-width="2.3"
                                   d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/>
                         </svg>
-                    </button>
-                        <div className="flex flex-row lg:p-4 w-full h-full">
+                        </button>
+                        <div className="flex flex-row lg:p-4 w-full h-full justify-center">
                             {currentMatch ? (
                                 <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px] m-2">
                                     <FlowbiteCarousel
