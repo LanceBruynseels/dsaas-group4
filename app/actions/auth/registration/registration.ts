@@ -14,11 +14,15 @@ export async function register(formData: FormData): Promise<RegistrationResponse
     try {
         // get data
         const username = formData.get("username") as string;
+        const first_name = formData.get("first_name") as string;
+        const last_name = formData.get("last_name") as string;
         const password = formData.get("password") as string;
-        const facility = formData.get("facility") as string;
-        const supervisor = formData.get("supervisor") as string;
+        const institution_id = formData.get("institution_id") as string;
+        const caretaker_id = formData.get("caretaker_id") as string;
+        const is_accepted = false;
+        const is_banned = false;
 
-        if (!username || !password || !facility || !supervisor) {
+        if (!username || !password || !institution_id || !caretaker_id) {
             return {
                 success: false,
                 error: 'Alle velden zijn verplicht.'
@@ -26,16 +30,20 @@ export async function register(formData: FormData): Promise<RegistrationResponse
         }
 
         // invoke api
-        const response = await fetch('/api/auth/registration', {
+        const response = await fetch('http://localhost:3000/api/auth/registration', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 username,
+                first_name,
+                last_name,
                 password,
-                facility,
-                supervisor
+                institution_id: parseInt(institution_id),
+                caretaker_id,
+                is_accepted,
+                is_banned
             }),
         });
 

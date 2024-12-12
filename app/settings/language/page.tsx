@@ -6,13 +6,14 @@ import GoogleTranslate from "@components/settings/googleTranslate";
 
 const LanguageSettingsPage = () => {
     return (
-        <div className="flex min-h-screen">
+        <div className="flex flex-col sm:flex-row min-h-screen">
             {/* Sidebar */}
-            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div
+                className="w-full sm:basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Instellingen</h2> {/* Static title */}
+                    <h2 className="text-xl font-bold text-center sm:text-left">Instellingen</h2> {/* Static title */}
                 </div>
-                <ul className="space-y-4 flex-1">
+                <ul className="space-y-4 text-center sm:text-left">
                     <li className="text-base text-gray-500 cursor-pointer hover:text-gray-900">
                         <Link href="/settings">Profiel</Link> {/* Static profile link */}
                     </li>
@@ -22,11 +23,13 @@ const LanguageSettingsPage = () => {
                 </ul>
             </div>
 
-            {/* Main content */}
-            <div className="flex flex-col basis-3/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] flex-grow justify-center items-center">
-                <GoogleTranslate />
+            {/* Main Content */}
+            <div
+                className="flex flex-col w-full sm:basis-3/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F] justify-center items-center">
+                <GoogleTranslate/>
             </div>
         </div>
+
     );
 };
 

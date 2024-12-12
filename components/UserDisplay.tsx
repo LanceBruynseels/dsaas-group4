@@ -1,8 +1,10 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {useSession} from "next-auth/react";
 
 interface User {
     id: string;
@@ -14,7 +16,10 @@ interface UserData {
     user: User;
     picture: { profile_picture_url: string[] };  // Updated to reflect the correct structure
 }
-
+export const getUserId = () => {
+    const { data: session } = useSession();
+    return session?.user?.id;
+};
 const UserDisplay = () => {
     const [user, setUser] = useState<User | null>(null);
     const [picture, setPicture] = useState<string | null>(null); // Explicitly typed as string | null
@@ -57,7 +62,6 @@ const UserDisplay = () => {
     if (!user) {
         return (
             <Link href="/sign-in" className="flex items-center h-fit">
-                Sign in
             </Link>
         );
     }
@@ -70,7 +74,7 @@ const UserDisplay = () => {
                     href="/api/auth/signout"
                     className="text-xs text-gray-500 hover:text-gray-700"
                 >
-                    Sign out
+                    Log uit
                 </Link>
             </div>
             <Image
@@ -80,8 +84,10 @@ const UserDisplay = () => {
                 height={32}
                 className="rounded-full border border-gray-500"
             />
+
         </div>
     );
 };
+
 
 export default UserDisplay;

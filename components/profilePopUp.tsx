@@ -1,59 +1,48 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import ProfilePicture from "@components/settings/profilePicture"; // Import the ProfilePicture component
+import { useState } from 'react';
 
 export default function ProfilePopup({ userId, initialShowPopup, initialImageUrl }) {
     const [showPopup, setShowPopup] = useState(initialShowPopup);
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [dateOfBirth, setDateOfBirth] = useState("");
-    const supabase = createClientComponentClient();
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState('');
     const [profileImageUrl, setProfileImageUrl] = useState(initialImageUrl);
-
-    useEffect(() => {
-        const createEmptyProfile = async () => {
-            const { data, error } = await supabase
-                .from("profile")
-                .upsert([{ user_id: userId, first_name: null, last_name: null, dob: null, profile_picture_url: "mock-picture.webp" }]);
-
-            if (error) {
-                console.error("Error creating empty profile row:", error);
-            } else {
-                console.log("Empty profile row created/updated:", data);
-            }
-        };
-        createEmptyProfile();
-    }, [userId, supabase]);
 
     const handleConfirmSettings = async () => {
         if (!firstName || !lastName) {
-            alert("Vul je voornaam en achternaam in.");
+            alert('Vul je voornaam en achternaam in.');
             return;
         }
 
-        const { data, error: insertError } = await supabase
-            .from("profile")
-            .upsert([{
-                user_id: userId,
-                first_name: firstName,
-                last_name: lastName,
-                dob: dateOfBirth || null,
-                profile_picture_url: profileImageUrl || null
-            }], { onConflict: 'user_id' });
+        try {
+            const response = await fetch('/api/home/update-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    firstName,
+                    lastName,
+                    dateOfBirth: dateOfBirth || null,
+                    profileImageUrl: profileImageUrl || null,
+                }),
+            });
 
-        if (insertError) {
-            console.error("Error inserting/updating profile data:", insertError);
-        } else {
-            console.log("Profile data inserted/updated:", data);
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error('Error updating profile:', result.error);
+                alert(`Error: ${result.error}`);
+                return;
+            }
+
+            console.log('Profile updated:', result.data);
             setShowPopup(false);
+        } catch (error) {
+            console.error('Unexpected error:', error);
+            alert('Er is een onverwachte fout opgetreden.');
         }
     };
-
-    // const handleDoLater = () => {
-    //     setShowPopup(false);
-    // };
 
     if (!showPopup) {
         return null;
@@ -64,7 +53,6 @@ export default function ProfilePopup({ userId, initialShowPopup, initialImageUrl
             <div className="bg-[#771D1D] p-8 rounded-lg shadow-md w-full max-w-sm">
                 <h2 className="text-white text-2xl font-semibold mb-4">Vul hier je persoonlijke gegevens in</h2>
                 <form>
-                    {/* First Name Input */}
                     <label className="block mb-4 text-white">
                         Voornaam (Verplicht):
                         <input
@@ -76,8 +64,6 @@ export default function ProfilePopup({ userId, initialShowPopup, initialImageUrl
                             required
                         />
                     </label>
-
-                    {/* Last Name Input */}
                     <label className="block text-white mb-4">
                         Achternaam (Verplicht):
                         <input
@@ -89,8 +75,6 @@ export default function ProfilePopup({ userId, initialShowPopup, initialImageUrl
                             required
                         />
                     </label>
-
-                    {/* Date of Birth Input */}
                     <label className="block text-white mb-4">
                         Geboortedatum (Optioneel):
                         <input
@@ -101,15 +85,7 @@ export default function ProfilePopup({ userId, initialShowPopup, initialImageUrl
                         />
                     </label>
                 </form>
-
-                {/* Buttons */}
                 <div className="flex justify-center items-center mt-6">
-                {/*<button*/}
-                {/*        onClick={handleDoLater}*/}
-                {/*        className="bg-gray-300 text-gray-800 px-4 py-2 rounded"*/}
-                {/*    >*/}
-                {/*        Later Doen*/}
-                {/*</button>*/}
                     <button
                         onClick={handleConfirmSettings}
                         className="bg-[#FCA5A5] text-white px-4 py-2 rounded"

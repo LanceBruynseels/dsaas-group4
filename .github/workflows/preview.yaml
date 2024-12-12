@@ -1,23 +1,27 @@
 name: Vercel Preview Deployment
 
+
+
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 #on:
+#  push:
+#    branches:
+#      - main
+#      - develop
+#      - matching
+#  pull_request:
+#    branches:
+#      - main
+#      - develop
+#      - matching
+#on:
 #  workflow_run:
 #    workflows: ["Node.js CI with Cypress Tests"]
 #    types:
 #      - completed
-on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
 
 jobs:
   Deploy-Preview:
@@ -36,4 +40,4 @@ jobs:
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --force --token=${{ secrets.VERCEL_TOKEN }}
