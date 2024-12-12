@@ -53,6 +53,43 @@ export default async function HomePage() {
         .single();
     }
 
+    //console.log(notifications_data);
+
+    // // Handle errors more gracefully
+    // if (profileData.error || initialMatchData.error || filterData.error || notifications_data.error) {
+    //     console.error("Error fetching data:", profileData.error || initialMatchData.error || filterData.error || notifications_data.error);
+    //     return <p>Error loading data</p>;
+    // }
+    //
+    // //console.log(initialMatchData);
+    //
+    // let allMatchData: MatchingUser[];
+    //
+    // if (initialMatchData.data && initialMatchData.data.length > 0) {
+    //     // Use Promise.all to wait for all asynchronous operations
+    //      allMatchData = await Promise.all(
+    //         initialMatchData.data.map(async (match) => {
+    //             const { data: fileList, error: listError } = await supabase
+    //                 .storage
+    //                 .from('picturesExtra') // The storage bucket name
+    //                 .list(match.user_id);
+    //
+    //             if (listError) {
+    //                 console.error(`Error listing files for user_id ${match.user_id}:`, listError);
+    //                 return { ...match, publicUrls: [] }; // Default to empty array on error
+    //             }
+    //
+    //             // Generate public URLs for each file
+    //             const publicUrls = fileList.map((file) =>
+    //                 supabase.storage.from('picturesExtra').getPublicUrl(`${match.user_id}/${file.name}`).data.publicUrl
+    //             );
+    //
+    //             // Return the enriched match object
+    //             return { ...match, publicUrls };
+    //         })
+    //     );
+    // }
+
     const showProfilePopup = !profileData.data; // Show popup if no profile found
 
     return (

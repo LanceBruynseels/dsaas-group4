@@ -2,24 +2,41 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Mic, Send } from 'lucide-react';
+import { useIsMobile } from "@/components/mediaQuery";
+import Link from 'next/link';
 const supabase = createClient();
-import Image from "next/image";
+import {useRouter} from 'next/navigation';
+import {getUserId} from "@components/UserDisplay";
 
 const ChatApp: React.FC = () => {
     const [selectedContact, setSelectedContact] = useState<any | null>(null); // holds the current selected contact from the side bar
+    const isMobile = useIsMobile();
+    const router = useRouter();
 
-    return (
-        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+    // mobile version -------------------------------------
+    return isMobile ? <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+        <div className="max-w-fit p-10">
+            <Sidebar
+                onSelectContact={(contact) =>
+                    router.push(`/mobile-messaging?id=${contact.id}`) // Pass contact ID via query params
+                }
+            />
+
+
+        </div>
+
+    </div> : ( // laptop version ---------------------------------------------
+        <div className="flex h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
             <div className="w-1/3 p-6">
-                <Sidebar onSelectContact={setSelectedContact} />
+                <Sidebar onSelectContact={setSelectedContact}/>
             </div>
-            <div className="w-6 bg-[hsl(10,100%,95%)]"></div>
+            <div className="w-2 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] "></div>
             <div className="flex-1 flex flex-col p-6">
                 {selectedContact ? (
-                    <ChatSection selectedContact={selectedContact} /> // renders the chat section with the selected contact if its not null
+                    <ChatSection selectedContact={selectedContact}/> // renders the chat section with the selected contact if its not null
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-lg text-gray-500">Select a contact to start chatting</p>
+                        <p className="text-lg text-gray-500">Select a contact for chatting</p>
                     </div>
                 )}
             </div>
@@ -28,103 +45,161 @@ const ChatApp: React.FC = () => {
 };
 
 const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
-    // State to store the list of contacts fetched from the database
-    const [matches, setMatches] = useState<any[]>([]);
-    // Hardcoded ID representing the current user
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const [matches, setMatches] = useState<any[]>([]); // Matched contacts
+    const [profilePictures, setProfilePictures] = useState<{ [key: string]: string }>({}); // Profile pictures by user ID
+    const isMobile = useIsMobile();
+    const senderId = getUserId(); // Get current user ID
 
-    // Effect to fetch matched contacts when the component mounts or when senderId changes
+    // Fetch matched contacts
     useEffect(() => {
-        // Asynchronous function to fetch matches and corresponding user details
         const fetchMatches = async () => {
-            // Query the 'Matches' table to find rows where the current user is either user_1 or user_2
             const { data: matchData, error: matchError } = await supabase
                 .from('Matches')
                 .select('*')
                 .or(`user_1.eq.${senderId},user_2.eq.${senderId}`);
 
             if (matchError) {
-                // Log any error that occurs during the fetch
                 console.error('Error fetching matches:', matchError);
-            } else if (matchData) {
-                // Extract the IDs of the contacts matched with the current user
-                const matchedContacts = matchData.map((match: any) => {
-                    return match.user_1 === senderId ? match.user_2 : match.user_1; // Identify the contact based on user_1 or user_2
+                return;
+            }
+
+            if (matchData) {
+                const matchedContacts = matchData.map((match) => {
+                    return match.user_1 === senderId ? match.user_2 : match.user_1;
                 });
 
-                // Fetch details (id and username) of the matched contacts from the 'users' table
+                // Fetch user details for matched contacts
                 const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('id, username')
-                    .in('id', matchedContacts); // Filter users by IDs in matchedContacts
+                    .in('id', matchedContacts);
 
                 if (userError) {
-                    // Log any error that occurs while fetching user details
                     console.error('Error fetching user details:', userError);
-                } else if (userData) {
-                    // Update the state with the fetched user details
-                    setMatches(userData); // userData will contain the username and id of the matched users
+                    return;
+                }
+
+                if (userData) {
+                    setMatches(userData); // Save matched user data
                 }
             }
         };
 
-        // Call the asynchronous fetch function
         fetchMatches();
-    }, [senderId]); // Runs again if the senderID changes
+    }, [senderId]);
 
-    return (
-        <>
-            {/* Search bar for filtering conversations */}
+    // Fetch profile pictures
+    useEffect(() => {
+        const fetchProfilePictures = async () => {
+            const userIds = matches.map((match) => match.id); // Extract user IDs
+
+            if (userIds.length > 0) {
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profile') // Query the profile table
+                    .select('user_id, profile_picture_url')
+                    .in('user_id', userIds); // Filter by matched user IDs
+
+                if (profileError) {
+                    console.error('Error fetching profile pictures:', profileError);
+                    return;
+                }
+
+                if (profileData) {
+                    // Build a dictionary of user_id to profile_picture_url
+                    const pictures = profileData.reduce((acc, profile) => {
+                        acc[profile.user_id] = profile.profile_picture_url;
+                        return acc;
+                    }, {});
+                    setProfilePictures(pictures); // Save profile pictures
+                }
+            }
+        };
+
+        fetchProfilePictures();
+    }, [matches]);
+
+    return isMobile ? (
+        <div>
             <div className="mb-6">
                 <input
                     type="text"
-                    placeholder="zoek een gesprek" // Placeholder text in Dutch meaning "search a conversation"
-                    className="w-full p-3 rounded-lg border border-gray-300" // Styling for the input field
+                    placeholder="Search conversations"
+                    className="w-full p-3 rounded-lg border border-gray-300"
                 />
             </div>
-            {/* List of matched contacts */}
             <div className="space-y-5">
-                {matches.map((contact, index) => (
+                {matches.map((contact) => (
                     <div
-                        key={index} // Unique key for each contact
-                        onClick={() => onSelectContact(contact)} // Callback to select the contact when clicked
+                        key={contact.id}
+                        onClick={() => onSelectContact(contact)}
                         className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         <div className="flex items-center gap-4">
-                            {/* Placeholder profile image */}
-                            <Image
-                                src="/profile-picture.jpeg"
-                                alt="Profile" // Alternative text for the image
-                                width={10}
-                                height={10}
-                                className="rounded-full" // Styling for a circular profile picture
+                            <img
+                                src={profilePictures[contact.id] || 'https://via.placeholder.com/40'}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
                             />
                             <div className="flex-1 min-w-0">
-                                {/* Display the username of the contact */}
                                 <div className="font-bold truncate">{contact.username}</div>
-                                {/* Subtext under the username */}
                                 <div className="text-gray-500 text-sm truncate">
-                                    een gesprek beginnen ...
+                                    Start a conversation...
                                 </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-        </>
+        </div>
+    ) : (
+        <div>
+            <div className="mb-6">
+                <input
+                    type="text"
+                    placeholder="Search conversations"
+                    className="w-full p-3 rounded-lg border border-gray-300"
+                />
+            </div>
+            <div className="space-y-5">
+                {matches.map((contact) => (
+                    <div
+                        key={contact.id}
+                        onClick={() => onSelectContact(contact)}
+                        className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                        <div className="flex items-center gap-4">
+                            <img
+                                src={profilePictures[contact.id] || 'https://via.placeholder.com/40'}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <div className="font-bold truncate">{contact.username}</div>
+                                <div className="text-gray-500 text-sm truncate">
+                                    Start a conversation...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
+
 
 
 const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
     // State to store messages exchanged between the sender and the selected contact
     const [messages, setMessages] = useState<any[]>([]);
-
+    const isMobile = useIsMobile();
     // Hardcoded ID for the sender (current user)
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const senderId = getUserId();
 
     // Extract the receiver's ID from the selected contact
     const receiverId = selectedContact.id;
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
 
     // useEffect to fetch messages and set up real-time updates
     useEffect(() => { // for managing external interactions
@@ -136,6 +211,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                 .or(             // Fetch messages where:
                     // Sender is the current user and receiver is the selected contact, OR vice versa
                     `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
+
                 );
 
             if (error) {
@@ -156,16 +232,17 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT',       // Only listen for new message inserts
-                    schema: 'public',      // Schema name
-                    table: 'message',      // Table name
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'message',
                 },
                 (payload) => {
                     // Handle the new message payload
                     const newMessage = payload.new;
 
-                     {
+                    {
                         // Add the new message to the existing state
+                        // if(selectedContact.id == senderId)
                         setMessages((prevMessages) => [...prevMessages, newMessage]);
                     }
                 }
@@ -178,13 +255,23 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
         };
     }, [senderId, receiverId]); // run this effect when senderId or receiverId changes
 
-    return (
-        <>
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+
+    return isMobile ? null:(
+        <div>
             {/* Render the chat header with selected contact's details */}
             <ChatHeader selectedContact={selectedContact} />
 
             {/* Message display area */}
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div
+
+                ref={chatContainerRef}
+                className="flex-1 overflow-y-auto min-h-0 max-h-[60vh]">
                 {messages.map((message, index) => (
                     // Render each message using the ChatMessage component
                     <ChatMessage key={index} message={message} senderId={senderId} />
@@ -193,31 +280,64 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
             {/* Input area for sending new messages */}
             <MessageInput receiverId={receiverId} />
-        </>
+        </div>
     );
 };
 
 
 const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Reset the profile picture when the selected contact changes
+        setProfilePicture(null);
+
+        const getProfilePicture = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('profile')
+                    .select('profile_picture_url')
+                    .eq('user_id', selectedContact.id)
+                    .single(); // Fetch a single row
+
+                if (error) {
+                    console.error('Error fetching profile picture:', error);
+                    return;
+                }
+
+                if (data?.profile_picture_url) {
+                    setProfilePicture(data.profile_picture_url); // Set the profile picture URL
+                } else {
+                    setProfilePicture(null); // Set to null if no picture found
+                }
+            } catch (err) {
+                console.error('Unexpected error fetching profile picture:', err);
+                setProfilePicture(null); // Reset on error
+            }
+        };
+
+        getProfilePicture();
+    }, [selectedContact]);
+
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
-                <Image
-                    src="/profile-picture.jpeg"
-                    alt="Profile"
-                    width={10}
-                    height={10}
+                <img
+                    src={profilePicture || '/profile-picture.png'} // Use default if no profile picture
+                    alt={`${selectedContact?.username || 'Unknown'}'s Profile`}
                     className="w-10 h-10 rounded-full"
                 />
-                <h3 className="text-lg font-bold">{selectedContact.username}</h3>
+                <h3 className="text-lg font-bold">{selectedContact?.username || 'Unknown'}</h3>
             </div>
         </div>
     );
 };
 
+
 const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, senderId }) => {
     // Destructure the message object to extract relevant fields
     const { mediaURL, time_stamp, sender } = message;
+    const isMobile = useIsMobile();
 
     // Determine if the message was sent by the current user
     const isSentByCurrentUser = sender === senderId;
@@ -258,7 +378,8 @@ const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, se
         fetchTextContent(); // Call the function to fetch the text content
     }, [mediaURL, isText]); // Dependencies: re-run if mediaURL or isText changes
 
-    return (
+
+    return isMobile ? null:(
         // Outer container for the message with alignment based on the sender
         <div className={`flex items-start ${isSentByCurrentUser ? 'justify-end' : 'justify-start'} gap-3 mb-3`}>
             <div className="flex flex-col">
@@ -268,12 +389,10 @@ const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, se
                 {/* Conditional rendering based on the type of media in the message */}
                 {isImage ? (
                     // Render an image if the message contains an image file
-                    <Image
+                    <img
                         src={mediaURL} // Use the mediaURL as the source of the image
                         alt="Media content"
-                        width={40}
-                        height={40}
-                        className="object-cover rounded-lg"
+                        className="w-40 h-40 object-cover rounded-lg"
                     />
                 ) : isAudio ? (
                     // Render an audio player if the message contains an audio file
@@ -298,6 +417,7 @@ const ChatMessage: React.FC<{ message: any; senderId: string }> = ({ message, se
 
 
 const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
+    const isMobile = useIsMobile();
     // State to manage the text content entered by the user
     const [textContent, setTextContent] = useState('');
     // State to store a file selected by the user (e.g., images)
@@ -313,7 +433,7 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     const streamRef = useRef<MediaStream | null>(null); // React reference to the audio
 
     // Hardcoded sender ID (current user)
-    const senderId = '42a20f25-a201-4706-b8a3-2c4fafa58f4b';
+    const senderId = getUserId();
 
     // Starts audio recording
     const startRecording = async () => {
@@ -382,67 +502,68 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
     // Sends the message (text, file, or audio)
     const handleSend = async () => {
 
-            let fileName: string;
-            let contentToUpload: File | Blob;
+        let fileName: string;
+        let contentToUpload: File | Blob;
 
-            // Determine the type of content to upload
-            if (recordedAudio) {
-                // If there's recorded audio, prepare it for upload
-                fileName = `voice/${Date.now()}-voice-message.wav`;
-                contentToUpload = recordedAudio;
-            } else if (selectedFile) {
-                // If a file is selected, prepare it for upload
-                fileName = `images/${Date.now()}-${selectedFile.name}`;
-                contentToUpload = selectedFile;
-            } else if (textContent.trim()) {
-                // If text is entered, prepare it as a text file for upload
-                fileName = `texts/${Date.now()}-message.txt`;
-                contentToUpload = new Blob([textContent], { type: 'text/plain' });
-            } else {
-                // If no content is provided, show an alert
-                alert('Please enter a message, select a file, or record audio.');
-                return;
-            }
+        // Determine the type of content to upload
+        if (recordedAudio) {
+            // If there's recorded audio, prepare it for upload
+            fileName = `voice/${Date.now()}-voice-message.wav`;
+            contentToUpload = recordedAudio;
+        } else if (selectedFile) {
+            // If a file is selected, prepare it for upload
+            fileName = `images/${Date.now()}-${selectedFile.name}`;
+            contentToUpload = selectedFile;
+        } else if (textContent.trim()) {
+            // If text is entered, prepare it as a text file for upload
+            fileName = `texts/${Date.now()}-message.txt`;
+            contentToUpload = new Blob([textContent], { type: 'text/plain' });
+        } else {
+            // If no content is provided, show an alert
+            alert('Please enter a message, select a file, or record audio.');
+            return;
+        }
 
-            // Upload the content to the Supabase storage bucket
-            const { data: uploadData, error: uploadError } = await supabase
-                .storage
-                .from('Messages')
-                .upload(fileName, contentToUpload);
-
-
-            // Generate a public URL for the uploaded content
-            const { data: urlData } = supabase.storage.from('Messages').getPublicUrl(fileName);
-            const publicURL = urlData?.publicUrl;
-
-            if (!publicURL) {
-                alert('Failed to get public URL for the uploaded content.');
-                return;
-            }
-
-            // Insert the message into the database
-            const { error: insertError } = await supabase
-                .from('message')
-                .insert([
-                    {
-                        sender: senderId, // Current user
-                        receiver: receiverId, // Recipient
-                        mediaURL: publicURL, // Uploaded content's URL
-                        time_stamp: new Date(), // Timestamp of the message
-                        is_read: false // Mark as unread
-                    }
-                ]);
+        // Upload the content to the Supabase storage bucket
+        const { data: uploadData, error: uploadError } = await supabase
+            .storage
+            .from('Messages')
+            .upload(fileName, contentToUpload);
 
 
-            // Clear input fields after successful send
-            setTextContent('');
-            setSelectedFile(null);
-            setRecordedAudio(null);
+        // Generate a public URL for the uploaded content
+        const { data: urlData } = supabase.storage.from('Messages').getPublicUrl(fileName);
+        const publicURL = urlData?.publicUrl;
+
+        if (!publicURL) {
+            alert('Failed to get public URL for the uploaded content.');
+            return;
+        }
+
+        // Insert the message into the database
+        const { error: insertError } = await supabase
+            .from('message')
+            .insert([
+                {
+                    sender: senderId, // Current user
+                    receiver: receiverId, // Recipient
+                    mediaURL: publicURL, // Uploaded content's URL
+                    time_stamp: new Date(), // Timestamp of the message
+                    is_read: false // Mark as unread
+                }
+            ]);
+
+
+        // Clear input fields after successful send
+        setTextContent('');
+        setSelectedFile(null);
+        setRecordedAudio(null);
 
 
     };
 
-    return (
+
+    return isMobile ? null:(
         <div className="mt-auto flex items-center p-4 bg-white rounded-lg gap-2">
             {/* Text input for the message */}
             <textarea
@@ -465,17 +586,19 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
                 <>
                     <button
                         onClick={startRecording}
-                        className="ml-2 p-2 rounded-full bg-green-500 hover:bg-green-600 text-white"
-                        disabled={isRecording} // Disable if already recording
+                        className={`px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors 
+                        ${isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isRecording}
                     >
-                        Start Recording
+                        🎙️ Start
                     </button>
                     <button
                         onClick={stopRecording}
-                        className="ml-2 p-2 rounded-full bg-red-500 hover:bg-red-600 text-white"
-                        disabled={!isRecording} // Disable if not recording
+                        className={`px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors 
+                        ${!isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={!isRecording}
                     >
-                        Stop Recording
+                        🎙️ Stop
                     </button>
                 </>
             ) : (
@@ -487,14 +610,15 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
             {/* Send button */}
             <button
                 onClick={handleSend}
-                className={`ml-2 p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white
-                          ${(!textContent && !selectedFile && !recordedAudio) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={!textContent && !selectedFile && !recordedAudio} // Disable if no content
+                className={`flex items-center justify-center px-4 py-2 rounded-lg bg-blue-500 text-white text-xl hover:bg-blue-600 
+                transition-colors ${(!textContent && !selectedFile && !recordedAudio) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={!textContent && !selectedFile && !recordedAudio}
             >
-                <Send size={20} />
+                &#10148; {/* Send icon */}
             </button>
         </div>
     );
 };
+
 
 export default ChatApp;

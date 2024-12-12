@@ -17,12 +17,12 @@ export async function register(formData: FormData): Promise<RegistrationResponse
         const first_name = formData.get("first_name") as string;
         const last_name = formData.get("last_name") as string;
         const password = formData.get("password") as string;
-        const facility = formData.get("facility") as string;
-        const supervisor = formData.get("supervisor") as string;
-        const is_accepted = false;  // false by default
+        const institution_id = formData.get("institution_id") as string;
+        const caretaker_id = formData.get("caretaker_id") as string;
+        const is_accepted = false;
         const is_banned = false;
 
-        if (!username || !password || !facility || !supervisor) {
+        if (!username || !password || !institution_id || !caretaker_id) {
             return {
                 success: false,
                 error: 'Alle velden zijn verplicht.'
@@ -40,8 +40,8 @@ export async function register(formData: FormData): Promise<RegistrationResponse
                 first_name,
                 last_name,
                 password,
-                facility,
-                supervisor,
+                institution_id: parseInt(institution_id),
+                caretaker_id,
                 is_accepted,
                 is_banned
             }),

@@ -56,9 +56,10 @@ export const signUpAction = async (formData: FormData) => {
         email,
         password,
         options: {
-            emailRedirectTo: `${origin}/auth/callback`,
+            // emailRedirectTo: `${origin}/auth/callback`,
             data: {
                 display_name: displayName,
+                role: "caretaker",
                 // institution: accessCodeData.institution  // institution msg
             }
         },
@@ -83,19 +84,51 @@ export const signUpAction = async (formData: FormData) => {
 export const signInAction = async (formData: FormData) => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    // const role;
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.signInWithPassword({
+    // const { error } = await supabase.auth.signInWithPassword({
+    //     email,
+    //     password,
+    // });
+    const { data: { user }, error } = await supabase.auth.signInWithPassword({
         email,
         password,
     });
+
+    // console.log("=== Login User Info ===");
+    // console.log("Full user object:", user);
+    // console.log("User metadata:", user?.user_metadata);
+    // console.log("User role:", user?.user_metadata?.role);
+    // console.log("User email:", user?.email);
+    // console.log("=====================");
 
     if (error) {
         return encodedRedirect("error", "/sign-in-caretaker", error.message);
     }
 
-    // return redirect("/protected");
-    return redirect("/caretaker/home");
+    // check role
+    const userRole = user?.user_metadata?.role;
+    // switch (userRole) {
+    //     case "caretaker":
+    //         return redirect("/caretaker/home");
+    //     case "buyer":
+    //         return redirect("/sign-up-caretaker");
+    //     default:
+    //         console.error("Invalid role:", userRole);
+    //         await supabase.auth.signOut();
+    //         return encodedRedirect(
+    //             "error",
+    //             "/sign-in-caretaker",
+    //             "Invalid role"
+    //         );
+    // }
+
+    if (userRole === "buyer") {
+        return redirect("/sign-up-caretaker");
+    } else {
+        return redirect("/caretaker/home");
+    }
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
