@@ -5,47 +5,28 @@ import { useSearchParams } from "next/navigation";
 
 const SubscriptionCompleted = () => {
     const searchParams = useSearchParams();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [sub, setSub] = useState("");
     const [status, setStatus] = useState<string | null>(null);
 
     useEffect(() => {
-        // Retrieve email and password from the query parameters
-        const queryEmail = searchParams.get("email");
-        const queryPassword = searchParams.get("password");
+        // SUBid
+        const querySub = searchParams.get("subscription");
 
-        if (queryEmail) setEmail(queryEmail);
-        if (queryPassword) setPassword(queryPassword);
+        if (querySub) setSub(querySub);
     }, [searchParams]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!email || !password) {
+        if (!sub ) {
             setStatus("Error: Profile data not available. Please try again later.");
             return;
         }
+        else{
+            // Redirect to the SubscriptionOverview page with subscriptionID as a query parameter
+            window.location.href = `/SubscriptionOverview?subscriptionID=${sub}`;}
 
-        try {
-            const res = await fetch("/api/payment/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
 
-            const data = await res.json();
-
-            if (res.ok) {
-                // Redirect to the SubscriptionOverview page with subscriptionID as a query parameter
-                window.location.href = `/SubscriptionOverview?subscriptionID=${data.subscriptionID}`;
-            } else {
-                setStatus(`Login failed: ${data.error}`);
-            }
-        } catch (error) {
-            setStatus(`Error: ${error.message}`);
-        }
     };
 
     return (

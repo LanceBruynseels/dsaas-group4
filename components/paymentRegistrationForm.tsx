@@ -118,7 +118,7 @@ const PaymentForm = ({ productData }) => {
                 throw new Error("Failed to create PaymentIntent");
             }
 
-            const { clientSecret, customerId } = await res.json();
+            const { clientSecret, customerId , subscription} = await res.json();
 
             // Confirm the payment with Stripe
             const cardElement = elements.getElement(CardElement);
@@ -141,7 +141,7 @@ const PaymentForm = ({ productData }) => {
             console.log("Payment successful:");
 
             // Redirect to the subscription completed page
-            router.push(`/subscriptionComplete?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+            router.push(`/subscriptionComplete?subscription=${subscription}`);
 
         } catch (err) {
             setError(err.message);

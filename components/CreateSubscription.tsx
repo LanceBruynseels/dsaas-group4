@@ -72,7 +72,7 @@ const ProductsPage = () => {
                 {product3 && (
                     <div
                         key={product3.id}
-                        className="flex flex-col justify-center items-center lg:w-[25%] w-[80%] transition-all duration-200 text-center group aspect-[1/1] lg:hover:aspect-[3/2] lg:hover:w-[40%] "
+                        className="flex flex-col justify-center items-center lg:w-[25%] w-[60%] transition-all duration-200 text-center group aspect-[1/1] lg:hover:aspect-[3/2] lg:hover:w-[40%] "
                     >
                         <div className="flex flex-col justify-between items-center gap-[1%] p-[5%] border-white rounded-2xl border-8 w-[90%] group-hover:bg-red-200 h-[90%] lg:group-hover:w-[90%]">
                             <h3 className="text-[2vw] h-[15%]">{product3.name}</h3>

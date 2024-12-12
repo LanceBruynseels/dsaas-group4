@@ -129,6 +129,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             clientSecret,
             customerId: customer.id,
+            subscription: subscription.id,
+
         });
     } catch (error) {
         console.error("Error creating subscription:", error);
