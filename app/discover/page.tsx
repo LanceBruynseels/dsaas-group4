@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client"; // Adjust the import path
 import { getUserId } from "@components/UserDisplay";
-import {useIsMobile} from "@components/mediaQuery";
+import { useIsMobile } from "@components/mediaQuery";
 import { Spinner } from "flowbite-react"; // Import Flowbite Spinner
 
 const Discover: React.FC = () => {
@@ -30,7 +30,7 @@ const Discover: React.FC = () => {
                 setChats(data); // Store all chats
                 setFilteredChats(data); // Initialize filtered chats with all chats
             } catch (err) {
-                setError("Er is een fout opgetreden.");
+                setError("An error occurred while fetching chats.");
                 console.error(err);
             } finally {
                 setLoading(false); // Stop loading
@@ -52,29 +52,12 @@ const Discover: React.FC = () => {
             setFilteredChats(filtered); // Update filtered chats when search query exists
             setCurrentPage(1); // Reset to the first page after search
         } else {
-            // Re-fetch chats from the database when search is cleared
-            setLoading(true); // Start loading
-            try {
-                const { data, error } = await supabase
-                    .from("discover_chats")
-                    .select("id, title, image_url");
-
-                if (error) throw error;
-
-                setChats(data); // Store all chats
-                setFilteredChats(data); // Initialize filtered chats with all chats
-                setCurrentPage(1); // Reset to the first page
-            } catch (err) {
-                setError("Er is een fout opgetreden.");
-                console.error(err);
-            } finally {
-                setLoading(false); // Stop loading
-            }
+            setFilteredChats(chats); // Reset to original chats if search is cleared
         }
     };
 
     const handleNextPage = () => {
-        if (filteredChats && currentPage * chatsPerPage < filteredChats.length) {
+        if (currentPage * chatsPerPage < filteredChats.length) {
             setCurrentPage(currentPage + 1);
         }
     };
@@ -122,7 +105,7 @@ const Discover: React.FC = () => {
             <div
                 className="bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB] text-xl text-white p-4 rounded-xl shadow-md w-full min-h-[400px]">
                 <h1 className="font-bold text-2xl sm:text-3xl mb-6 text-center">
-                    Nieuwe groep toevoegen? 🔍
+                    Add a new group? 🔍
                 </h1>
 
                 {/* Search bar */}
@@ -143,53 +126,16 @@ const Discover: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Navigation buttons and chat display */}
                         <div className="flex items-center justify-between mt-4">
                             <button
                                 onClick={handlePreviousPage}
                                 disabled={currentPage === 1}
-                                className="p-2 rounded-lg text-white bg-white disabled:bg-gray-400 hover:bg-rose-400 mr-3"
+                                className="p-2 rounded-lg text-white bg-white disabled:bg-gray-400 hover:bg-rose-400"
                             >
                                 ⬅️
                             </button>
-                {/* Navigation buttons and chat display */}
-                <div className="flex flex-col sm:flex-row items-center justify-between mt-6">
-                    <button
-                        onClick={handlePreviousPage}
-                        disabled={currentPage === 1}
-                        className="p-2 rounded-lg text-white bg-white disabled:bg-gray-400 hover:bg-rose-400 mb-4 sm:mb-0 sm:mr-3"
-                    >
-                        ⬅️
-                    </button>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
-                        {currentChats && currentChats.length > 0 ? (
-                            currentChats.map((chat) => (
-                                <button
-                                    key={chat.id}
-                                    className="bg-white p-3 rounded-lg text-center hover:bg-rose-400 hover:scale-105 focus:outline-none"
-                                    onClick={() => handleChatClick(chat.id)}
-                                >
-                                    {chat.image_url ? (
-                                        <img
-                                            src={chat.image_url}
-                                            alt={chat.title}
-                                            className="w-full h-[150px] sm:h-[200px] object-cover rounded-md mb-2"
-                                        />
-                                    ) : (
-                                        <div
-                                            className="w-full h-[150px] sm:h-[200px] bg-gray-300 rounded-md mb-2"></div>
-                                    )}
-                                    <p className="text-sm text-black">{chat.title}</p>
-                                </button>
-                            ))
-                        ) : (
-                            <div className="col-span-2 sm:col-span-3 text-center">
-                                Loading chats...
-                            </div>
-                        )}
-                    </div>
-                            <div className="grid grid-cols-3 gap-4 w-full">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
                                 {currentChats && currentChats.length > 0 ? (
                                     currentChats.map((chat) => (
                                         <button
@@ -201,31 +147,25 @@ const Discover: React.FC = () => {
                                                 <img
                                                     src={chat.image_url}
                                                     alt={chat.title}
-                                                    className="w-full h-[200px] object-cover rounded-md mb-2"
+                                                    className="w-full h-[150px] sm:h-[200px] object-cover rounded-md mb-2"
                                                 />
                                             ) : (
-                                                <div className="w-full h-[200px] bg-gray-300 rounded-md mb-2"></div>
+                                                <div className="w-full h-[150px] sm:h-[200px] bg-gray-300 rounded-md mb-2"></div>
                                             )}
                                             <p className="text-sm text-black">{chat.title}</p>
                                         </button>
                                     ))
                                 ) : (
-                                    <div></div>
+                                    <div className="col-span-2 sm:col-span-3 text-center">
+                                        No chats found.
+                                    </div>
                                 )}
                             </div>
 
-                    <button
-                        onClick={handleNextPage}
-                        disabled={filteredChats && indexOfLastChat >= filteredChats.length}
-                        className="p-2 rounded-lg text-white bg-white disabled:bg-gray-400 hover:bg-rose-400 mt-4 sm:mt-0 sm:ml-3"
-                    >
-                        ➡️
-                    </button>
-                </div>
                             <button
                                 onClick={handleNextPage}
                                 disabled={filteredChats && indexOfLastChat >= filteredChats.length}
-                                className="p-2 rounded-lg text-white bg-white disabled:bg-gray-400 hover:bg-rose-400 ml-3 "
+                                className="p-2 rounded-lg text-white bg-white disabled:bg-gray-400 hover:bg-rose-400"
                             >
                                 ➡️
                             </button>
@@ -234,7 +174,6 @@ const Discover: React.FC = () => {
                 )}
             </div>
         </div>
-
     );
 };
 
