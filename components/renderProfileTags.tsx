@@ -37,9 +37,9 @@ const renderProfileTags = ({ currentMatch }) => {
       {renderTags('Gender', currentMatch?.profile_data?.genders)}
       {renderTags('Persoonlijkheid', currentMatch?.profile_data?.personalities)}
       {renderTags('Interesses', currentMatch?.profile_data?.interests)}
-      {renderTags('Religion', currentMatch?.profile_data?.religions)}
-      {renderTags('Home Status', currentMatch?.profile_data?.home_status)}
-      {renderTags('Handicap', currentMatch?.profile_data?.disabilities)}
+      {renderTags('Religie', currentMatch?.profile_data?.religions)}
+      {renderTags('Thuis status', currentMatch?.profile_data?.home_status)}
+      {renderTags('bijzonder kenmerk', currentMatch?.profile_data?.disabilities)}
       {renderTags('Relatie Doel', currentMatch?.profile_data?.relationship_goals)}
     </div>
   );

@@ -8,6 +8,7 @@ import RenderProfileTags from "@components/renderProfileTags"; // Assuming you'r
 
 export function UserPopup({ currentMatch, isOpen, onClose }) {
 
+    console.log(isOpen);
     if (!isOpen || !currentMatch) return null;
 
     const [isSmallScreen, setIsSmallScreen] = useState(false);

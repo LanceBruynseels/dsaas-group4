@@ -75,8 +75,6 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
         refreshMatches();
     }, []);
 
-
-
     //console.log("matchingCard:", userId);
     useEffect(() => {
         // Ensure the buffer is initially filled
@@ -135,7 +133,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
         <Suspense fallback={<Loading/>}>
             {isLoading ? (
                 <>
-                    <div className="flex flex-col justify-center items-center w-full h-full">
+                    <div className="flex flex-col justify-center items-center w-full h-full left-8">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-950"></div>
                         <p className="text-red-950 mt-4 text-lg">Loading...</p>
                     </div>
@@ -143,21 +141,23 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
             ) : (
                 currentMatch ? (
                     <>
-                        <h2 className={"text-xl font-bold lg:mb-4 lg:p-4 text-red-950 text-center "}> Zoek hier je
-                            nieuwe
-                            match!</h2>
-                        <button onClick={refreshMatches}>
-                        <svg className="w-[48px] h-[48px] text-gray-800 dark:text-white" aria-hidden="true"
-                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                             viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2.3"
-                                  d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/>
-                        </svg>
-                    </button>
-                        <div className="flex flex-row lg:p-4 w-full h-full">
+                        <div className={"flex flex-row items-center w-full justify-between px-8"}>
+                            <h2 className={"text-xl font-bold  text-red-950"}> Zoek hier je
+                                nieuwe
+                                match!</h2>
+                            <button onClick={refreshMatches}>
+                                <svg className="w-[48px] h-[48px] text-gray-800 dark:text-white" aria-hidden="true"
+                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                     viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2.3"
+                                          d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="flex flex-row lg:p-4 w-full h-full justify-center">
                             {currentMatch ? (
-                                <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px]">
+                                <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px] m-2">
                                     <FlowbiteCarousel
                                         pictures={currentMatch.publicUrls || []}
                                         infoSection={<RenderProfileTags
@@ -169,7 +169,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                             )}
                             {/*Right Info Section for larger screens */}
                             <div
-                                className="hidden lg:flex m-2 basis-1/2 flex-col h-full max-h-[500px] p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
+                                className="hidden lg:flex m-2 basis-1/2 flex-col h-full max-h-[500px] overflow-y-auto p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
                                 <RenderProfileTags currentMatch={currentMatch}></RenderProfileTags>
                             </div>
                         </div>
@@ -219,7 +219,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                             </div>
                         </div>
                     </>
-                    ): (
+                ) : (
                     <div
                         className="flex flex-col items-center justify-center w-full h-full ">
                         <div className="flex flex-col items-center p-8">
@@ -231,8 +231,8 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                                 stroke="currentColor"
                                 className="w-16 h-16 text-red-800 mb-4"
                             >
-                            <path
-                                strokeLinecap="round"
+                                <path
+                                    strokeLinecap="round"
                                 strokeLinejoin="round"
                                 d="M12 6.75l.002 5.378a2.625 2.625 0 11-2.382 0V6.75m7.5 8.25a6.375 6.375 0 10-12.75 0"
                             />
@@ -249,7 +249,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                 )
             )}
             </Suspense>
-            {/*<UserPopup currentMatch={currentMatch} isOpen={isPopupOpen} onClose={() => setPopupOpen(false)}></UserPopup>*/}
+
         </>
     );
 }
