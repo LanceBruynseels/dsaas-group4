@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
       <html lang="nl" className={GeistSans.className} suppressHydrationWarning>
-      <body className="bg-background text-foreground">
+      <body className="bg-red-50 text-foreground">
       <Providers>
         <main className="min-h-screen flex flex-col">
             <Metrics />
@@ -35,7 +35,7 @@ export default function RootLayout({
             <footer className="flex flex-row w-screen h-fit text-red-950 justify-between border-t border-red-950 py-5">
                 <div className="hidden w-full h-fit gap-2 md:flex md:justify-center md:items-center">
                     <Link href={"/share"} className="text-red-950 w-[60%] text-center hover:text-red-950">
-                        Deel met vrienden!
+                        Deel de app met je vrienden!
                     </Link>
                 </div>
             </footer>

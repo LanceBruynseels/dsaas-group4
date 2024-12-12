@@ -45,7 +45,7 @@ export default function NotificationsPanel({notifications_data}: NotificationPro
                             <div className={`flex flex-row justify-between items-center ${
                                 expanded ? "p-4" : "px-1 py-4"
                             }`}>
-                                <h2 className={`text-xl font-bold overflow-hidden ${
+                                <h2 className={`text-xl font-bold overflow-hidden text-gray-900 ${
                                     expanded ? "w-32" : "w-0"
                                 }`}>
                                     Meldingen
@@ -89,10 +89,10 @@ export default function NotificationsPanel({notifications_data}: NotificationPro
                                         />
                                     </svg>
                                     <h2 className="text-2xl font-semibold text-red-800 mb-2">
-                                        No Notifications
+                                        Geen meldingen
                                     </h2>
                                     <p className="text-red-700 text-center">
-                                        You're all caught up! Check back later for new updates.
+                                        Je hebt niets gemist!
                                     </p>
                                 </div>
                             )}
@@ -164,11 +164,10 @@ export default function NotificationsPanel({notifications_data}: NotificationPro
                                             />
                                         </svg>
                                         <h2 className="text-2xl font-semibold text-red-800 mb-2">
-                                            No Notifications
+                                            Geen meldingen
                                         </h2>
                                         <p className="text-red-700 text-center">
-                                            You're all caught up! Check back later for new
-                                            updates.
+                                            Je hebt niets gemist!
                                         </p>
                                     </div>
                                 </div>

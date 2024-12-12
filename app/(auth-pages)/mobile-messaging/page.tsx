@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mic, Send } from 'lucide-react';
@@ -77,6 +77,7 @@ const MobileMessaging: React.FC = () => {
     }, [contactId, senderId]);
 
     return (
+        <Suspense fallback={<div>Loading...</div>}>
         <div className="flex flex-col h-screen" style={{backgroundColor: '#FFEBEB'}}>
             {contact ? (
                 <>
@@ -90,6 +91,7 @@ const MobileMessaging: React.FC = () => {
                 </div>
             )}
         </div>
+        </Suspense>
     );
 };
 
