@@ -228,10 +228,11 @@ export default function CaretakerHome() {
 
                 <button
                     onClick={handleSignOut}
-                    className="p-2 hover:bg-red-100 rounded-full transition-colors"
+                    className="p-2 flex items-center gap-2 hover:bg-red-100 rounded-lg transition-colors"
                     title="Sign out"
                 >
                     <LogOut className="text-red-600" size={24}/>
+                    <span className="text-red-600">Sign out</span>
                 </button>
 
                 <div className="space-y-4 overflow-y-auto">

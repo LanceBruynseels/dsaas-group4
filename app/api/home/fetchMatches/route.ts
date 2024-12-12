@@ -40,7 +40,7 @@ export async function POST(req : NextRequest) {
         const typedMatchData = matchData; // Ensure proper typing if needed
         // console.log("typedMatchData: ", typedMatchData);
 
-        let publicUrls = [];
+        const publicUrls = [];
         let allMatchData: MatchingUser[];
 
         // Get public URLs for the first match's pictures

@@ -11,7 +11,6 @@ export const signUpAction = async (formData: FormData) => {
     const displayName = formData.get("displayName")?.toString();
     const accessCode = formData.get("accessCode")?.toString();
     const supabase = await createClient();
-    const origin = (await headers()).get("origin");
 
     if (!email || !password || !accessCode) {
         return encodedRedirect(
@@ -37,7 +36,42 @@ export const signUpAction = async (formData: FormData) => {
         );
     }
 
-    // update access code status to used
+    // Sign up user
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                display_name: displayName,
+                role: "caretaker",
+            }
+        },
+    });
+
+    if (signUpError) {
+        return encodedRedirect(
+            "error",
+            "/sign-up-caretaker",
+            signUpError.message
+        );
+    }
+
+    // Only update the institution_id in caretakers table
+    const { error: caretakerError } = await supabase
+        .from('caretakers')
+        .update({ institution_id: accessCodeData.institution })
+        .eq('id', authData.user?.id);
+
+    if (caretakerError) {
+        console.error(caretakerError);
+        return encodedRedirect(
+            "error",
+            "/sign-up-caretaker",
+            "Error associating caretaker with institution"
+        );
+    }
+
+    // Mark access code as used
     const { error: updateError } = await supabase
         .from('access_codes')
         .update({ is_used: true })
@@ -52,33 +86,11 @@ export const signUpAction = async (formData: FormData) => {
         );
     }
 
-    const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            // emailRedirectTo: `${origin}/auth/callback`,
-            data: {
-                display_name: displayName,
-                role: "caretaker",
-                // institution: accessCodeData.institution  // institution msg
-            }
-        },
-    });
-
-    if (error) {
-        console.error(error.code + " " + error.message);
-        return encodedRedirect(
-            "error",
-            "/sign-up-caretaker",
-            error.message
-        );
-    } else {
-        return encodedRedirect(
-            "success",
-            "/sign-up-caretaker",
-            "Thanks for signing up! Please check your email for a verification link.",
-        );
-    }
+    return encodedRedirect(
+        "success",
+        "/sign-up-caretaker",
+        "Thanks for signing up! Please check your email for a verification link.",
+    );
 };
 
 export const signInAction = async (formData: FormData) => {
