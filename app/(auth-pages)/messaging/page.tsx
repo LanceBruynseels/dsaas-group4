@@ -15,7 +15,7 @@ const ChatApp: React.FC = () => {
     const router = useRouter();
 
     useEffect(() => {
-        // Check for matchId in the query parameters
+
         const matchedId = searchParams.get('matchedId');
         if (matchedId) {
             // Fetch contact details for the given matchId
