@@ -246,6 +246,8 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     // Mark all messages from the selected contact as read
+
+
     const markMessagesAsRead = async () => {
         try {
             const { error } = await supabase
@@ -352,6 +354,9 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
 const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
+    const [problemDescription, setProblemDescription] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const senderId = getUserId(); // Assuming a function to get the current user's ID
 
     useEffect(() => {
         // Reset the profile picture when the selected contact changes
@@ -384,6 +389,42 @@ const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => 
         getProfilePicture();
     }, [selectedContact]);
 
+    const handleReportSubmit = async () => {
+        const receiverId = selectedContact.id; // Assuming selectedContact contains the receiver's info
+
+        // Check if a description is provided
+        if (!problemDescription.trim()) {
+            console.error("Problem description is required");
+            return;
+        }
+
+        try {
+            // Insert the report into the 'reports' table
+            const { error } = await supabase
+                .from('reports') // Replace 'reports' with the actual table name
+                .insert([
+                    {
+                        sender_id: senderId,  // The user submitting the report
+                        receiver_id: receiverId,  // The user being reported
+                        description: problemDescription,  // The problem description
+                    },
+                ]);
+
+            if (error) {
+                console.error("Error submitting report:", error);
+                return;
+            }
+
+            console.log("Report submitted successfully");
+            setIsModalOpen(false); // Close the modal after submission
+
+            // Optionally reset other states like problemDescription if needed
+            setProblemDescription('');
+        } catch (error) {
+            console.error("Unexpected error submitting report:", error);
+        }
+    };
+
     return (
         <div className="flex items-center justify-between p-4 mb-6 bg-[hsl(10,100%,95%)] rounded-lg">
             <div className="flex items-center gap-3">
@@ -394,6 +435,42 @@ const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => 
                 />
                 <h3 className="text-lg font-bold">{selectedContact?.username || 'Unknown'}</h3>
             </div>
+
+            <button
+                onClick={() => setIsModalOpen(true)}
+                className="ml-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
+            >
+                🚩 Probleem melden
+            </button>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg w-96">
+                        <h2 className="text-xl font-semibold">Probleem melden</h2>
+                        <textarea
+                            value={problemDescription}
+                            onChange={(e) => setProblemDescription(e.target.value)}
+                            rows={4}
+                            className="mt-4 w-full p-2 border rounded-md"
+                            placeholder="Beschrijf hier het probleem..."
+                        />
+                        <div className="mt-4 flex gap-4">
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                            >
+                                Sluiten
+                            </button>
+                            <button
+                                onClick={handleReportSubmit}
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                            >
+                                Melden
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
