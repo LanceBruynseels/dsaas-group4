@@ -38,8 +38,9 @@ const ProductsPage = () => {
     // Show loading state
     if (loading) {
         return (
-            <div className="flex justify-center items-center w-full h-screen">
-                <Spinner color="pink" size="xl" aria-label="Spinner" />
+            <div className="flex flex-col justify-center items-center w-full h-full">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-950"></div>
+                <p className="text-red-950 mt-4 text-lg">Loading...</p>
             </div>
         );
     }
@@ -47,7 +48,7 @@ const ProductsPage = () => {
     // Show error if it occurs
     if (error) {
         return (
-            <div style={{color: 'red' }}>
+            <div style={{color: 'red'}}>
                 <h3>Error:</h3>
                 <p>{error}</p>
             </div>

@@ -1,7 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import Image from "next/image";
-
 
 const teamMembers = [
     {name: 'Anton Ceusters', function: 'Software Engineer', description: 'description', picture: '/vlinder.png'},

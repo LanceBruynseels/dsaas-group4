@@ -39,16 +39,17 @@ const PaymentPage = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center w-full h-screen">
-                <Spinner color="pink" size="xl" aria-label="Pink spinner example" />
+            <div className="flex flex-col justify-center items-center w-screen h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-950"></div>
+                <p className="text-red-950 mt-4 text-lg">Loading...</p>
             </div>
         );
     }
 
     return (
-       <div className="flex flex-col justify-center items-center w-screen  h-screen p-4">
+        <div className="flex flex-col justify-center items-center w-screen  h-screen p-4">
             <Elements stripe={stripePromise}>
-                <PaymentForm productData={productData} />
+                <PaymentForm productData={productData}/>
             </Elements>
         </div>
     );

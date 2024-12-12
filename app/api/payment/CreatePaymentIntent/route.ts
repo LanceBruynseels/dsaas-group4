@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { createClient } from '@/utils/supabase/server';
-import bcrypt from 'bcryptjs';
 import { signBuyerUpAction } from "@/app/actions";
 
 // Initialize Stripe for payments
@@ -11,6 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 let globalCodes: string[] = [];
+let insertedInstitutionId = null;
 
 export async function POST(req: NextRequest) {
     try {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
 
 
-        // Create a user in Supabase
+ /*       // Create a user in Supabase
         const hashedPassword = await bcrypt.hash(password, 14);
         const supabase = await createClient(); // Await the promise here
         const { data: supabaseData, error: supabaseError } = await supabase.from('Buyers').insert([
@@ -46,24 +46,27 @@ export async function POST(req: NextRequest) {
                 subscriptionID: null,
             },
         ]);
-
         if (supabaseError) {
             console.error("Error inserting user into Supabase:", supabaseError.message);
             throw new Error("Supabase user creation failed");
-        }
+        }*/
 
         //creates institude in supabase
-        const supabase2 = await createClient(); // Await the promise here
-        const { data: supabaseData2, error: supabaseError2 } = await supabase2.from('institutions').insert([
+        const supabase = await createClient(); // Await the promise here
+        const { data: supabaseData2, error: supabaseError2 } = await supabase.from('institutions').insert([
             {
                 institution: institution
             },
-        ]);
+        ])
+        .select(); // returns full row ov everything JUST added
 
         if (supabaseError2) {
             console.error("Error inserting user into Supabase:", supabaseError2.message);
             throw new Error("Supabase user creation failed");
+        }
 
+        if (supabaseData2 && supabaseData2.length > 0) {
+            insertedInstitutionId = supabaseData2[0].id; // getting ID out of row
         }
 
         console.log("User created in Supabase:");
@@ -113,7 +116,7 @@ export async function POST(req: NextRequest) {
         await signBuyerUpAction(formData);
 
         //update buyers
-        const { data: updatedUser, error: updateError } = await supabase
+/*        const { data: updatedUser, error: updateError } = await supabase
             .from('Buyers')
             .update({ subscriptionID: subscription.id })
             .eq('email', email);  // Match the email to update the correct record
@@ -123,7 +126,7 @@ export async function POST(req: NextRequest) {
             throw new Error("Failed to update subscription ID");
         }
 
-        console.log("User's subscription ID updated in Supabase:", updatedUser);
+        console.log("User's subscription ID updated in Supabase:", updatedUser);*/
 
         // Generate unique codes for different subscription tiers
         const BasicSubscription = 20;
@@ -133,17 +136,17 @@ export async function POST(req: NextRequest) {
         switch (productId) {
             case "prod_RGFgganaaEOG3u": // Basic
                 globalCodes = generateUniqueCodes(BasicSubscription, 16);
-                await storeCodes(institution, globalCodes);
+                await storeCodes(insertedInstitutionId, globalCodes);
                 break;
 
             case "prod_RGQIgY6QtXCIUR": // Advanced
                 globalCodes = generateUniqueCodes(AdvancedSubscription, 16);
-                await storeCodes(institution, globalCodes);
+                await storeCodes(insertedInstitutionId, globalCodes);
                 break;
 
             case "prod_RGQJrvBvsy3s2k": // Ultra
                 globalCodes = generateUniqueCodes(UltraSubscription, 16);
-                await storeCodes(institution, globalCodes);
+                await storeCodes(insertedInstitutionId, globalCodes);
                 break;
         }
 
@@ -202,10 +205,10 @@ function generateUniqueCodes(numberOfCodes: number, codeLength: number): string[
 // Store codes in Supabase
 interface AccessCode {
     code: string;
-    institution: string;
+    institution: number;
 }
 
-async function storeCodes(institution: string, codes: string[]): Promise<AccessCode[] | null> {
+async function storeCodes(institution: number, codes: string[]): Promise<AccessCode[] | null> {
     const supabase = await createClient(); // Await the promise here
 
     const rows = codes.map((code) => ({
@@ -223,7 +226,6 @@ async function storeCodes(institution: string, codes: string[]): Promise<AccessC
     console.log('Inserted codes:');
     return data as AccessCode[];
 }
-
 
 // Get global codes as a newline-separated string
 function getCodes(): string {
