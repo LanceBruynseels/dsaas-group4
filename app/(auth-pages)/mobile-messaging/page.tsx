@@ -1,8 +1,8 @@
 'use client';
-import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Mic, Send } from 'lucide-react';
+import React, {Suspense, useEffect, useRef, useState} from 'react';
+import {createClient} from '@/utils/supabase/client';
+import {useRouter, useSearchParams} from 'next/navigation';
+import {Send} from 'lucide-react';
 import TextContent from "@components/TextContent";
 import {getUserId} from "@components/UserDisplay";
 
@@ -78,7 +78,7 @@ const MobileMessaging: React.FC = () => {
 
     return (
         <Suspense fallback={<div>Loading...</div>}>
-        <div className="flex flex-col h-screen" style={{backgroundColor: '#FFEBEB'}}>
+        <div className="flex flex-col h-screen bg-[#FFEBEB]">
             {contact ? (
                 <>
                     <ChatHeader contact={contact} onBack={() => router.push('/messaging')}/>

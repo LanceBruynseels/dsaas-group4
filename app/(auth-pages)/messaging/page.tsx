@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Mic, Send } from 'lucide-react';
 import { useIsMobile } from "@/components/mediaQuery";
@@ -57,33 +57,41 @@ const ChatApp: React.FC = () => {
     }, [selectedContact]); // Run this effect when selectedContact changes
 
     return isMobile ? (
-        <div className="flex h-screen bg-[hsl(10,100%,90%)]">
-            <div className="max-w-fit p-10">
-                <Sidebar
-                    onSelectContact={(contact) =>
-                        router.push(`/mobile-messaging?id=${contact.id}`) // Pass contact ID via query params
-                    }
-                />
+        <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div>Loading search params...</div>}>
+            <div className="flex h-screen bg-[hsl(10,100%,90%)]">
+                <div className="max-w-fit p-10">
+                    <Sidebar
+                        onSelectContact={(contact) =>
+                            router.push(`/mobile-messaging?id=${contact.id}`) // Pass contact ID via query params
+                        }
+                    />
+                </div>
             </div>
-        </div>
-    ) : (
-        // Laptop version
-        <div className="flex h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-            <div className="w-1/3 p-6">
-                <Sidebar onSelectContact={setSelectedContact} />
+            </Suspense>
+        </Suspense>
+        ) : (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div>Loading search params...</div>}>
+            // Laptop version
+            <div className="flex h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+                <div className="w-1/3 p-6">
+                    <Sidebar onSelectContact={setSelectedContact} />
+                </div>
+                <div className="w-2 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB]"></div>
+                <div className="flex-1 flex flex-col p-6">
+                    {selectedContact ? (
+                        <ChatSection selectedContact={selectedContact} /> // Render the chat section with the selected contact
+                    ) : (
+                        <div className="flex items-center justify-center h-full">
+                            <p className="text-lg text-gray-500">Select a contact for chatting</p>
+                        </div>
+                    )}
+                </div>
             </div>
-            <div className="w-2 bg-gradient-to-b from-[#FFAB9F] to-[#FFDFDB]"></div>
-            <div className="flex-1 flex flex-col p-6">
-                {selectedContact ? (
-                    <ChatSection selectedContact={selectedContact} /> // Render the chat section with the selected contact
-                ) : (
-                    <div className="flex items-center justify-center h-full">
-                        <p className="text-lg text-gray-500">Select a contact for chatting</p>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
+            </Suspense>
+        </Suspense>
+    )
 };
 
 const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
