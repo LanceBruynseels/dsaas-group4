@@ -5,13 +5,10 @@ import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { signBuyerUpAction } from "@/app/actions";
 
-
-
 // Initialize Stripe for payments
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2024-11-20.acacia",
 });
-
 
 let globalCodes: string[] = [];
 
@@ -24,7 +21,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-
         // Create a customer in Stripe
         const customer = await stripe.customers.create({
             email,
@@ -33,9 +29,7 @@ export async function POST(req: NextRequest) {
             metadata: { institution },
         });
 
-        console.log("Customer created:");
-
-
+        //console.log("Customer created:");
 
         //pogint got registreren
         console.log("poging tot reg")
@@ -44,10 +38,6 @@ export async function POST(req: NextRequest) {
         formData.append("password", password);
         formData.append("displayName", name);
         await signBuyerUpAction(formData);
-
-
-
-
 
         // Create a user in Supabase
         const hashedPassword = await bcrypt.hash(password, 14);
@@ -66,7 +56,6 @@ export async function POST(req: NextRequest) {
         if (supabaseError) {
             console.error("Error inserting user into Supabase:", supabaseError.message);
             throw new Error("Supabase user creation failed");
-
         }
 
         //creates institude in supabase
@@ -82,10 +71,6 @@ export async function POST(req: NextRequest) {
             throw new Error("Supabase user creation failed");
 
         }
-
-
-
-
 
         console.log("User created in Supabase:");
 

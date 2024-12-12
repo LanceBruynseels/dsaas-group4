@@ -2,11 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-    useStripe,
-    useElements,
-    CardElement
-} from "@stripe/react-stripe-js";
+import {useStripe, useElements, CardElement} from "@stripe/react-stripe-js";
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
@@ -19,10 +15,11 @@ const PaymentForm = ({ productData }) => {
     const router = useRouter(); // Router for redirection
     const stripe = useStripe();
     const elements = useElements();
-
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
+    const [password2, setPassword2] = useState("");
     const [phone, setPhone] = useState("");
+    const [phoneError, setPhoneError] = useState("");
     const [institution, setInstitution] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -30,8 +27,9 @@ const PaymentForm = ({ productData }) => {
     const [emailError, setEmailError] = useState<string | null>(null);
     const [institutionError, setInstitutionError] = useState<string | null>(null);
     const [passwordError, setPasswordError] = useState<string | null>(null);
-    const [status, setStatus] = useState();
+    const [password2Error, setPassword2Error] = useState<string | null>(null);
 
+    //Check email
     const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
         const email = event.target.value;
 
@@ -56,6 +54,7 @@ const PaymentForm = ({ productData }) => {
         }
     };
 
+    //Check institution
     const handleInstitutionBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
         const institution = event.target.value;
 
@@ -80,13 +79,36 @@ const PaymentForm = ({ productData }) => {
         }
     };
 
-    const handlepPasswordBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
-        const institution = event.target.value;
-        if (institution.length < 8) {
-            setPasswordError("wachtwoord moet langer zijn dan 8 tekens!");
-            return;
+    //Phone Number check
+    const handlePhoneNumberBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
+        const phone = event.target.value;
+
+        if (!phone) return;
+
+        try {
+            const response = await fetch('/api/payment/CheckPhoneNumberRegistration', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ institution }),
+            });
+
+            const result = await response.json();
+
+            setPhone(!result.available ? null : "Dit telefoonnummer is al in gebruik!");
+
+        } catch (error) {
+            setPhoneError("Fout bij het controleren van het telefoon nummer.");
         }
-    }
+    };
+
+    //
+    const handlePasswordBlur = () => {
+        setPasswordError(password.length >= 8 ? null : "Wachtwoord moet langer zijn dan 8 tekens.");
+    };
+
+    const handlePassword2Blur = () => {
+        setPassword2Error(password === password2 ? null : "Wachtwoorden komen niet overeen.");
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -153,7 +175,7 @@ const PaymentForm = ({ productData }) => {
 
     return (
             <div className="flex lg:flex-row flex-col-reverse justify-center items-center  w-[70%] lg:h-[90%] h-full">
-                <div className="flex flex-row justify-center items-center w-[50%] h-full p-[5%]  border-red-950
+                <div className="flex flex-row justify-center items-center lg:w-[50%] w-[90%] h-full p-[5%]  border-red-950
                 border-l-4  border-b-4  border-r-4 rounded-b-3xl
                 lg:border-t-4  lg:border-b-4  lg:border-r-0 lg:rounded-l-3xl lg:rounded-r-none">
                     <form onSubmit={handleSubmit}
@@ -183,6 +205,7 @@ const PaymentForm = ({ productData }) => {
                             type="tel"
                             placeholder="Phone Number"
                             value={phone}
+                            onBlur={handlePhoneNumberBlur}
                             onChange={(e) => setPhone(e.target.value)}
                             required
                         />
@@ -196,19 +219,31 @@ const PaymentForm = ({ productData }) => {
                             onChange={(e) => setInstitution(e.target.value)}
                             required
                         />
-                        {institutionError && <p className="text-red-500 text-sm">{institutionError}</p>}
+                        {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
 
                         <input
                             className="flex w-full h-full bg-white rounded-xl p-2"
                             type="password"
                             placeholder="Password"
                             value={password}
-                            onBlur={handlepPasswordBlur}
                             onChange={(e) => setPassword(e.target.value)}
+                            onBlur={handlePasswordBlur}
                             required
                         />
-
                         {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+
+                        <input
+                            className="flex w-full h-full bg-white rounded-xl p-2"
+                            type="password"
+                            placeholder="Password"
+                            value={password2}
+                            onChange={(e) => setPassword2(e.target.value)}
+                            onBlur={handlePassword2Blur}
+                            required
+                        />
+                        {password2Error && <p className="text-red-500 text-sm">{password2Error}</p>}
+
+
 
                         {/* Stripe Card Elements */}
                         <div className="w-full h-full bg-white p-2 rounded-xl  ">
@@ -231,12 +266,13 @@ const PaymentForm = ({ productData }) => {
 
                         {/* Checkbox for terms and conditions */}
                         <div className="flex h-full w-full items-center gap-2">
-                            <Checkbox id="agree"/>
+                            <Checkbox id="agree" required/>
                             <Label htmlFor="agree" className="flex">
                                 I agree with the&nbsp;
                                 <Link href="#" className="text-cyan-600 hover:underline dark:text-cyan-500">
                                     terms and conditions
                                 </Link>
+
                             </Label>
                         </div>
 
@@ -257,7 +293,7 @@ const PaymentForm = ({ productData }) => {
                     </form>
                 </div>
 
-                <div className="flex flex-col lg:justify-center justify-center items-center w-[50%] lg:h-full h-[30%] ">
+                <div className="flex flex-col lg:justify-center justify-center items-center lg:w-[50%] w-[90%] lg:h-full h-[30%] ">
                     <div className="flex flex-col justify-center items-center w-full h-full bg-white border-red-950
                         border-l-4  border-t-4  border-r-4 rounded-t-3xl
                         lg:border-t-4  lg:border-b-4  lg:border-l-0 lg:rounded-r-3xl lg:rounded-l-none ">
