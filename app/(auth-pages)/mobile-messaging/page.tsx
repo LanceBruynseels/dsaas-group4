@@ -78,6 +78,7 @@ const MobileMessaging: React.FC = () => {
 
     return (
         <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div>Loading search params...</div>}>
         <div className="flex flex-col h-screen bg-[#FFEBEB]">
             {contact ? (
                 <>
@@ -91,6 +92,7 @@ const MobileMessaging: React.FC = () => {
                 </div>
             )}
         </div>
+            </Suspense>
         </Suspense>
     );
 };

@@ -56,9 +56,9 @@ const ChatApp: React.FC = () => {
         markMessagesAsRead();
     }, [selectedContact]); // Run this effect when selectedContact changes
 
-    return isMobile ? (
-        <Suspense fallback={<div>Loading...</div>}>
-            <Suspense fallback={<div>Loading search params...</div>}>
+    return <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>Loading search params...</div>}>
+            {isMobile ? (
             <div className="flex h-screen bg-[hsl(10,100%,90%)]">
                 <div className="max-w-fit p-10">
                     <Sidebar
@@ -68,11 +68,7 @@ const ChatApp: React.FC = () => {
                     />
                 </div>
             </div>
-            </Suspense>
-        </Suspense>
         ) : (
-        <Suspense fallback={<div>Loading...</div>}>
-            <Suspense fallback={<div>Loading search params...</div>}>
             // Laptop version
             <div className="flex h-screen bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="w-1/3 p-6">
@@ -89,9 +85,9 @@ const ChatApp: React.FC = () => {
                     )}
                 </div>
             </div>
+            )}
             </Suspense>
         </Suspense>
-    )
 };
 
 const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
