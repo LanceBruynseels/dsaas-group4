@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
 
         // Return the subscriptionId to the frontend
         return NextResponse.json({ subscriptionID: user.subscriptionID});
+
     } catch (error: any) {
         console.error("Error during login:", error.message);
         return NextResponse.json({ error: error.message }, { status: 500 });

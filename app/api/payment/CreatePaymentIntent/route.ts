@@ -9,8 +9,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2024-11-20.acacia",
 });
 
-let globalCodes: string[] = [];
-let insertedInstitutionId = null;
+let globalCodes: string[] = []; //Global variable for the caretaker accescodes
+let insertedInstitutionId = null; //Id of the institution of accescodes
 
 export async function POST(req: NextRequest) {
     try {
@@ -29,52 +29,6 @@ export async function POST(req: NextRequest) {
             metadata: { institution },
         });
 
-        //console.log("Customer created:");
-
-/*        //pogint got registreren
-        console.log("poging tot reg")
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("displayName", name);
-        formData.append("institution", institution);
-        await signBuyerUpAction(formData);*/
-
- /*       // Create a user in Supabase
-        const hashedPassword = await bcrypt.hash(password, 14);
-        const supabase = await createClient(); // Await the promise here
-        const { data: supabaseData, error: supabaseError } = await supabase.from('Buyers').insert([
-            {
-                name,
-                email,
-                phone,
-                institution,
-                password: hashedPassword,
-                subscriptionID: null,
-            },
-        ]);
-
-        if (supabaseError) {
-            console.error("Error inserting user into Supabase:", supabaseError.message);
-            throw new Error("Supabase user creation failed");
-        }*/
-
-        // creates institude in supabase
-        // const supabase2 = await createClient(); // Await the promise here
-        // const { data: supabaseData2, error: supabaseError2 } = await supabase2.from('institutions').insert([
-        //     {
-        //         institution: institution
-        //     },
-        // ]);
-        //
-        // if (supabaseError2) {
-        //     console.error("Error inserting user into Supabase:", supabaseError2.message);
-        //     throw new Error("Supabase user creation failed");
-        //
-        // }
-        //
-        // console.log("User created in Supabase:");
-
         // Fetch product price
         const prices = await stripe.prices.list({ product: productId });
         const price = prices.data[0];
@@ -82,7 +36,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Price not found" }, { status: 400 });
         }
 
-        // Create a subscription
+        // Create a subscription in stripe
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
             items: [{ price: price.id }],
@@ -90,8 +44,6 @@ export async function POST(req: NextRequest) {
             expand: ["latest_invoice.payment_intent"],
             metadata: { productId, institution, email },
         });
-
-        console.log("Subscription created:");
 
         // Access the client secret from the subscription's payment intent
         let clientSecret: string | null = null;
@@ -108,27 +60,9 @@ export async function POST(req: NextRequest) {
         if (!clientSecret) {
             throw new Error("Client secret could not be retrieved from the payment intent.");
         }
-        console.log("Payment Intend created")
 
 
-
-
-        //update buyers
-/*        const { data: updatedUser, error: updateError } = await supabase
-            .from('Buyers')
-            .update({ subscriptionID: subscription.id })
-            .eq('email', email);  // Match the email to update the correct record
-
-        if (updateError) {
-            console.error("Error updating subscription_id in Supabase:", updateError.message);
-            throw new Error("Failed to update subscription ID");
-        }
-
-        console.log("User's subscription ID updated in Supabase:", updatedUser);*/
-
-
-
-        //pogint got registreren in supabase
+        //Registering the user to the supabase via auth pages
         console.log("poging tot reg")
         const formData = new FormData();
         formData.append("email", email);
@@ -138,12 +72,12 @@ export async function POST(req: NextRequest) {
         formData.append("institution", institution);
         await signBuyerUpAction(formData);
 
+        //getting the ID of the instituions out of the supabase
         const supabase = await createClient();
         const { data: supabaseData2, error: supabaseError2 } = await supabase.from('institutions').select().eq("institution", institution);
         console.log("User created in Supabase:",supabaseData2 );
         insertedInstitutionId = supabaseData2[0].id;
         console.log("///////////////////////////////////////////////////////////////////////////////////////////" , insertedInstitutionId);
-
 
         // Generate unique codes for different subscription tiers
         const BasicSubscription = 20;
@@ -167,7 +101,6 @@ export async function POST(req: NextRequest) {
                 break;
         }
 
-
         // Send email with Nodemailer
         const transporter: Transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -179,8 +112,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        console.log("email Transporter created")
-
+        //email noder
         const mailOptions: SendMailOptions = {
             from: "SaasGroupVlinder@gmail.com",
             to: email,
@@ -188,7 +120,7 @@ export async function POST(req: NextRequest) {
             text: `Dear ${name},\n\nThank you for subscribing to our service. Your subscription is now active. Your codes:\n\n${getCodes()}`,
         };
 
-
+        //sending email
         await transporter.sendMail(mailOptions);
         console.log("Email sent successfully.");
         console.log("prijs",price);
@@ -231,7 +163,7 @@ async function storeCodes(institution: number, codes: string[]): Promise<AccessC
 
     const rows = codes.map((code) => ({
         code,
-        insertedInstitutionId,
+        institution,
     }));
 
     const { data, error } = await supabase.from('access_codes').insert(rows);
@@ -244,7 +176,6 @@ async function storeCodes(institution: number, codes: string[]): Promise<AccessC
     console.log('Inserted codes:');
     return data as AccessCode[];
 }
-
 
 // Get global codes as a newline-separated string
 function getCodes(): string {
