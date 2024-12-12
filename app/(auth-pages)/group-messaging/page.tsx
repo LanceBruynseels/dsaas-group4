@@ -4,6 +4,7 @@ import { Mic, Send } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { getUserId } from "@components/UserDisplay";
+import { Spinner } from 'flowbite-react';
 
 const supabase = createClient();
 
@@ -37,7 +38,7 @@ const ChatContent: React.FC<{
                     .single();
 
                 if (error) {
-                    console.error('Failed to fetch chat:', error);
+
                 } else {
                     setSelectedGroupChat(data);
                 }
@@ -101,7 +102,6 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                     setChats([]);
                 }
             } catch (err) {
-                setError("Failed to fetch chats");
             }
         };
 
@@ -165,7 +165,9 @@ const Sidebar: React.FC<{ onSelectGroupChat: (chat: any) => void }> = ({ onSelec
                 ) : error ? (
                     <div className="text-red-500">{error}</div>
                 ) : (
-                    <div>{chats ? "Geen resultaten gevonden." : "Laden..."}</div>
+                    <div className="flex justify-center items-center h-16">
+                        <Spinner aria-label="Loading chats" size="lg" />
+                    </div>
                 )}
             </div>
         </>
@@ -390,7 +392,7 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                             />
                         </div>
 
-                        <div className="mt-4 max-h-40 overflow-y-auto">
+                        <div className="mt-4">
                             <h3 className="font-semibold">Is er iemand betrokken?</h3>
                             <ul className="list-disc pl-5 space-y-2 max-h-40 overflow-y-auto">
                                 {filteredPeople.slice(0, 5).map((user, index) => (
