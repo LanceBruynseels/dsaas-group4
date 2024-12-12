@@ -37,6 +37,25 @@ const ChatApp: React.FC = () => {
         }
     }, [searchParams]); // Re-run if query parameters change
 
+    // Mark all messages from the selected contact as read when a chat is opened
+    useEffect(() => {
+        const markMessagesAsRead = async () => {
+            if (selectedContact) {
+                const { error } = await supabase
+                    .from('message')
+                    .update({ is_read: true }) // Set is_read to true
+                    .eq('receiver', getUserId()) // Current user is the receiver
+                    .eq('sender', selectedContact.id); // Messages from the selected contact
+
+                if (error) {
+                    console.error('Error marking messages as read:', error);
+                }
+            }
+        };
+
+        markMessagesAsRead();
+    }, [selectedContact]); // Run this effect when selectedContact changes
+
     return isMobile ? (
         <div className="flex h-screen bg-[hsl(10,100%,90%)]">
             <div className="max-w-fit p-10">
@@ -66,9 +85,11 @@ const ChatApp: React.FC = () => {
         </div>
     );
 };
+
 const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
     const [matches, setMatches] = useState<any[]>([]); // Matched contacts
     const [profilePictures, setProfilePictures] = useState<{ [key: string]: string }>({}); // Profile pictures by user ID
+    const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({}); // Unread message counts
     const isMobile = useIsMobile();
     const senderId = getUserId(); // Get current user ID
 
@@ -110,6 +131,35 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSele
         fetchMatches();
     }, [senderId]);
 
+    // Fetch unread message counts
+    useEffect(() => {
+        const fetchUnreadCounts = async () => {
+            const { data, error } = await supabase
+                .from('message')
+                .select('receiver, sender, is_read') // Fetch relevant fields
+                .eq('is_read', false) // Filter for unread messages
+                .eq('receiver', senderId); // Current user is the receiver
+
+            if (error) {
+                console.error('Error fetching unread messages:', error);
+                return;
+            }
+
+            // Group and count unread messages
+            const counts = data.reduce((acc, msg) => {
+                if (!acc[msg.sender]) {
+                    acc[msg.sender] = 0; // Initialize count for this sender
+                }
+                acc[msg.sender] += 1; // Increment count for this sender
+                return acc;
+            }, {});
+
+            setUnreadCounts(counts); // Save the unread counts
+        };
+
+        fetchUnreadCounts();
+    }, [senderId]);
+
     // Fetch profile pictures
     useEffect(() => {
         const fetchProfilePictures = async () => {
@@ -140,7 +190,7 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSele
         fetchProfilePictures();
     }, [matches]);
 
-    return isMobile ? (
+    return (
         <div>
             <div className="mb-6">
                 <input
@@ -163,42 +213,17 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSele
                                 className="w-10 h-10 rounded-full"
                             />
                             <div className="flex-1 min-w-0">
-                                <div className="font-bold truncate">{contact.username}</div>
-                                <div className="text-gray-500 text-sm truncate">
-                                    Start a conversation...
+                                <div
+                                    className={`font-bold truncate ${
+                                        unreadCounts[contact.id] ? 'text-red-500' : 'text-black'
+                                    }`}
+                                >
+                                    {contact.username}
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    ) : (
-        <div>
-            <div className="mb-6">
-                <input
-                    type="text"
-                    placeholder="Search conversations"
-                    className="w-full p-3 rounded-lg border border-gray-300"
-                />
-            </div>
-            <div className="space-y-5">
-                {matches.map((contact) => (
-                    <div
-                        key={contact.id}
-                        onClick={() => onSelectContact(contact)}
-                        className="p-3 bg-[hsl(10,100%,95%)] rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                    >
-                        <div className="flex items-center gap-4">
-                            <img
-                                src={profilePictures[contact.id] || 'https://via.placeholder.com/40'}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full"
-                            />
-                            <div className="flex-1 min-w-0">
-                                <div className="font-bold truncate">{contact.username}</div>
                                 <div className="text-gray-500 text-sm truncate">
-                                    Start a conversation...
+                                    {unreadCounts[contact.id]
+                                        ? `Unread messages: ${unreadCounts[contact.id]}`
+                                        : 'Start a conversation...'}
                                 </div>
                             </div>
                         </div>
@@ -211,46 +236,67 @@ const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSele
 
 
 
+
+
 const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {
-    // State to store messages exchanged between the sender and the selected contact
     const [messages, setMessages] = useState<any[]>([]);
     const isMobile = useIsMobile();
-    // Hardcoded ID for the sender (current user)
-    const senderId = getUserId();
-
-    // Extract the receiver's ID from the selected contact
-    const receiverId = selectedContact.id;
+    const senderId = getUserId(); // Current user ID
+    const receiverId = selectedContact.id; // Selected contact's ID
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
-
-    // useEffect to fetch messages and set up real-time updates
-    useEffect(() => { // for managing external interactions
-        // Function to fetch all messages between the sender and receiver from the database
-        const fetchMessages = async () => {
-            const { data, error } = await supabase
-                .from('message') // Query the 'message' table
-                .select('*')     // Select all fields
-                .or(             // Fetch messages where:
-                    // Sender is the current user and receiver is the selected contact, OR vice versa
-                    `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
-
-                );
+    // Mark all messages from the selected contact as read
+    const markMessagesAsRead = async () => {
+        try {
+            const { error } = await supabase
+                .from('message')
+                .update({ is_read: true }) // Update `is_read` to true
+                .or(
+                    `and(sender.eq.${receiverId},receiver.eq.${senderId})`
+                ); // Only update messages sent by the contact to the current user
 
             if (error) {
-                // Log any errors during the fetch
-                console.error('Error fetching messages:', error);
-            } else if (data) {
-                // Update the state with the fetched messages
-                setMessages(data);
+                console.error('Error marking messages as read:', error);
+            } else {
+                console.log('Messages marked as read for conversation with', receiverId);
+            }
+        } catch (err) {
+            console.error('Unexpected error marking messages as read:', err);
+        }
+    };
+
+    // Fetch messages and mark them as read
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('message')
+                    .select('*')
+                    .or(
+                        `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
+                    );
+
+                if (error) {
+                    console.error('Error fetching messages:', error);
+                    return;
+                }
+
+                if (data) {
+                    setMessages(data); // Set fetched messages
+                }
+            } catch (err) {
+                console.error('Unexpected error fetching messages:', err);
             }
         };
 
-        // Call the function to fetch messages
         fetchMessages();
+        markMessagesAsRead(); // Mark messages as read when the chat opens
+    }, [senderId, receiverId]);
 
-        // Set up a real-time listener for new messages
+    // Real-time listener for new messages
+    useEffect(() => {
         const channel = supabase
-            .channel('realtime:message') // Listen to the 'message' table for changes
+            .channel('realtime:message')
             .on(
                 'postgres_changes',
                 {
@@ -259,52 +305,49 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     table: 'message',
                 },
                 (payload) => {
-                    // Handle the new message payload
                     const newMessage = payload.new;
 
-                    {
-                        // Add the new message to the existing state
-                        // if(selectedContact.id == senderId)
-                        setMessages((prevMessages) => [...prevMessages, newMessage]);
-                    }
+                    // Add the new message to the state
+                    setMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
             )
-            .subscribe(); // Subscribe to the real-time channel
+            .subscribe();
 
-        // Cleanup function to remove the real-time channel subscription
+        // Cleanup the subscription
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [senderId, receiverId]); // run this effect when senderId or receiverId changes
+    }, [senderId, receiverId]);
 
+    // Scroll to the bottom of the chat whenever messages update
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [messages]);
 
-
-    return isMobile ? null:(
+    return isMobile ? null : (
         <div>
-            {/* Render the chat header with selected contact's details */}
+            {/* Chat Header */}
             <ChatHeader selectedContact={selectedContact} />
 
-            {/* Message display area */}
+            {/* Message Display Area */}
             <div
-
                 ref={chatContainerRef}
-                className="flex-1 overflow-y-auto min-h-0 max-h-[60vh]">
+                className="flex-1 overflow-y-auto min-h-0 max-h-[60vh]"
+            >
                 {messages.map((message, index) => (
-                    // Render each message using the ChatMessage component
                     <ChatMessage key={index} message={message} senderId={senderId} />
                 ))}
             </div>
 
-            {/* Input area for sending new messages */}
+            {/* Message Input */}
             <MessageInput receiverId={receiverId} />
         </div>
     );
 };
+
+
 
 
 const ChatHeader: React.FC<{ selectedContact: any }> = ({ selectedContact }) => {

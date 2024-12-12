@@ -28,11 +28,10 @@ export default async function HomePage() {
     }
 
     const userId = session.user.id;
-    // Fetch user profile to check if it's created
 
+    // Fetch user profile to check if it's created
     const [profileData, filterData, notifications_data, sliderAgeRangeData] = await Promise.all([
         supabase.from("profile").select("*").eq("user_id", userId).single(),
-        //supabase.rpc('find_potential_matches', { request_user_id: userId }),
         supabase.rpc('get_all_filter_data'),
         supabase.rpc('get_user_notifications', { notifications_user_id: userId }),
         supabase.from("search_age_range").select("min_age, max_age").eq("user_id", userId).single()
@@ -53,47 +52,10 @@ export default async function HomePage() {
         .single();
     }
 
-    //console.log(notifications_data);
-
-    // // Handle errors more gracefully
-    // if (profileData.error || initialMatchData.error || filterData.error || notifications_data.error) {
-    //     console.error("Error fetching data:", profileData.error || initialMatchData.error || filterData.error || notifications_data.error);
-    //     return <p>Error loading data</p>;
-    // }
-    //
-    // //console.log(initialMatchData);
-    //
-    // let allMatchData: MatchingUser[];
-    //
-    // if (initialMatchData.data && initialMatchData.data.length > 0) {
-    //     // Use Promise.all to wait for all asynchronous operations
-    //      allMatchData = await Promise.all(
-    //         initialMatchData.data.map(async (match) => {
-    //             const { data: fileList, error: listError } = await supabase
-    //                 .storage
-    //                 .from('picturesExtra') // The storage bucket name
-    //                 .list(match.user_id);
-    //
-    //             if (listError) {
-    //                 console.error(`Error listing files for user_id ${match.user_id}:`, listError);
-    //                 return { ...match, publicUrls: [] }; // Default to empty array on error
-    //             }
-    //
-    //             // Generate public URLs for each file
-    //             const publicUrls = fileList.map((file) =>
-    //                 supabase.storage.from('picturesExtra').getPublicUrl(`${match.user_id}/${file.name}`).data.publicUrl
-    //             );
-    //
-    //             // Return the enriched match object
-    //             return { ...match, publicUrls };
-    //         })
-    //     );
-    // }
-
     const showProfilePopup = !profileData.data; // Show popup if no profile found
 
     return (
-        <div className="flex flex-row w-full justify-center text-red-950">
+        <div className="flex flex-row w-full justify-center text-gray-900">
             {/* Notifications Side Panel */}
             <NotificationsPanel notifications_data={notifications_data}></NotificationsPanel>
 

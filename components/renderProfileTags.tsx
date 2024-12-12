@@ -23,7 +23,7 @@ const renderProfileTags = ({ currentMatch }) => {
   };
 
   return (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-start ">
       {/* Match Name and Age */}
       <h2 className="text-2xl font-bold">
         {currentMatch.first_name},{' '}

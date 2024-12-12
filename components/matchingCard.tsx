@@ -93,6 +93,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
             const jsonResponse: MatchingUser = await response.json();
 
             if (response.status == 200) {
+
                 setMatchBuffer((prevBuffer) => [...prevBuffer, jsonResponse].slice(0, 5)); // Keep buffer size at 5
                 console.log(matchBuffer);
             }
@@ -157,7 +158,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                         </div>
                         <div className="flex flex-row lg:p-4 w-full h-full justify-center">
                             {currentMatch ? (
-                                <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px] m-2">
+                                <div className="flex flex-row basis-1/2 min-h-[400px] min-w-[300px] mx-2 pt-2">
                                     <FlowbiteCarousel
                                         pictures={currentMatch.publicUrls || []}
                                         infoSection={<RenderProfileTags
@@ -169,7 +170,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                             )}
                             {/*Right Info Section for larger screens */}
                             <div
-                                className="hidden lg:flex m-2 basis-1/2 flex-col h-full max-h-[500px] overflow-y-auto p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
+                                className="hidden lg:flex mx-2 mt-2 basis-1/2 flex-col h-full max-h-[500px] overflow-y-auto p-8 bg-gradient-to-b shadow-md from-gray-50 to-gray-200 text-red-950 rounded-lg">
                                 <RenderProfileTags currentMatch={currentMatch}></RenderProfileTags>
                             </div>
                         </div>
