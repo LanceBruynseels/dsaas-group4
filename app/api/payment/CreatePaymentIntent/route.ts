@@ -31,7 +31,14 @@ export async function POST(req: NextRequest) {
 
         //console.log("Customer created:");
 
-
+        //pogint got registreren
+        console.log("poging tot reg")
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("displayName", name);
+        formData.append("institution", institution);
+        await signBuyerUpAction(formData);
 
         // Create a user in Supabase
         const hashedPassword = await bcrypt.hash(password, 14);
@@ -52,21 +59,21 @@ export async function POST(req: NextRequest) {
             throw new Error("Supabase user creation failed");
         }
 
-        //creates institude in supabase
-        const supabase2 = await createClient(); // Await the promise here
-        const { data: supabaseData2, error: supabaseError2 } = await supabase2.from('institutions').insert([
-            {
-                institution: institution
-            },
-        ]);
-
-        if (supabaseError2) {
-            console.error("Error inserting user into Supabase:", supabaseError2.message);
-            throw new Error("Supabase user creation failed");
-
-        }
-
-        console.log("User created in Supabase:");
+        // creates institude in supabase
+        // const supabase2 = await createClient(); // Await the promise here
+        // const { data: supabaseData2, error: supabaseError2 } = await supabase2.from('institutions').insert([
+        //     {
+        //         institution: institution
+        //     },
+        // ]);
+        //
+        // if (supabaseError2) {
+        //     console.error("Error inserting user into Supabase:", supabaseError2.message);
+        //     throw new Error("Supabase user creation failed");
+        //
+        // }
+        //
+        // console.log("User created in Supabase:");
 
         // Fetch product price
         const prices = await stripe.prices.list({ product: productId });
@@ -103,16 +110,6 @@ export async function POST(req: NextRequest) {
         }
         console.log("Payment Intend created")
 
-        //pogint got registreren in supabase
-        console.log("poging tot reg")
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("displayName", name);
-        formData.append("subscriptionID", subscription.id)
-        await signBuyerUpAction(formData);
-
-        //update buyers
         const { data: updatedUser, error: updateError } = await supabase
             .from('Buyers')
             .update({ subscriptionID: subscription.id })
@@ -210,7 +207,7 @@ async function storeCodes(institution: string, codes: string[]): Promise<AccessC
 
     const rows = codes.map((code) => ({
         code,
-        institution,
+        institution, // how to customize it ??
     }));
 
     const { data, error } = await supabase.from('access_codes').insert(rows);
