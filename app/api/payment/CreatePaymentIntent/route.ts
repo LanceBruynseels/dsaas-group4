@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { createClient } from '@/utils/supabase/server';
-import bcrypt from 'bcryptjs';
 import { signBuyerUpAction } from "@/app/actions";
 
 // Initialize Stripe for payments
@@ -32,14 +31,14 @@ export async function POST(req: NextRequest) {
 
         //console.log("Customer created:");
 
-        //pogint got registreren
+/*        //pogint got registreren
         console.log("poging tot reg")
         const formData = new FormData();
         formData.append("email", email);
         formData.append("password", password);
         formData.append("displayName", name);
         formData.append("institution", institution);
-        await signBuyerUpAction(formData);
+        await signBuyerUpAction(formData);*/
 
  /*       // Create a user in Supabase
         const hashedPassword = await bcrypt.hash(password, 14);
@@ -111,14 +110,8 @@ export async function POST(req: NextRequest) {
         }
         console.log("Payment Intend created")
 
-        //pogint got registreren in supabase
-        console.log("poging tot reg")
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("displayName", name);
-        formData.append("subscriptionID", subscription.id)
-        await signBuyerUpAction(formData);
+
+
 
         //update buyers
 /*        const { data: updatedUser, error: updateError } = await supabase
@@ -132,6 +125,25 @@ export async function POST(req: NextRequest) {
         }
 
         console.log("User's subscription ID updated in Supabase:", updatedUser);*/
+
+
+
+        //pogint got registreren in supabase
+        console.log("poging tot reg")
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("displayName", name);
+        formData.append("subscriptionID", subscription.id)
+        formData.append("institution", institution);
+        await signBuyerUpAction(formData);
+
+        const supabase = await createClient();
+        const { data: supabaseData2, error: supabaseError2 } = await supabase.from('institutions').select().eq("institution", institution);
+        console.log("User created in Supabase:",supabaseData2 );
+        insertedInstitutionId = supabaseData2[0].id;
+        console.log("///////////////////////////////////////////////////////////////////////////////////////////" , insertedInstitutionId);
+
 
         // Generate unique codes for different subscription tiers
         const BasicSubscription = 20;
@@ -154,6 +166,7 @@ export async function POST(req: NextRequest) {
                 await storeCodes(insertedInstitutionId, globalCodes);
                 break;
         }
+
 
         // Send email with Nodemailer
         const transporter: Transporter = nodemailer.createTransport({
@@ -218,7 +231,7 @@ async function storeCodes(institution: number, codes: string[]): Promise<AccessC
 
     const rows = codes.map((code) => ({
         code,
-        institution,
+        insertedInstitutionId,
     }));
 
     const { data, error } = await supabase.from('access_codes').insert(rows);
