@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { createClient } from '@/utils/supabase/server';
+import bcrypt from 'bcryptjs';
 import { signBuyerUpAction } from "@/app/actions";
 
 // Initialize Stripe for payments
@@ -31,7 +32,14 @@ export async function POST(req: NextRequest) {
 
         //console.log("Customer created:");
 
-
+        //pogint got registreren
+        console.log("poging tot reg")
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("displayName", name);
+        formData.append("institution", institution);
+        await signBuyerUpAction(formData);
 
  /*       // Create a user in Supabase
         const hashedPassword = await bcrypt.hash(password, 14);
@@ -46,30 +54,27 @@ export async function POST(req: NextRequest) {
                 subscriptionID: null,
             },
         ]);
+
         if (supabaseError) {
             console.error("Error inserting user into Supabase:", supabaseError.message);
             throw new Error("Supabase user creation failed");
         }*/
 
-        //creates institude in supabase
-        const supabase = await createClient(); // Await the promise here
-        const { data: supabaseData2, error: supabaseError2 } = await supabase.from('institutions').insert([
-            {
-                institution: institution
-            },
-        ])
-        .select(); // returns full row ov everything JUST added
-
-        if (supabaseError2) {
-            console.error("Error inserting user into Supabase:", supabaseError2.message);
-            throw new Error("Supabase user creation failed");
-        }
-
-        if (supabaseData2 && supabaseData2.length > 0) {
-            insertedInstitutionId = supabaseData2[0].id; // getting ID out of row
-        }
-
-        console.log("User created in Supabase:");
+        // creates institude in supabase
+        // const supabase2 = await createClient(); // Await the promise here
+        // const { data: supabaseData2, error: supabaseError2 } = await supabase2.from('institutions').insert([
+        //     {
+        //         institution: institution
+        //     },
+        // ]);
+        //
+        // if (supabaseError2) {
+        //     console.error("Error inserting user into Supabase:", supabaseError2.message);
+        //     throw new Error("Supabase user creation failed");
+        //
+        // }
+        //
+        // console.log("User created in Supabase:");
 
         // Fetch product price
         const prices = await stripe.prices.list({ product: productId });
@@ -226,6 +231,7 @@ async function storeCodes(institution: number, codes: string[]): Promise<AccessC
     console.log('Inserted codes:');
     return data as AccessCode[];
 }
+
 
 // Get global codes as a newline-separated string
 function getCodes(): string {
