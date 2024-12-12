@@ -32,13 +32,14 @@ const SettingsPage = async () => {
     }
 
     return (
-        <div className="flex">
+        <div className="flex flex-col sm:flex-row min-h-screen">
             {/* Sidebar */}
-            <div className="flex flex-col basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
+            <div
+                className="w-full sm:basis-1/4 p-4 bg-pink-100 rounded-lg m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Instellingen</h2>
+                    <h2 className="text-xl font-bold text-center sm:text-left">Instellingen</h2>
                 </div>
-                <ul className="space-y-4 flex-1">
+                <ul className="space-y-4 flex-1 text-center sm:text-left">
                     <li className="text-base font-semibold text-[#771D1D] cursor-pointer hover:text-[#771D1D]">
                         <Link href="/settings">Profiel</Link>
                     </li>
@@ -49,29 +50,28 @@ const SettingsPage = async () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-col basis-3/4 p-4 m-2 flex-grow bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
-
+            <div className="flex flex-col flex-grow p-4 m-2 bg-gradient-to-b from-[#FFDFDB] to-[#FFAB9F]">
                 {/* Profile Section */}
-                <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
+                <div className="rounded-lg mb-6 p-4" style={{backgroundColor: "#FFDFDB"}}>
                     <div className="flex flex-col justify-center items-center mb-6">
-                        <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D]">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-[#771D1D]">
                             {profile_data.first_name} {profile_data.last_name}
                         </h2>
-                        <ProfilePicture imageUrl={picture.profile_picture_url || "/mock-picture.webp"} userId={user_id} />
+                        <ProfilePicture
+                            imageUrl={picture.profile_picture_url || "/mock-picture.webp"}
+                            userId={user_id}
+                        />
                     </div>
-                    <ProfileDOB userId={user_id} dob={profile_data.dob} />
+                    <ProfileDOB userId={user_id} dob={profile_data.dob}/>
                 </div>
 
                 {/* Add More Pictures Section */}
-                <div className="rounded-lg mb-6 p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D]">
+                <div className="rounded-lg mb-6 p-4" style={{backgroundColor: "#FFDFDB"}}>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-[#771D1D]">
                         Voeg meer foto's toe
                     </h2>
                     <div className="flex flex-wrap justify-center gap-4">
-                        <AddPictures
-                            maxPictures={3}
-                            userId={user_id}
-                        />
+                        <AddPictures maxPictures={3} userId={user_id}/>
                     </div>
                     <p className="text-sm text-center text-gray-600 mt-4">
                         Voeg tot 3 extra foto's toe aan je profiel
@@ -79,84 +79,70 @@ const SettingsPage = async () => {
                 </div>
 
                 {/* Personality and Filters Section */}
-                <div className="rounded-lg p-4" style={{ backgroundColor: "#FFDFDB" }}>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#771D1D] ">
+                <div className="rounded-lg p-4" style={{backgroundColor: "#FFDFDB"}}>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-[#771D1D]">
                         Dit moet je ook weten over mij...
                     </h2>
-                    <div className={`flex flex-col items-center justify-end transition-all w-full`}>
-                    {/* Personality Options */}
-                    <ProfileFiltersSection
-                        title="Ik ben ..."
-                        table="personality"
-                        data={filter_data.personalities}
-                        keyField="personality_id"
-                        labelField="personality"
-                        user_id={user_id}
-                    />
+                    <div className="flex flex-col items-center justify-end w-full space-y-4">
+                        <ProfileFiltersSection
+                            title="Ik ben ..."
+                            table="personality"
+                            data={filter_data.personalities}
+                            keyField="personality_id"
+                            labelField="personality"
+                            user_id={user_id}
+                        />
+                        <ProfileFiltersSection
+                            title="Ik ben op zoek naar ..."
+                            table="relationship_goals"
+                            data={filter_data.relationship_goals}
+                            keyField="relationship_goals_id"
+                            labelField="relationship_goals"
+                            user_id={user_id}
+                        />
+                        <SingleSelectFilter
+                            title="Mijn gender is ..."
+                            table="gender"
+                            data={filter_data.genders}
+                            keyField="gender_id"
+                            labelField="gender"
+                            user_id={user_id}
+                        />
+                        <ProfileFiltersSection
+                            title="Mijn Interesses zijn ..."
+                            table="interests"
+                            data={filter_data.interests}
+                            keyField="id"
+                            labelField="interest"
+                            user_id={user_id}
+                        />
+                        <ProfileFiltersSection
+                            title="Mijn bijzondere kenmerken zijn ..."
+                            table="disability"
+                            data={filter_data.disabilities}
+                            keyField="disability_id"
+                            labelField="disability"
+                            user_id={user_id}
+                        />
+                        <ProfileFiltersSection
+                            title="Ik woon ..."
+                            table="home_status"
+                            data={filter_data.home_statuses}
+                            keyField="home_status_id"
+                            labelField="home_status"
+                            user_id={user_id}
+                        />
+                        <SingleSelectFilter
+                            title="Mijn Religie is ..."
+                            table="religion"
+                            data={filter_data.religions}
+                            keyField="religion_id"
+                            labelField="religion"
+                            user_id={user_id}
+                        />
 
-                    {/* Relationship goals Options */}
-                    <ProfileFiltersSection
-                        title="Ik ben op zoek naar ..."
-                        table="relationship_goals"
-                        data={filter_data.relationship_goals}
-                        keyField="relationship_goals_id"
-                        labelField="relationship_goals"
-                        user_id={user_id}
-                    />
-
-                    {/* Gender Options */}
-                    <SingleSelectFilter
-                        title="Mijn gender is ..."
-                        table="gender"
-                        data={filter_data.genders}
-                        keyField="gender_id"
-                        labelField="gender"
-                        user_id={user_id}
-                    />
-
-                    {/* Interests Options */}
-                    <ProfileFiltersSection
-                        title="Mijn Interesses zijn ..."
-                        table="interest"
-                        data={filter_data.interests}
-                        keyField="id"
-                        labelField="interest"
-                        user_id={user_id}
-                    />
-
-                    {/* Disability Options */}
-                    <ProfileFiltersSection
-                        title="Mijn bijzondere kenmerken zijn ..."
-                        table="disability"
-                        data={filter_data.disabilities}
-                        keyField="disability_id"
-                        labelField="disability"
-                        user_id={user_id}
-                    />
-
-                    {/* Home status Options */}
-                    <ProfileFiltersSection
-                        title="Ik woon ..."
-                        table="home_status"
-                        data={filter_data.home_statuses}
-                        keyField="home_status_id"
-                        labelField="home_status"
-                        user_id={user_id}
-                    />
-
-                    {/* Religion Options */}
-                    <SingleSelectFilter
-                        title="Mijn Religie is ..."
-                        table="religion"
-                        data={filter_data.religions}
-                        keyField="religion_id"
-                        labelField="religion"
-                        user_id={user_id}
-                    />
-
-                    {/* Sliders */}
-                    <div className="flex flex-col w-full mt-4 mb-6">
-                        <div className="flex flex-col w-full mt-6 justify-center items-center px-20">
+                        {/* Sliders */}
+                        <div className="flex flex-col w-full mt-6 px-6 sm:px-20">
                             <SliderSettings
                                 label="Afstand tot anderen"
                                 unit="km"
@@ -164,14 +150,15 @@ const SettingsPage = async () => {
                                 max={30}
                                 defaultValue={profile_data.distance || 15}
                                 userId={user_id}
-                                sliderColor="#771D1D" table={""}
+                                sliderColor="#771D1D"
+                                table={""}
                             />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
     );
 };
 

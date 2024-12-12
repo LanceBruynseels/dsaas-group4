@@ -263,7 +263,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
 
     return isMobile ? null:(
-        <>
+        <div>
             {/* Render the chat header with selected contact's details */}
             <ChatHeader selectedContact={selectedContact} />
 
@@ -271,7 +271,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             <div
 
                 ref={chatContainerRef}
-                className="flex-1 overflow-y-auto min-h-3 shadow-sm">
+                className="flex-1 overflow-y-auto min-h-0 max-h-[60vh]">
                 {messages.map((message, index) => (
                     // Render each message using the ChatMessage component
                     <ChatMessage key={index} message={message} senderId={senderId} />
@@ -280,7 +280,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
 
             {/* Input area for sending new messages */}
             <MessageInput receiverId={receiverId} />
-        </>
+        </div>
     );
 };
 
@@ -586,17 +586,19 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
                 <>
                     <button
                         onClick={startRecording}
-                        className="ml-2 p-2 rounded-full bg-green-500 hover:bg-green-600 text-white"
-                        disabled={isRecording} // Disable if already recording
+                        className={`px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors 
+                        ${isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isRecording}
                     >
-                        Start Recording
+                        🎙️ Start
                     </button>
                     <button
                         onClick={stopRecording}
-                        className="ml-2 p-2 rounded-full bg-red-500 hover:bg-red-600 text-white"
-                        disabled={!isRecording} // Disable if not recording
+                        className={`px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors 
+                        ${!isRecording ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={!isRecording}
                     >
-                        Stop Recording
+                        🎙️ Stop
                     </button>
                 </>
             ) : (
@@ -608,11 +610,11 @@ const MessageInput: React.FC<{ receiverId: string }> = ({ receiverId }) => {
             {/* Send button */}
             <button
                 onClick={handleSend}
-                className={`ml-2 p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white
-                          ${(!textContent && !selectedFile && !recordedAudio) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={!textContent && !selectedFile && !recordedAudio} // Disable if no content
+                className={`flex items-center justify-center px-4 py-2 rounded-lg bg-blue-500 text-white text-xl hover:bg-blue-600 
+                transition-colors ${(!textContent && !selectedFile && !recordedAudio) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={!textContent && !selectedFile && !recordedAudio}
             >
-                <Send size={20} />
+                &#10148; {/* Send icon */}
             </button>
         </div>
     );

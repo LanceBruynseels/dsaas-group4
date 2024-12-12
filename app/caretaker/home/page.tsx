@@ -197,7 +197,7 @@ export default function CaretakerHome() {
     const handleSignOut = async () => {
         try {
             await supabase.auth.signOut();
-            router.push('/sign-in');
+            router.push('/sign-in-caretaker');
         } catch (err) {
             console.error('Error signing out:', err);
             alert('Failed to sign out. Please try again.');

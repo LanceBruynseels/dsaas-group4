@@ -15,6 +15,10 @@ import NotificationsPanel from "@components/notificationsPanel";
 import SearchSettings from "@components/searchSettings";
 import {UserPopup} from "@components/userPopup";
 
+interface sliderAgeInterface{
+    min_age: number,
+    max_age: number,
+}
 
 export default async function HomePage() {
     const supabase = await createClient();
@@ -26,7 +30,7 @@ export default async function HomePage() {
     const userId = session.user.id;
     // Fetch user profile to check if it's created
 
-    const [profileData, filterData, notifications_data, sliderAgeRange] = await Promise.all([
+    const [profileData, filterData, notifications_data, sliderAgeRangeData] = await Promise.all([
         supabase.from("profile").select("*").eq("user_id", userId).single(),
         //supabase.rpc('find_potential_matches', { request_user_id: userId }),
         supabase.rpc('get_all_filter_data'),
@@ -34,7 +38,22 @@ export default async function HomePage() {
         supabase.from("search_age_range").select("min_age, max_age").eq("user_id", userId).single()
     ]);
 
-    console.log(notifications_data);
+    const sliderAgeRange: sliderAgeInterface = sliderAgeRangeData.data || { min_age: 18, max_age: 99 };
+
+    if(!sliderAgeRangeData.data){
+        //console.log("i get here")
+         await supabase.from("search_age_range").insert([
+            {
+                user_id: userId,
+                min_age: 18,
+                max_age: 99,
+            },
+        ])
+        .select()
+        .single();
+    }
+
+    //console.log(notifications_data);
 
     // // Handle errors more gracefully
     // if (profileData.error || initialMatchData.error || filterData.error || notifications_data.error) {
@@ -86,7 +105,7 @@ export default async function HomePage() {
             </div>
 
             {/* Search Settings Section */}
-            <SearchSettings filterData={filterData} userId={userId} sliderAgeRange={sliderAgeRange.data}></SearchSettings>
+            <SearchSettings filterData={filterData} userId={userId} sliderAgeRange={sliderAgeRange}></SearchSettings>
 
             {/* Pop-up screen for first login */}
             {showProfilePopup && (
