@@ -109,19 +109,25 @@ export const signInAction = async (formData: FormData) => {
 
     // check role
     const userRole = user?.user_metadata?.role;
-    switch (userRole) {
-        case "caretaker":
-            return redirect("/caretaker/home");
-        case "buyer":
-            return redirect("/sign-up-caretaker");
-        default:
-            console.error("Invalid role:", userRole);
-            await supabase.auth.signOut();
-            return encodedRedirect(
-                "error",
-                "/sign-in-caretaker",
-                "Invalid role"
-            );
+    // switch (userRole) {
+    //     case "caretaker":
+    //         return redirect("/caretaker/home");
+    //     case "buyer":
+    //         return redirect("/sign-up-caretaker");
+    //     default:
+    //         console.error("Invalid role:", userRole);
+    //         await supabase.auth.signOut();
+    //         return encodedRedirect(
+    //             "error",
+    //             "/sign-in-caretaker",
+    //             "Invalid role"
+    //         );
+    // }
+
+    if (userRole === "buyer") {
+        return redirect("/sign-up-caretaker");
+    } else {
+        return redirect("/caretaker/home");
     }
 };
 
