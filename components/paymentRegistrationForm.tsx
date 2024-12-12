@@ -81,24 +81,24 @@ const PaymentForm = ({ productData }) => {
 
     //Phone Number check
     const handlePhoneNumberBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
-        const phone = event.target.value;
-
-        if (!phone) return;
-
-        try {
-            const response = await fetch('/api/payment/CheckPhoneNumberRegistration', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ institution }),
-            });
-
-            const result = await response.json();
-
-            setPhone(!result.available ? null : "Dit telefoonnummer is al in gebruik!");
-
-        } catch (error) {
-            setPhoneError("Fout bij het controleren van het telefoon nummer.");
-        }
+        // const phone = event.target.value;
+        //
+        // if (!phone) return;
+        //
+        // try {
+        //     const response = await fetch('/api/payment/CheckPhoneNumberRegistration', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ institution }),
+        //     });
+        //
+        //     const result = await response.json();
+        //
+        //     setPhone(!result.available ? null : "Dit telefoonnummer is al in gebruik!");
+        //
+        // } catch (error) {
+        //     setPhoneError("Fout bij het controleren van het telefoon nummer.");
+        // }
     };
 
     //

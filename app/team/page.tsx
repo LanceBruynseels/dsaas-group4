@@ -58,8 +58,7 @@ const TeamSection = () => {
                                  setCurrentFunction(member.function);
                                  setCurrentDescription(member.description);
                              }}>
-
-                            <Image className="border-2 border-[#6f5956] rounded-2xl hover:border-[#a0d5c0] hover:border-4" src={member.picture} alt={'memberPicture'}/>
+                            <Image className="border-2 border-[#6f5956] rounded-2xl hover:border-[#a0d5c0] hover:border-4" src={member.picture} alt={'memberPicture'} />
                         </div>
                     </div>
                 ))}
