@@ -31,13 +31,7 @@ export async function POST(req: NextRequest) {
 
         //console.log("Customer created:");
 
-        //pogint got registreren
-        console.log("poging tot reg")
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("displayName", name);
-        await signBuyerUpAction(formData);
+
 
         // Create a user in Supabase
         const hashedPassword = await bcrypt.hash(password, 14);
@@ -109,6 +103,16 @@ export async function POST(req: NextRequest) {
         }
         console.log("Payment Intend created")
 
+        //pogint got registreren in supabase
+        console.log("poging tot reg")
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("displayName", name);
+        formData.append("subscriptionID", subscription.id)
+        await signBuyerUpAction(formData);
+
+        //update buyers
         const { data: updatedUser, error: updateError } = await supabase
             .from('Buyers')
             .update({ subscriptionID: subscription.id })

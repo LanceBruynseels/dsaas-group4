@@ -41,6 +41,7 @@ export const signBuyerUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const displayName = formData.get("displayName")?.toString();
+  const subscriptionID = formData.get("subscriptionID")?.toString();
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
@@ -68,6 +69,7 @@ export const signBuyerUpAction = async (formData: FormData) => {
       data: {
         display_name: displayName,
         role: "buyer",
+        subID: {subscriptionID},
         // institution: accessCodeData.institution  // institution msg
       }
     },

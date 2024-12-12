@@ -4,12 +4,12 @@ import Image from "next/image";
 
 
 const teamMembers = [
-    {name: 'Anton Ceusters', function: 'Software Engineer', description: 'description', picture: 'vlinder.png'},
-    {name: 'Datao Liang', function: 'Software Engineer', description: 'description', picture: 'mock-picture.webp'},
-    {name: 'Joran Vleugels', function: 'Software Engineer', description: 'description', picture: 'vlinder.png'},
-    {name: 'Lance Bruynseels', function: 'Software Engineer', description: 'description', picture: 'vlinder.png'},
-    {name: 'Manuel Pollet', function: 'Software Engineer', description: 'description', picture: 'vlinder.png'},
-    {name: 'Rohan Bhattaram', function: 'Software Engineer', description: 'description', picture: 'vlinder.png'},
+    {name: 'Anton Ceusters', function: 'Software Engineer', description: 'description', picture: '/vlinder.png'},
+    {name: 'Datao Liang', function: 'Software Engineer', description: 'description', picture: '/mock-picture.webp'},
+    {name: 'Joran Vleugels', function: 'Software Engineer', description: 'description', picture: '/vlinder.png'},
+    {name: 'Lance Bruynseels', function: 'Software Engineer', description: 'description', picture: '/vlinder.png'},
+    {name: 'Manuel Pollet', function: 'Software Engineer', description: 'description', picture: '/vlinder.png'},
+    {name: 'Rohan Bhattaram', function: 'Software Engineer', description: 'description', picture: '/vlinder.png'},
 ];
 
 const TeamSection = () => {
@@ -28,7 +28,7 @@ const TeamSection = () => {
             </div>
             <div className="flex flex-row w-screen h-3/6 justify-center gap-8">
                 <div className="flex w-3/12 h-full aspect-square">
-                    <Image fill className="w-full h-full  border-4 border-[#6f5956] rounded-2xl " src={currentImage}
+                    <img className="w-full h-full  border-4 border-[#6f5956] rounded-2xl " src={currentImage}
                            alt={'someImage'}/>
                 </div>
                 <div className="flex flex-col w-5/12 h-full gap-4 p-3">
@@ -59,7 +59,7 @@ const TeamSection = () => {
                                  setCurrentDescription(member.description);
                              }}>
 
-                            <Image className="border-2 border-[#6f5956] rounded-2xl hover:border-[#a0d5c0] hover:border-4" src={member.picture} alt={'memberPicture'}/>
+                            <img className="border-2 border-[#6f5956] rounded-2xl hover:border-[#a0d5c0] hover:border-4" src={member.picture} alt={'memberPicture'} />
                         </div>
                     </div>
                 ))}

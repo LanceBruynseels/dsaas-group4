@@ -79,28 +79,6 @@ const PaymentForm = ({ productData }) => {
         }
     };
 
-    //Phone Number check
-    const handlePhoneNumberBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
-        const phone = event.target.value;
-
-        if (!phone) return;
-
-        try {
-            const response = await fetch('/api/payment/CheckPhoneNumberRegistration', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ institution }),
-            });
-
-            const result = await response.json();
-
-            setPhone(!result.available ? null : "Dit telefoonnummer is al in gebruik!");
-
-        } catch (error) {
-            setPhoneError("Fout bij het controleren van het telefoon nummer.");
-        }
-    };
-
     //
     const handlePasswordBlur = () => {
         setPasswordError(password.length >= 8 ? null : "Wachtwoord moet langer zijn dan 8 tekens.");
@@ -205,7 +183,6 @@ const PaymentForm = ({ productData }) => {
                             type="tel"
                             placeholder="Phone Number"
                             value={phone}
-                            onBlur={handlePhoneNumberBlur}
                             onChange={(e) => setPhone(e.target.value)}
                             required
                         />
