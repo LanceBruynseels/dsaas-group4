@@ -28,6 +28,7 @@ const PaymentForm = ({ productData }) => {
     const [institutionError, setInstitutionError] = useState<string | null>(null);
     const [passwordError, setPasswordError] = useState<string | null>(null);
     const [password2Error, setPassword2Error] = useState<string | null>(null);
+    const [cardComplete, setCardComplete] = useState(false);
 
     //Check email
     const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
@@ -79,7 +80,17 @@ const PaymentForm = ({ productData }) => {
         }
     };
 
-    //
+    //stripe checks
+    const handleCardChange = (event) => {
+        setCardComplete(event.complete);
+        if (event.error) {
+            setError(event.error.message);
+        } else {
+            setError(null);
+        }
+    };
+
+    //password
     const handlePasswordBlur = () => {
         setPasswordError(password.length >= 8 ? null : "Wachtwoord moet langer zijn dan 8 tekens.");
     };
@@ -94,7 +105,13 @@ const PaymentForm = ({ productData }) => {
         setError(null);
 
         if (!stripe || !elements) {
-            setError("Stripe.js is not loaded");
+            setError("Stripe is niet geladen");
+            setLoading(false);
+            return;
+        }
+
+        if (!cardComplete) {
+            setError("Vul de kaart informatie volledig in!");
             setLoading(false);
             return;
         }
@@ -196,7 +213,7 @@ const PaymentForm = ({ productData }) => {
                             onChange={(e) => setInstitution(e.target.value)}
                             required
                         />
-                        {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
+                        {institutionError && <p className="text-red-500 text-sm">{institutionError}</p>}
 
                         <input
                             className="flex w-full h-full bg-white rounded-xl p-2"
@@ -238,6 +255,7 @@ const PaymentForm = ({ productData }) => {
                                     },
                                 }}
                                 className="w-full h-full bg-white border-none"
+                                onChange={handleCardChange}
                             />
                         </div>
 
