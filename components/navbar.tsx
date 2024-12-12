@@ -45,7 +45,7 @@ export default function NavBar() {
         { href: "/settings", label: "Mijn Profiel" },
     ];
 
-    const links = path === "/" || path === "/sign-in" || path === "/registration" || path === "/caretaker" || path === "/caretaker/home"
+    const links = path === "/" || path === "/sign-in" || path === "/registration" || path === "/caretaker" || path === "/caretaker/home" || path === "/team"
         ? commonLinks
         : authenticatedLinks;
 
