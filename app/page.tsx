@@ -8,10 +8,6 @@ import Link from "next/link";
 export default async function Index() {
     const session = await getServerSession(authOptions);
 
-    if (session) {
-        return redirect("/home");
-    }
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
             <div className="mb-5">

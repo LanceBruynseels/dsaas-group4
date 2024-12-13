@@ -20,7 +20,7 @@ export default async function Index() {
                         LOGIN
                     </button>
                 </Link>
-                <Link href="/registration-caretaker" className="flex-1">
+                <Link href="/sign-up-caretaker" className="flex-1">
                     <button
                         className="w-full bg-[#FCA5A5] hover:bg-[#771d1d] text-white py-2 rounded-xl transition duration-300">
                         REGISTRATIE

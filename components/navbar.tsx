@@ -36,6 +36,7 @@ export default function NavBar() {
         { href: "/team", label: "Over ons" },
         { href: "/contact-us", label: "Contact" },
         { href: "/caretaker", label: "Caretaker"},
+        { href: "/paymentPage", label: "Aankopen"},
     ];
 
     const authenticatedLinks = [
@@ -46,7 +47,8 @@ export default function NavBar() {
     ];
 
     const links = path === "/" || path === "/sign-in"  || path === "/sign-in-caretaker" || path === "/registration"
-    || path === "/sign-up-caretaker" || path === "/caretaker" || path === "/caretaker/home" || path === "/team"
+    || path === "/sign-up-caretaker" || path === "/caretaker" || path === "/caretaker/home" || path === "/team" || path === "/paymentPage"
+        || path === "/paymentPageRegistration" || path === "/payment" || path === "/subscriptionComplete" || path === "/subscriptionOverview"
         ? commonLinks
         : authenticatedLinks;
 
