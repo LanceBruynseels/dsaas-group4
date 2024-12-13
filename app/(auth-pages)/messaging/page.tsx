@@ -265,7 +265,8 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     .select('*')
                     .or(
                         `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
-                    );
+                    )
+                    .order('time_stamp', { ascending: true });
 
                 if (error) {
                     console.error('Error fetching messages:', error);
@@ -299,7 +300,12 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     const newMessage = payload.new;
 
                     // Add the new message to the state
-                    setMessages((prevMessages) => [...prevMessages, newMessage]);
+                    setMessages((prevMessages) =>
+                        [...prevMessages, newMessage].sort(
+                            (a, b) =>
+                                new Date(a.time_stamp).getTime() - new Date(b.time_stamp).getTime()
+                        )
+                    );
                 }
             )
             .subscribe();
@@ -309,6 +315,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             supabase.removeChannel(channel);
         };
     }, [senderId, receiverId]);
+
 
     // Scroll to the bottom of the chat whenever messages update
     useEffect(() => {
