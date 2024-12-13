@@ -1,32 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-const SubscriptionCompleted = () => {
+// Child Component to Handle Logic
+const SubscriptionCompletedContent = () => {
     const searchParams = useSearchParams();
     const [sub, setSub] = useState("");
     const [status, setStatus] = useState<string | null>(null);
 
     useEffect(() => {
-        // SUBid
+        // Retrieve subscription ID from query params
         const querySub = searchParams.get("subscription");
-
         if (querySub) setSub(querySub);
     }, [searchParams]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!sub ) {
+        if (!sub) {
             setStatus("Error: Profile data not available. Please try again later.");
             return;
         }
-        else{
-            // Redirect to the SubscriptionOverview page with subscriptionID as a query parameter
-            window.location.href = `/SubscriptionOverview?subscriptionID=${sub}`;}
 
-
+        // Redirect to SubscriptionOverview page with subscriptionID as a query parameter
+        window.location.href = `/SubscriptionOverview?subscriptionID=${sub}`;
     };
 
     return (
@@ -49,5 +47,12 @@ const SubscriptionCompleted = () => {
         </div>
     );
 };
+
+// Main Component with Suspense
+const SubscriptionCompleted = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <SubscriptionCompletedContent />
+    </Suspense>
+);
 
 export default SubscriptionCompleted;
