@@ -32,10 +32,11 @@ export default function NavBar() {
     }, []);
 
     const commonLinks = [
-        { href: "/", label: "Log in" },
+        { href: "/", label: "Start" },
         { href: "/team", label: "Over ons" },
         { href: "/contact-us", label: "Contact" },
         { href: "/caretaker", label: "Caretaker"},
+        { href: "/paymentPage", label: "Abonneer"},
     ];
 
     const authenticatedLinks = [
