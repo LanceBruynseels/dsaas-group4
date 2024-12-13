@@ -8,7 +8,16 @@ import {getUserId} from "@components/UserDisplay";
 
 const supabase = createClient();
 
-const MobileMessaging: React.FC = () => {
+
+// Main Component
+const MobileMessaging = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <MobileMessagingContent />
+    </Suspense>
+);
+
+// Child Component for Logic
+const MobileMessagingContent: React.FC = () => {
     const searchParams = useSearchParams(); // Fetch query parameters
     const contactId = searchParams.get('id'); // Selected contact ID from query params
     const [contact, setContact] = useState<any | null>(null); // Contact details
@@ -77,14 +86,12 @@ const MobileMessaging: React.FC = () => {
     }, [contactId, senderId]);
 
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <Suspense fallback={<div>Loading search params...</div>}>
         <div className="flex flex-col h-screen bg-[#FFEBEB]">
             {contact ? (
                 <>
-                    <ChatHeader contact={contact} onBack={() => router.push('/messaging')}/>
-                    <ChatSection messages={messages} senderId={senderId}/>
-                    <MessageInput receiverId={contact.id}/>
+                    <ChatHeader contact={contact} onBack={() => router.push('/messaging')} />
+                    <ChatSection messages={messages} senderId={senderId} />
+                    <MessageInput receiverId={contact.id} />
                 </>
             ) : (
                 <div className="flex items-center justify-center h-full">
@@ -92,12 +99,11 @@ const MobileMessaging: React.FC = () => {
                 </div>
             )}
         </div>
-            </Suspense>
-        </Suspense>
     );
 };
 
 export default MobileMessaging;
+
 
 const ChatHeader: React.FC<{ contact: any; onBack: () => void }> = ({contact, onBack}) => (
     <div className="p-4" style={{backgroundColor: '#FFE0E0', boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'}}>

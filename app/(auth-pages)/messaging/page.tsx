@@ -8,17 +8,15 @@ const supabase = createClient();
 import {useRouter, useSearchParams} from 'next/navigation';
 import {getUserId} from "@components/UserDisplay";
 
-const ChatApp: React.FC = () => {
-    const [selectedContact, setSelectedContact] = useState<any | null>(null); // Holds the current selected contact
-    const isMobile = useIsMobile();
+const MessagingContent: React.FC = () => {
+    const [selectedContact, setSelectedContact] = useState<any | null>(null);
     const searchParams = useSearchParams();
     const router = useRouter();
+    const isMobile = useIsMobile();
 
     useEffect(() => {
-
         const matchedId = searchParams.get('matchedId');
         if (matchedId) {
-            // Fetch contact details for the given matchId
             const fetchContact = async () => {
                 const { data, error } = await supabase
                     .from('users')
@@ -35,29 +33,10 @@ const ChatApp: React.FC = () => {
 
             fetchContact();
         }
-    }, [searchParams]); // Re-run if query parameters change
-
-    // Mark all messages from the selected contact as read when a chat is opened
-    useEffect(() => {
-        const markMessagesAsRead = async () => {
-            if (selectedContact) {
-                const { error } = await supabase
-                    .from('message')
-                    .update({ is_read: true }) // Set is_read to true
-                    .eq('receiver', getUserId()) // Current user is the receiver
-                    .eq('sender', selectedContact.id); // Messages from the selected contact
-
-                if (error) {
-                    console.error('Error marking messages as read:', error);
-                }
-            }
-        };
-
-        markMessagesAsRead();
-    }, [selectedContact]); // Run this effect when selectedContact changes
+    }, [searchParams]);
 
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <>
             {isMobile ? (
                 <div className="flex h-screen bg-[hsl(10,100%,90%)]">
                     <div className="max-w-fit p-10">
@@ -85,9 +64,16 @@ const ChatApp: React.FC = () => {
                     </div>
                 </div>
             )}
-        </Suspense>
+        </>
     );
 };
+
+// Main Component with Suspense
+const ChatApp: React.FC = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <MessagingContent />
+    </Suspense>
+);
 
 const Sidebar: React.FC<{ onSelectContact: (contact: any) => void }> = ({ onSelectContact }) => {
     const [matches, setMatches] = useState<any[]>([]); // Matched contacts
@@ -279,7 +265,8 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     .select('*')
                     .or(
                         `and(sender.eq.${senderId},receiver.eq.${receiverId}),and(sender.eq.${receiverId},receiver.eq.${senderId})`
-                    );
+                    )
+                    .order('time_stamp', { ascending: true });
 
                 if (error) {
                     console.error('Error fetching messages:', error);
@@ -313,7 +300,12 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
                     const newMessage = payload.new;
 
                     // Add the new message to the state
-                    setMessages((prevMessages) => [...prevMessages, newMessage]);
+                    setMessages((prevMessages) =>
+                        [...prevMessages, newMessage].sort(
+                            (a, b) =>
+                                new Date(a.time_stamp).getTime() - new Date(b.time_stamp).getTime()
+                        )
+                    );
                 }
             )
             .subscribe();
@@ -323,6 +315,7 @@ const ChatSection: React.FC<{ selectedContact: any }> = ({ selectedContact }) =>
             supabase.removeChannel(channel);
         };
     }, [senderId, receiverId]);
+
 
     // Scroll to the bottom of the chat whenever messages update
     useEffect(() => {
