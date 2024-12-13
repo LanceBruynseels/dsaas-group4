@@ -101,18 +101,6 @@ export default function SearchSettings({ filterData, userId, sliderAgeRange }: S
                 defaultValue={[sliderAgeRange.min_age, sliderAgeRange.max_age]}
                 user_id={userId}
             />
-            <div className="mb-4">
-                <SliderSettings
-                    label="Afstand tot anderen"
-                    unit="km"
-                    min={5}
-                    max={30}
-                    defaultValue={filterData.data.distance || 15}
-                    userId={userId}
-                    sliderColor="#771D1D"
-                    table="search_distance"
-                />
-            </div>
         </>
     );
 

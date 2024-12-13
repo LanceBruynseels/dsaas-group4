@@ -140,20 +140,6 @@ const SettingsPage = async () => {
                             labelField="religion"
                             user_id={user_id}
                         />
-
-                        {/* Sliders */}
-                        <div className="flex flex-col w-full mt-6 px-6 sm:px-20">
-                            <SliderSettings
-                                label="Afstand tot anderen"
-                                unit="km"
-                                min={5}
-                                max={30}
-                                defaultValue={profile_data.distance || 15}
-                                userId={user_id}
-                                sliderColor="#771D1D"
-                                table={""}
-                            />
-                        </div>
                     </div>
                 </div>
             </div>
