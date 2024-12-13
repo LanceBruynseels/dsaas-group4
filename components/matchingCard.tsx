@@ -147,7 +147,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                                 nieuwe
                                 match!</h2>
                             <button onClick={refreshMatches}>
-                                <svg className="w-[48px] h-[48px] text-gray-800 dark:text-white" aria-hidden="true"
+                                <svg className="w-[48px] h-[48px] text-red-800 dark:text-white" aria-hidden="true"
                                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                      viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -234,22 +234,32 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                             >
                                 <path
                                     strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 6.75l.002 5.378a2.625 2.625 0 11-2.382 0V6.75m7.5 8.25a6.375 6.375 0 10-12.75 0"
-                            />
-                        </svg>
-                        <h2 className="text-2xl font-semibold text-red-800 mb-2">
-                            Geen Matches Gevonden
-                        </h2>
-                        <p className="text-red-700 text-center">
-                            Probeer andere zoek instellingen of kom later terug. Wij werken er
-                            aan om u perfecte match te vinden!
-                        </p>
+                                    strokeLinejoin="round"
+                                    d="M12 6.75l.002 5.378a2.625 2.625 0 11-2.382 0V6.75m7.5 8.25a6.375 6.375 0 10-12.75 0"
+                                />
+                            </svg>
+                            <h2 className="text-2xl font-semibold text-red-800 mb-2">
+                                Geen Matches Gevonden
+                            </h2>
+
+                            <p className="text-red-700 text-center">
+                                Probeer andere zoek instellingen of kom later terug. Wij werken er
+                                aan om u perfecte match te vinden!
+                            </p>
+                            <button className={"mt-8"} onClick={refreshMatches}>
+                                <svg className="w-[48px] h-[48px] text-red-800 dark:text-white" aria-hidden="true"
+                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                     viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2.3"
+                                          d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                </div>
                 )
             )}
-            </Suspense>
+        </Suspense>
 
         </>
     );
