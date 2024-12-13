@@ -395,7 +395,7 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                         <div className="mt-4">
                             <h3 className="font-semibold">Is er iemand betrokken?</h3>
                             <ul className="list-disc pl-5 space-y-2 max-h-40 overflow-y-auto">
-                                {filteredPeople.slice(0, 5).map((user, index) => (
+                                {filteredPeople.map((user, index) => (
                                     <li key={index} className="flex items-center gap-2">
                                         <input
                                             type="checkbox"
@@ -406,11 +406,6 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
                                         <span>{user.username}</span>
                                     </li>
                                 ))}
-                                {filteredPeople.length > 5 && (
-                                    <li className="text-gray-500 text-sm">
-                                        Blader omhoog of omlaag voor meer gebruikers...
-                                    </li>
-                                )}
                             </ul>
                         </div>
 
