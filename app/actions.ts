@@ -93,6 +93,57 @@ export const signUpAction = async (formData: FormData) => {
     );
 };
 
+
+export const signBuyerUpAction = async (formData: FormData) => {
+  const email = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+  const displayName = formData.get("displayName")?.toString();
+  const subscriptionID = formData.get("subscriptionID")?.toString();
+  const institution = formData.get("institution")?.toString();
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  if (!email || !password) {
+    return encodedRedirect(
+        "error",
+        "/SubscriptionOverview",
+        "Email, password and access code are required",
+    );
+  }
+
+  if (!password || password.length < 8) {
+    return encodedRedirect(
+        "error",
+        "/SubscriptionOverview",
+        "Het wachtwoord moet minstens 8 tekens bevatten.",
+    );
+  }
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      //emailRedirectTo: `${origin}/auth/callback`,
+      data: {
+        display_name: displayName,
+        role: "buyer",
+        institution: institution,
+        subID: {subscriptionID},
+        // institution: accessCodeData.institution  // institution msg
+      }
+    },
+  });
+  console.log("ikbenhier");
+  if (error) {
+    console.error(error.code + " " + error.message);
+    return encodedRedirect(
+        "error",
+        "/",
+        error.message
+    );
+  } 
+};
+
 export const signInAction = async (formData: FormData) => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;

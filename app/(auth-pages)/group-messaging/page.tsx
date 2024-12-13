@@ -315,7 +315,7 @@ const ChatHeader: React.FC<{ selectedGroupChat: { id: number; title: string; ima
         try {
             const insertPromises = selectedUsers.map(user =>
                 supabase
-                    .from('reports')
+                    .from('groupreports')
                     .insert({
                         description: problemDescription,
                         user_id: user.user_id,
