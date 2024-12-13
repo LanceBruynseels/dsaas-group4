@@ -21,12 +21,19 @@ export const getUserId = () => {
     return session?.user?.id;
 };
 const UserDisplay = () => {
+    const { data: session, status } = useSession();
     const [user, setUser] = useState<User | null>(null);
     const [picture, setPicture] = useState<string | null>(null); // Explicitly typed as string | null
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUser = async () => {
+            if (status !== "authenticated") {
+                // Exit if the user is not logged in
+                setLoading(false);
+                return;
+            }
+
             try {
                 const res = await fetch("/api/user");
                 if (!res.ok) {
@@ -48,7 +55,7 @@ const UserDisplay = () => {
         };
 
         fetchUser();
-    }, []);
+    }, [status]);
 
     if (loading) {
         return (

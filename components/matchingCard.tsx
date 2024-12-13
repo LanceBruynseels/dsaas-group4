@@ -166,7 +166,7 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                                     />
                                 </div>
                             ) : (
-                                <p>No matches found</p>
+                                <p>Geen Matches Gevonden</p>
                             )}
                             {/*Right Info Section for larger screens */}
                             <div
@@ -239,11 +239,11 @@ export default function MatchingCard({ userId}: MatchingUserProps) {
                             />
                         </svg>
                         <h2 className="text-2xl font-semibold text-red-800 mb-2">
-                            No Matches Found
+                            Geen Matches Gevonden
                         </h2>
                         <p className="text-red-700 text-center">
-                            Try adjusting your search settings or come back later. We’re always
-                            working to find the best matches for you!
+                            Probeer andere zoek instellingen of kom later terug. Wij werken er
+                            aan om u perfecte match te vinden!
                         </p>
                     </div>
                 </div>
