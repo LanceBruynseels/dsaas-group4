@@ -40,13 +40,13 @@ export const updateSession = async (request: NextRequest) => {
     const user = await supabase.auth.getUser();
 
     // protected routes
-    if (request.nextUrl.pathname.startsWith("/home") && user.error) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
+    // if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
+    //   return NextResponse.redirect(new URL("/sign-in", request.url));
+    // }
 
-    if (request.nextUrl.pathname === "/home" && !user.error) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+    // if (request.nextUrl.pathname === "/home" && !user.error) {
+    //   return NextResponse.redirect(new URL("/", request.url));
+    // }
 
     return response;
   } catch (e) {
